@@ -1,0 +1,906 @@
+2013-06-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Use AC_CONFIG_HEADER, not AM_CONFIG_HEADER.
+	Replace use of obsolete AM_PROG_CC_STDC and am_cv_prog_cc_stdc.
+
+2013-03-30  Niels Möller  <nisse@lysator.liu.se>
+
+	From Magnus Holmgren's debian patches. Adapt to nettle-2.1.
+	* verify.c (spki_verify_dsa): Adapted to new DSA interface.
+
+	* testsuite/Makefile.am (LDADD): Added -lhogweed.
+	* tools/Makefile.am (LDADD): Likewise.
+
+2005-11-25  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Use -Wno-pointer-sign when compiling with gcc-4.x.
+
+2004-11-18  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/Makefile.am (CLEANFILES): Delete test.canonical.
+
+	* testsuite/delegate-test: Don't use cmp -, use a temporary file
+	instead.
+	* testsuite/reduce-test: Likewise.
+
+2004-11-16  Niels Möller  <nisse@lysator.liu.se>
+
+	* Deleted getopt.c, getopt.h and getopt1.c from the CVS tree. Link
+	them from shared copies in lsh/misc instead.
+
+2004-03-20  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Use AC_CONFIG_AUX_DIR([.]).
+
+2004-03-01  Niels Möller  <niels@s3.kth.se>
+
+	* configure.ac: Check for gmtime_r.
+
+	* certificate.c (spki_date_from_time_t): Use gmtime, if gmtime_r
+	isn't available.
+
+2004-02-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: No spaces after -I and -L flags.
+
+2004-01-31  Niels Möller  <nisse@lysator.liu.se>
+
+	* tag.c: Comment fixes.
+	(spki_tag_compile): In the SPKI_TAG_LIST case, check for
+	spki_tag_compile_list returning NULL.
+	(spki_tag_list_alloc): Minor reorganization of failure case.
+
+2004-01-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* Makefile.am (AM_CPPFLAGS): Added -I../nettle. Needed to find the
+	nettle-types.h include file when building outside of the source
+	directory.
+	* testsuite/Makefile.am (AM_CPPFLAGS): Added -I../../nettle.
+	* tools/Makefile.am (AM_CPPFLAGS): Likewise.
+
+2003-05-18  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* Changed include file ordering, to follow the same conventions as
+	lsh and nettle: .c-files include config.h first, then system
+	files, and finally spki files. .h-files never include config.h,
+	and they include system files before spki files. 
+
+	* configure.ac: Use LSH_FUNC_ALLOCA.
+
+2003-04-11  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/Makefile.am (distclean-local, CLEANFILES): Delete
+	files and directories used by the tests.
+
+2003-04-08  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/delegate-test: Use $srcdir when referring to the test
+	keys. 
+	* testsuite/make-signature-test: Likewise.
+
+2003-03-11  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/Makefile.am (TS_SH): Added reduce-test.
+
+	* testsuite/reduce-test: Use advanced syntax for the input.
+
+	* testsuite/reduce-test: New testcase.
+
+	* certificate.c (parse_sequence): Changed return type to int.
+	Instead use a new struct spki_5_tuple_list ** argument for
+	returning the list. The pint is to support sequences of the form
+	(sequence (public-key ...)) that implies a subject, but result in
+	an empty 5-tuple list.
+	(spki_parse_sequence): Likewise.
+	(spki_parse_sequence_no_signatures): Likewise.
+	* testsuite/cdsa-reduce-test.c (test_main): Adapted to new
+	spki_parse_sequence_no_signatures.
+	* tools/spki-delegate.c (process_sequence): Adapted to new
+	spki_parse_sequence.
+	* tools/spki-reduce.c (process_sequence): Likewise.
+
+	* certificate.c (parse_sequence): New helper function, dealing
+	with both the signature and non signature cases.
+	(spki_parse_sequence, spki_parse_sequence_no_signatures): Wrappers
+	around parse_sequence.
+
+	* index.html: Updated JSDSI link.
+
+	* testsuite/Makefile.am (EXTRA_DIST): Added the setup-env script.
+
+2003-03-10  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* index.css: Stylesheet for index.html.
+
+2003-03-10  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/delegate-test (check_sexp): Use full path to
+	sexp-conv. 
+
+2003-03-10  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/Makefile.am (EXTRA_DIST): Added key-1.pub, key2 and
+	key2.pub. 
+
+	* testsuite/key-2.pub, testsuite/key-2: One more test key.
+
+	* testsuite/delegate-test: Include delegation flag in the ACL.
+	Test certificate creation. Test spki-reduce.
+
+	* tag.c (spki_tag_format): Fixed formatting functions, and updated
+	it to use current sexp_format features. Seems to work now.
+
+	* certificate.c (spki_parse_sequence): Must call spki_parse_type
+	to enter hash expression. Fixed missing assignment to ISSUER.
+	(spki_acl_format): Include tag expression in output.
+
+	* parse.c (spki_parse_hash): Check that the expression type is
+	right.
+
+	* tools/misc.c (read_file, read_file_by_name): Interchanged return
+	value and *buffer argument, now returns a char * and uses an
+	unsigned * argument for the length. Updated callers.
+
+	* tools/Makefile.am (noinst_PROGRAMS): Added spki-delegate and
+	spki-reduce. 
+
+	* tools/spki-reduce.c: New program.
+
+	* tools/spki-delegate.c: Implemented creation of acls and chained
+	certificates. The latter not yet tested, though.
+
+	* certificate.c (spki_parse_sequence_no_signatures): Use const for
+	the subject argument. Call spki_principal_normalize before
+	returning. 
+	(spki_hash_verify): New function.
+	(spki_parse_sequence): Implemented signature checks.
+
+	* testsuite/cdsa-reduce-test.c (test_main): const-declare subject. 
+
+	* testsuite/Makefile.am (TS_SH): Added delegate-test.
+
+	* testsuite/delegate-test: New testcase.
+
+	* testsuite/setup-env: New script.
+
+	* testsuite/Makefile.am (EXTRA_DIST): Added key-1.
+
+2003-03-09  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tools/Makefile.am (noinst_PROGRAMS): Added spki-delegate.
+	(EXTRA_DIST): Added sign.h.
+
+	* tools/spki-delegate.c: New program.
+
+	* testsuite/Makefile.am (TS_SH): Added make-signature-test.
+
+	* testsuite/key-1, testsuite/key-1.pub: Key used by testsuite.
+
+	* testsuite/make-signature-test: New testcase.
+
+	* tools/Makefile.am (spki_make_signature_SOURCES): Need to link
+	with sign.o.
+
+	* tools/spki-make-signature.c (main): Code moved to sign.c. Use
+	the new function spki_sign_digest.
+
+	* tools/sign.c, tools/sign.h: New files.
+
+	* names.c (spki_type_names): Use const for spki_type_names.
+
+2003-02-24  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/Makefile.am (EXTRA_DIST): Use dist_cdsa, and include
+	.dist_cdsa. 
+
+	* testsuite/.dist_cdsa (dist_cdsa): New file, listing distribution
+	files. 
+
+2003-02-23  Niels Moller  <nisse@carduelis>
+
+	* configure.ac: Use LSH_GCC_ATTRIBUTES.
+
+2003-02-19  Niels Möller  <nisse@cuckoo.hack.org>
+
+ 	* acinclude.m4: Deleted file from cvs, use a link to lsh's
+	acinclude.m4 instead.
+
+2003-02-17  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tools/Makefile.am (EXTRA_DIST): Added getopt.c and getopt1.c. 
+
+2003-02-16  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tools/Makefile.am (LDADD): Added getopt.o and getopt1.o
+	(EXTRA_DIST): Added getopt.h.
+
+2003-02-13  Niels Möller  <niels@s3.kth.se>
+
+	* README: Wrote down an SPKI overview and some ideas on how to
+	organize the information in the file system.
+
+2003-02-12  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/check-signature-test (test_valid, test_invalid):
+	Optionally take three arguments, where the second is the data
+	being signed. Added two new tests, with correct and incorrect
+	input for the RSA signature verification.
+
+	* tools/spki-check-signature.c (parse_options): New function.
+	(main): By default, read and hash stdin, and compare with the hash
+	in the signature. New option --no-data to omit this check.
+
+	* tools/spki-make-signature.c (die, xalloc): Moved functions to
+	misc.c. 
+
+	* tools/Makefile.am (LDADD): Added misc.o
+	(EXTRA_DIST): List misc.c and mish.h.
+
+	* tools/misc.c: Renamed io.c to misc.c. New function xalloc.
+	Changed function hash_file, updated callers.
+
+	* tools/Makefile.am (spki_make_signature_SOURCES): Added io.h.
+
+2003-02-11  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* Makefile.am (libspki_a_SOURCES): Added names.c.
+	Removed $(srcdir) prefix from targets.
+
+	* tools/Makefile.am (noinst_PROGRAMS): Added spki-make-signature.
+
+	* tools/spki-make-signature.c: New program.
+
+	* tools/io.c: New file.
+	(hash_file, read_file, read_file_by_name, write_file): New
+	functions. 
+
+	* tools/getopt1.c, tools/getopt.h, tools/getopt.c: New files.
+
+	* testsuite/check-signature-test: New rsa tests, replacing the
+	broken ones from the spki draft.
+
+	* spki-types.in: Added private-key.
+
+	* process-types: For the names file, output only the intializer,
+	not the declaration header.
+
+	* parse.c (spki_parse_fail): Made function non-static.
+
+	* certificate.h (struct spki_type_name): New struct.
+
+	* parse-transport.c (spki_transport_iterator_first): New file, new
+	function. 
+
+	* names.c: New file, including spki-type-names.h.
+
+2003-02-06  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/Makefile.am (DISTCLEANFILES): Delete test.in.
+
+2003-02-05  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/check-signature-test: Made function definitions
+	sh-compatible.  
+
+	* process-types (length): New function. Solaris' expr seems not to
+	understand length.
+
+	* acinclude.m4, configure.ac: Copied handling of --with-lib-path,
+	--with-include-path, and -R flags, from Nettle.
+
+2003-01-30  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/Makefile.am (TS_SH): Added check-signature-test.
+
+	* testsuite/check-signature-test: Commented out the first rsa
+	signature test. Appearantly, the sample signature in the spki
+	draft doesn't get the pkcs#1 padding right. For the tests with
+	truncated hashes, fixed the base64 code to be valid, with no
+	leftover bits.
+
+2003-01-29  Niels Möller  <niels@s3.kth.se>
+
+	* verify.c (spki_verify): Don't call spki_parse_type for the
+	signature. 
+
+	* testsuite/check-signature-test: Write input to test.in.
+
+2003-01-29  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* configure.ac (AC_OUTPUT): Generate tools/Makefile.
+
+	* Makefile.am (SUBDIRS): Added tools subdirectory.
+
+	* testsuite/check-signature-test: New testcase. Not yet enabled by
+	default. 
+
+	* tools/spki-check-signature.c: New program.
+
+	* verify.c (spki_verify): Take a struct spki_hash_value as
+	argument. 
+
+2003-01-28  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* parse.h (struct spki_hash_value): New struct.
+
+	* parse.c (spki_parse_hash): New function.
+	(spki_parse_principal): Use it.
+
+2003-01-27  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* spki-types.in: New keywords rsa-pkcs1-md5, rsa-pkcs1-sha1,
+	dsa-sha1. 
+
+	* certificate.c (spki_parse_sequence): New function (#if:ed out
+	for now).
+
+	* certificate.h: Include "spki-types.h". This should be the only
+	file including that. Removed the include in parse.h.
+
+	* verify.c (spki_verify): New file, new function.
+
+2003-01-23  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* parse.c (spki_parse_string): Made non-static.
+
+2003-01-22  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/testutils.c (read_acl): Use spki_acl_process.
+
+	* testsuite/lookup-acl-test.c (test_main): Updated to use
+	spki_5_tuple_list. 
+
+	* testsuite/cdsa-reduce-test.c (filter_by_tag): Rewritten to be
+	used with spki_5_tuple_list_filter.
+	(filter_by_subject): Likewise.
+	(filter_by_date): Likewise.
+	(test_main): Updated to use spki_5_tuple_list.
+
+	* reduce.c (reduce_with_list): Now results in zero or more
+	certificates, that are consed onto the "known" list.
+	(spki_5_tuple_reduce): Adapted to use spki_5_tuple_list.
+
+	* parse.c (spki_parse_acl): Moved function. Was
+	certificate.c:spki_acl_parse. 
+
+	* certificate.c (spki_5_tuple_init): Initialize refs to zero.
+	(spki_5_tuple_cons_new): New function.
+	(spki_5_tuple_list_release): New function. Replaces
+	spki_5_tuple_free_chain. 
+	(spki_5_tuple_list_nappend): New function.
+	(spki_5_tuple_list_nreverse): New function.
+	(spki_5_tuple_list_filter): New function.
+	(spki_5_tuple_by_subject_next): Renamed function. Was
+	spki_5_tuple_by_subject. Added spki_5_tuple_list ** argument, used
+	as an iterator.
+	(spki_acl_by_subject_first): Added iterator argument.
+	(spki_5_tuple_by_authorization_next): Renamed, was acl_by_auth.
+	Made non-static.
+	(spki_acl_by_authorization_first): Added iterator argument.
+	(spki_acl_process): New function, replacing spki_acl_parse.
+	(format_valid): Use const argument.
+	(spki_acl_format): Use a spki_5_tuple_list argument.
+	(spki_parse_sequence_no_signatures): Renamed function, was
+	spki_process_sequence_no_signatures. Now returns a
+	spki_5_tuple_list. 
+
+	* certificate.h (struct spki_5_tuple): Deleted attribute next.
+	Added a reference counter.
+	(struct spki_5_tuple_list): New struct.
+	(struct spki_acl_db): Renamed attribute first_acl to acl. Now
+	points at a spki_5_tuple_list.
+
+2003-01-20  Niels Möller  <niels@s3.kth.se>
+
+	* Makefile.am (EXTRA_DIST): Distribute process-types.
+
+2003-01-16  Niels Möller  <niels@s3.kth.se>
+
+	* Makefile.am (libspki_a_SOURCES): Added header files, to get them
+	included in the dist.
+
+2003-01-14  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/Makefile.am (EXTRA_DIST): Fixed file list. Also
+	include *.in and *.out from the cdsa-cases subdirectory.
+	(EXTRA_DIST): Added an explicit list of the files in cdsa-cases.
+	Really ugly.
+
+2003-01-14  Niels Möller  <nisse@lysator.liu.se>
+
+	* .bootstrap: Must invoke autoheader before automake.
+
+2003-01-10  Niels Möller  <niels@s3.kth.se>
+
+	* parse.c (spki_parse_principal): Deleted the final calls to
+	spki_parse_end.
+	(spki_parse_subject, spki_parse_issuer): Call spki_parse_end.
+
+	* certificate.c (spki_tag_free): New function.
+	(spki_5_tuple_free_chain): ...Use it.
+
+2003-01-09  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* certificate.c (spki_acl_parse): Use spki_check_type.
+	(spki_process_sequence_no_signatures): Likewise.
+
+	* parse.c (spki_check_type): New function. Now used in most places
+	that check the type of an expression and then enters it.
+
+2003-01-08  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/lookup-acl-test.c (test_main): Added some tests for
+	spki_acl_by_subject_first and spki_acl_by_subject_next.
+
+	* testsuite/cdsa-reduce-test.c (filter_by_subject): Use
+	spki_parse_subject. 
+
+	* parse.c (spki_parse_principal): Parse just the contents of the
+	key or hash expression, not the containing subject or issuer
+	expression. 
+	(spki_parse_subject, spki_parse_issuer): New functions.
+	(spki_parse_acl_entry): Use spki_parse_subject.
+	(spki_parse_cert): Use spki_parse_subject and spki_parse_issuer.
+
+	* certificate.h (struct spki_principal): New field verifier, for
+	use by the application.
+
+	* certificate.c (spki_principal_add_key): Initialize verifier
+	field. 
+	(spki_principal_add_md5, spki_principal_add_sha1): Likewise.
+	(spki_5_tuple_by_subject): Moved function from reduce.c, and made
+	non-static. 
+	(spki_acl_by_subject_first): New function.
+	(spki_acl_by_subject_next): New function.
+
+	* reduce.c (spki_5_tuple_by_subject): Moved function to
+	certificate.c. 
+
+2003-01-02  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tag.c (spki_tag_compile): For the unsupported tag type "range",
+	return NULL instead of abort().
+
+2002-12-04  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/cdsa-reduce-test.c (read_file): Check return value of
+	fopen. 
+
+	* tag.c (list_intersect): Must call spki_tag_dup on the tags, when
+	copying the tail fo the list.
+
+2002-12-04  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tag.c (atom_prefix): Fixed assertion.
+	(spki_tag_intersect): The ordering of a and b (with a having the
+	"widest" type) was wrong.
+
+	* reduce.c (spki_5_tuple_by_subject): Use spki_principal_normalize
+	for comparisons. 
+
+	* parse.c (spki_parse_fail): New function. Changed all parser
+	functons to use it when they fail.
+	(spki_parse_principal): Changed to parse a complete subject or
+	issuer subexpression.
+	(spki_parse_acl_entry): Use new spki_parse_principal.
+	(spki_parse_cert): Likewise.
+	(spki_parse_tag): Don't assert that expression is of the right
+	type, simply call spki_parse_fail.
+
+	* certificate.c (spki_principal_normalize): New function, to be
+	used when comparing principals.
+	(spki_5_tuple_fix_aliases): #if:ed out this function, as it didn't
+	seem robust enough. Also #if:ed out all uses.
+
+	* testsuite/Makefile.am (TS_PROGS): Added cdsa-reduce-test.
+
+	* testsuite/cdsa-reduce-test.c (filter_by_tag, filter_by_subject)
+	(filter_by_date): New functions.
+	(test_main): Process the red-test filter expressions. Omit some
+	tests that seem broken, or use features that we haven't
+	implemented yet. Don't ASSERT that the resulting 5-tuple list is
+	non-empty, some test cases result in empty lists.
+
+2002-12-03  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/cdsa-reduce-test.c: New test program, using cdsa tests.
+
+	* testsuite/cdsa-cases: New directory with test cases snarfed from
+	cdsa. 
+
+2002-11-27  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/lookup-acl-test.c (test_main): Updated for new acl
+	syntax. 
+	* testsuite/read-acl-test.c (test_main): Likewise.
+
+	* testsuite/read-cert-test.c (test_main): Need to initialize the
+	cert. 
+
+	* tag.c (list_format, spki_tag_format): New functions.
+
+	* certificate.c (spki_acl_clear): New function.
+	(spki_principal_add_keyspki_principal_add_md5,
+	spki_principal_add_sha1): Initialize alias field. 
+	(HASH_MATCH): New macro.
+	(spki_principal_fix_aliases): New function.
+	(spki_principal_by_key): Setup alias pointers if we add a key for
+	which a hash is already known.
+	(spki_principal_free_chain): New function.
+	(spki_5_tuple_init): New function.
+	(spki_5_tuple_fix_aliases): New function.
+	(spki_acl_parse): Call spki_5_tuple_fix_aliases before returning.
+	(format_valid, spki_acl_format): New functions.
+	(spki_process_sequence_no_signatures): Bug fix in looping over the
+	sequence. Call spki_5_tuple_fix_aliases before returning.
+	(spki_date_since_ever): Represent a time far ago.
+	(spki_date_for_ever): Represent a time far into the future.
+
+	* certificate.h (struct spki_principal): New field, alias.
+	(spki_date_since_ever, spki_date_for_ever): New constant globals. 
+	(SPKI_DATE_CMP): New macro.
+
+	* Makefile.am (libspki_a_SOURCES): Added reduce.c.
+
+	* reduce.c: New file.
+	(spki_5_tuple_reduce): New function.
+
+	* parse.c (spki_iterator_first_sexp): New function, an alternative
+	initializer.
+	(spki_parse_acl_entry): Deleted initialization, the caller should
+	initialize the 5-tuple. Updated the syntax to include a real
+	subject expression.
+	(spki_parse_cert): Deleted initialization, the caller should
+	initialize the 5-tuple. Fixed syntax check of subject expressions. 
+
+2002-11-27  Niels Möller  <niels@s3.kth.se>
+
+	* index.html: New file.
+
+2002-11-22  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tag.c (enum spki_tag_type): Reordered types, ordered from more
+	inclusive to less inclusive.
+	(spki_tag_intersect): New function.
+
+2002-11-22  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/tag-test.c (test_main): Enabled more tests, for
+	set/set inclusions.
+
+	* testsuite/lookup-acl-test.c (test_main): Adapted to changed
+	spki_acl_by_authorization_first and
+	spki_acl_by_authorization_next. 
+
+	* testsuite/testutils.c (make_tag, release_tag): New functions.
+
+	* certificate.h (struct spki_acl_db): Use nettle_realloc_func for
+	custom allocation.
+
+	* certificate.c (spki_realloc): Deleted function.
+	(spki_acl_init): Use nettle_realloc.
+	(acl_by_auth): Take a struct spki_tag argument.
+	(spki_acl_by_authorization_next): Likewise.
+	(spki_acl_by_authorization_first): Likewise.
+	(spki_5_tuple_free_chain): Use spki_tag_release.
+
+	* parse.c (spki_check_type): Deleted function.
+	(spki_next_subexpr): Deleted function.
+	(spki_parse_tag): Use spki_tag_compile to convert tag to internal
+	representation. 
+
+	* tag.c (string_equal, string_prefix): New functions.
+	(tag_list, tag_atom, tag_range): New functions, isolating type
+	casts. Replaced typecasts in the rest of the code with function
+	calls.
+	(spki_tag_set_new): Normalize sets with a single element. 
+	(spki_tag_compile): Get the tag expressions in a list in the right
+	order. 
+	(spki_tag_from_sexp): New function.
+	(atom_prefix): New function.
+	(atom_equal): Change dto use new string type.
+	(set_includes, list_includes, spki_tag_includes): Rewrote to work
+	with the tree representation of tags, rather than with plain strings.
+
+	* tag.c (struct spki_tag_range): Removed const.
+	(spki_tag_compile): Removed const.
+	(spki_tag_compile): Cast &spki_tag_any to a non-const pointer when
+	returning it. 
+	(spki_cons_nreverse): New function.
+	(spki_tag_set_new): New function, normalizing sets inside sets.
+	Also reordered functions, putting operations on strings and lists
+	first. 
+
+2002-11-22  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/tag-test.c (test_main): Added more tests.
+
+	* tag.c (struct spki_tag, struct spki_cons, struct spki_string):
+	New structs, used for representing a tag. Strings and tags are
+	reference counted. Added a set of contructors and book-keeping
+	functions. 
+	(enum spki_range_type): New enum.
+	(spki_tag_classify): An list must start with a string.
+	(spki_tag_compile): New function.
+	(spki_tag_release): New function.
+
+	* tag.c (set_includes): Fixed recovery if matching fails in the
+	middle of one of the elements.
+	(spki_tag_includes): For SPKI_TAG_ANY, advance past the (*)
+	expression.
+
+2002-11-21  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/testutils.h: Include tag.h.
+
+	* testsuite/Makefile.am (TS_PROGS): Added tag-test.
+
+	* testsuite/tag-test.c: Test cases for operations on tags.
+
+2002-11-21  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* tag.c (tag_magic): Deleted function.
+	(spki_tag_classify): New function.
+	(spki_tag_intersect): Started work on intersections, far from
+	finished. 
+
+2002-11-20  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* certificate.c (spki_process_sequence_no_signatures): Process
+	public-key expressions.
+
+	* parse.c (spki_parse_prevexpr): Renamed and made non-static (was
+	spki_last_expression). 
+
+2002-11-19  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* Makefile.am (libspki_a_SOURCES): Added tag.c.
+
+	* certificate.c (acl_by_auth, spki_acl_by_authorization_next) 
+	(spki_acl_by_authorization_first): New functions.
+
+	* tag.c, tag.h: New files.
+
+	* testsuite/Makefile.am (TS_PROGS): Added lookup-acl-test.
+
+	* testsuite/lookup-acl-test.c: New test program, for the
+	spki_acl_by_authorization functions.
+
+	* testsuite/testutils.c (read_acl): New function.
+	* testsuite/read-acl-test.c (test_main): Use it.
+
+2002-11-18  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/testutils.h: Don't include spki-types.h.
+
+	* testsuite/Makefile.am (AM_CPPFLAGS): Fixed obscure bug, we must
+	use AM_CPPFLAGS, not AM_CFLAGS, to get include directories in the
+	right order.
+
+	* process-types: The gperf file should not include spki-types.h.
+
+	* certificate.c (spki_check_type): Deleted function.
+	(spki_acl_parse): Use new parsing conventions.
+	(spki_process_sequence_no_signatures): Likewise.
+	* testsuite/read-acl-test.c (test_main): Likewise.
+	* testsuite/read-cert-test.c (read_cert): Likewise.
+
+	* parse.h (struct spki_iterator): New struct for keeping track of
+	parsing state. Rewrote parsing functions to use it.
+	* parse.c (spki_iterator_first): New function.
+
+	* testsuite/testutils.h: Include more header files.
+
+	* testsuite/read-cert-test.c (read_cert): New function.
+
+	* certificate.c (spki_cert_parse_body): Deleted function (replaced
+	by code in parse.c).
+	(spki_5_tuple_free_chain): New function.
+	(spki_process_sequence_no_signatures): New function.
+
+	* parse.c (spki_parse_cert): New function.
+
+	* spki-types.in: Added do, sequence and signature.
+
+	* Makefile.am (spki-gperf.h, spki-type-names.h, spki-types.h):
+	Changed $(srcdir) handling again.
+
+	* parse.c (spki_parse_acl_entry): New function.
+
+	* certificate.c (parse_acl_entry): Deleted function (moved to
+	parse.c).
+	(spki_acl_parse): Rewrote to use spki_parse_acl_entry.
+
+	* certificate.h (SPKI_MALLOC, SPKI_FREE, SPKI_NEW): New macros,
+	moved from certificate.c.
+
+2002-11-18  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/Makefile.am (TS_PROGS): Added date-test.
+
+	* testsuite/testutils.h: Include string.h.
+
+	* testsuite/read-cert-test.c (test_main): Check the validity
+	information. 
+
+	* testsuite/date-test.c: New file, testing spki_date functions.
+
+	* spki-types.in: Added not-before and not-after.
+
+	* certificate.h (struct spki_struct): New struct, containing a
+	date string. 
+	(struct spki_5_tuple): Use struct spki_date instead of time_t.
+
+	* certificate.c (parse_valid): Deleted placeholder functiom.
+	(parse_version): Deleted function, moved to parse.c.
+	(parse_acl_entry): Use spki_parse_valid and spki_parse_version.
+	(spki_cert_parse_body): Likewise.
+
+	* parse.c (spki_parse_date): New function.
+	(spki_parse_valid): New function.
+	(spki_parse_version): New function.
+
+	* certificate.c (spki_date_from_time_t): New function.
+	(spki_date_cmp_time_t): New function.
+
+2002-11-17  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* configure.ac: Removed RCS id line.
+
+	* certificate.c (spki_dup): Made function non-static.
+	(parse_tag_body): Deleted function.
+	(parse_acl_entry): Follow new parser function conventions. Use
+	spki_parse_tag, spki_parse_skip and spki_parse_end.
+	(spki_acl_parse): Adapt to new conventions.
+	(parse_skip_optional): Deleted function.
+	(spki_cert_parse_body): Use spki_parse_tag.
+
+	* parse.c (spki_parse_skip): New function, replacing
+	certificate.c:parse_skip_optional. 
+	(spki_parse_tag): New function, replacing
+	certificate.c:parse_tag_body. 
+
+	* Makefile.am (libspki_a_SOURCES): Added parse.c.
+
+	* configure.ac: Check for gcc's __attribute__, and use AH_BOTTOM
+	to define UNUSED, NORETURN and PRINTF_STYLE.
+
+	* process-types: Renamed SPKI_TYPE_UNKNOWN to
+	SPKI_TYPE_SYNTAX_ERROR. 
+
+	* parse.h: New file.
+
+	* parse.c: New file.
+	(spki_intern): Moved function here, from certificate.c.
+	(spki_parse_type): Likewise, and renamed from spki_get_type.
+	(spki_parse_end): New function.
+	(spki_parse_principal): New function, replacing...
+	* certificate.c (parse_principal): ... deleted function.
+	(parse_tag): Deleted function.
+	(parse_tag, parse_acl_entry): Rewrite to use spki_parse_principal.
+	(spki_cert_parse_body): Likewise.
+	
+2002-11-16  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/principal-test.c: Use testutils.h
+	* testsuite/read-acl-test.c: Likewise.
+
+	* testsuite/Makefile.am (TS_PROGS): Added read-cert-test.
+	(LDADD): Added testutils.o.
+
+	* testsuite/testutils.c, testsuite/testutils.h: New files.
+
+	* testsuite/read-cert-test.c: New test case.
+
+	* certificate.c (spki_get_type): Return SPKI_TYPE_END_OF_EXPR at
+	end of expression.
+	(parse_tag, parse_tag_body): Split parse_tag into two functions.
+	(parse_valid): Placeholder for real function.
+	(parse_version): New function.
+	(parse_skip_optional): New function.
+	(spki_cert_parse_body): New function.
+	(spki_cert_parse): New function.
+
+	* process-types: New pseudo-type SPKI_TYPE_END_OF_EXPR.
+
+	* spki-types.in: Added cert, dispaly, issuer, issuer-info,
+	subject-info. 
+
+	* testsuite/Makefile.am (check): Set LD_LIBRARY_PATH when running
+	tests. 
+
+	* configure.ac: Check for GMP, and fail if it's not present.
+
+2002-11-15  Niels Möller  <niels@s3.kth.se>
+
+	* testsuite/Makefile.am (AM_LDFLAGS): Need -L../../nettle.
+	(TS_PROGS): Added read-acl-test.
+
+	* testsuite/read-acl-test.c: New test case.
+
+	* testsuite/principal-test.c: Renamed file, was subject-test.c. 
+
+	* certificate.c (hash_data): New function.
+	(spki_principal_add_key): Made static. Use hash_data, and set the
+	flags.
+	(spki_principal_add_md5): New function.
+	(spki_principal_add_sha1): New function.
+	(spki_principal_by_key): Compare hashes. Create new principal if
+	no old one matches.
+	(spki_principal_by_md5): Check flag to see if md5 hash of each
+	principal on the list is known.
+	(spki_principal_by_sha1): Likewise, for sha1.
+	(spki_check_type): Advance iterator past the matched type.
+	(parse_principal): Handle hashes.
+	(parse_tag): New function.
+	(parse_acl_entry): Unlike certificates, subexpressions must come
+	in order, and there's no <subject>-expression.
+	(spki_acl_parse): Fixed version check.
+
+	* certificate.h (struct spki_hashes): New struct.
+	(enum spki_principal_flags): New enum.
+	(struct spki_principal): Use flags to keep track of which hash
+	values are known.
+	(enum spki_5_tuple_flags): Renamed, was spki_flags.
+
+	* spki-types.in: Added "comment" and "valid".
+
+2002-11-14  Niels Möller  <niels@s3.kth.se>
+
+	* spki-types.in: Added types public-key, md5 and sha1.
+
+	* certificate.c (spki_principal_add_key): Deleted code for
+	dynamic allocation of hash digests.
+	(spki_principal_by_md5): New function.
+	(spki_principal_by_sha1): New function.
+	(parse_principal): Implemented handling of public key and hash
+	expressions.
+
+	* certificate.h (struct spki_principal): Store hashes directly in
+	the struct, without pointers.
+
+	* Makefile.am (bootstrap): New target.
+	(spki-types.h, spki-type-names.h, spki-gperf.h): Create files in
+	the source tree. 
+
+2002-11-14  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* certificate.h (struct spki_5_tuple): Renamed (was spki_acl), and
+	added issuer field.
+
+2002-11-13  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* certificate.c: Include automatically generated files.
+	(spki_intern): New function.
+	(spki_get_type): New function.
+	(spki_check_type): New function.
+	(parse_principal): Placeholder for needed function.
+	(parse_acl_entry): New function.
+	(spki_acl_parse): Use parse_acl_entry.
+
+	* Makefile.am: Added rules for process-types and related files.
+
+	* spki-types.in: New file, containing listing spki's magic words.
+
+	* process-types: New file, similar to lsh's process_atoms.
+
+2002-11-13  Niels Möller  <niels@s3.kth.se>
+
+	* certificate.c (spki_acl_parse): New function (not done yet).
+
+	* certificate.h, certificate.c: Fixed terminology, refer to keys
+	as "principals", not "subjects". 
+
+	* Makefile.am (AM_CPPFLAGS): Use $(srcdir).
+	* testsuite/Makefile.am (AM_CFLAGS): Use $(top_srcdir).
+
+	* .bootstrap: Run autoheader before autoconf.
+
+2002-11-13  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* testsuite/subject-test.c: First test case.
+
+	* testsuite/run-tests: Copied from lsh:s testsuite.
+
+	* certificate.c: Implemented basic handling of keys.
+

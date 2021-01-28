@@ -1,0 +1,48 @@
+#! /bin/sh
+
+echo testing lcp
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+[ -x /bin/bash ] || test_skip
+
+spawn_lshd || die "spawn_lshd failed"
+spawn_lsh -G || die "spawn_lsh failed"
+
+rm -rf "$TEST_HOME"/files
+mkdir "$TEST_HOME"/files
+
+LCP_RSH=../lshg
+export LCP_RSH
+LCP="$srcdir/../lcp"
+
+echo foo > lcp-file-1.txt
+echo bar > lcp-file-2.txt
+
+# Copy from local files to remote files
+$LCP lcp-file-1.txt localhost:files || die "lcp failed, 1"
+cmp lcp-file-1.txt "$TEST_HOME/files/lcp-file-1.txt" || die "files differ, 2"
+
+$LCP lcp-file-1.txt localhost:files && die "lcp to existing file succeeded, 3"
+$LCP lcp-file-2.txt localhost:files/lcp-file-1.txt && die "lcp to existing file succeeded, 4"
+$LCP -f lcp-file-2.txt localhost:files/lcp-file-1.txt || die "lcp -f to existing file failed, 5"
+cmp lcp-file-2.txt "$TEST_HOME/files/lcp-file-1.txt" || die "files differ, 6"
+
+# Copy from remote files to local directory
+$LCP localhost:files/lcp-file-1.txt . && die "lcp to existing file succeeded, 11"
+
+echo baz > lcp-file-1.txt
+$LCP -f localhost:files/lcp-file-1.txt . || die "lcp -f to existing file failed, 12"
+
+cmp lcp-file-1.txt "$TEST_HOME/files/lcp-file-1.txt" || die "files differ, 13"
+
+rm -f lcp-file-3.txt
+$LCP localhost:files/lcp-file-1.txt lcp-file-3.txt || die "lcp failed, 14"
+cmp "$TEST_HOME/files/lcp-file-1.txt" lcp-file-3.txt || die "files differ, 15"
+
+test_success
+

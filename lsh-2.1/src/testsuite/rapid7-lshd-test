@@ -1,0 +1,25 @@
+#! /bin/sh
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+PORT=5555
+
+werror "Testing lshd"
+
+spawn_lshd
+
+for f in $srcdir/rapid7-ssh-pdu/*.pdu ; do
+    werror "Testing $f"
+    ./tcpconnect $INTERFACE $PORT < "$f" > /dev/null \
+	|| die "Connect failed"
+
+    kill -0 `cat $PIDFILE` || die "Server died"
+done
+
+werror "Test done"
+
+test_success

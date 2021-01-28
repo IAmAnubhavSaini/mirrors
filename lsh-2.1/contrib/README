@@ -1,0 +1,29 @@
+This "contrib" directory is a collection of code/scripts sent to me by
+contributors around the world. This README file will be kept
+up-to-date from release to release. BUT, we must point out that these
+contributions are really, REALLY UNSUPPORTED. In fact, we probably
+don't even know what some of them really do. We certainly do not
+guarantee to have tried them, or ported them to work with this LSH
+distribution. If you have questions, your best bet is to contact the
+original author.
+
+The LSH author does not maintain these files. However, I'll try to
+keep them updated if I get improved versions from the author of the
+script/code in question.
+
+A table of contents:
+
+	README			This file
+
+	lsh.spec		For building lsh RPM:s.
+	lsh.spec.in		Contributed by Thayne Harbaugh
+				<thayne@northsky.com> 
+
+	lshd.rhlinux.init	Init script for RedHat systems.
+				Contributed by Thayne Harbaugh
+				<thayne@northsky.com> 
+
+	Makefile		Build and autoconf stuff.
+	Makefile.in
+	Makefile.am
+

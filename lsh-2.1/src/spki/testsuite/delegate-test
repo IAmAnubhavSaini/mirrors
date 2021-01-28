@@ -1,0 +1,84 @@
+#! /bin/sh
+
+conv () {
+    sexp-conv -s transport | tee test.in
+}
+
+die () {
+    echo "Test failed:" "$@"
+    exit 1
+}
+
+check_sexp () {
+    file="$1"
+    shift
+    sexp-conv -s canonical > test.canonical || die "sexp-conv failed"
+    cmp "$file" test.canonical || die "$@"
+}
+    
+TAG1='(3:tag(1:*))'
+TAG2='(3:tag3:foo)'
+TAG3='(3:tag(1:*6:prefix1:f))'
+
+../tools/spki-delegate >testhome/.spki/acls \
+    --tag="$TAG3" \
+    --subject="`conv <"$srcdir/key-1.pub"`" \
+    --propagate
+		       
+
+check_sexp testhome/.spki/acls "ACLs differ" <<EOF
+(acl (entry (subject (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT
+                                                     2rVFtkPFIuDaxy8FShF
+                                                     h2LLQhSpONFObSR30MX
+                                                     mKFLgi8vn7RQyqn85bL
+                                                     bqbkRahR|)
+                                                 (e |J4NiEw==|))))
+            (propagate)
+            (tag (* prefix f))))
+EOF
+
+../tools/spki-delegate >testhome/.spki/certificates \
+    --tag="$TAG1" \
+    --issuer="`conv <"$srcdir/key-1.pub"`" \
+    --subject="`conv <"$srcdir/key-2.pub"`" \
+    --key="$srcdir/key-1"
+
+check_sexp testhome/.spki/certificates "Certificates differ" <<EOF
+(sequence (cert (issuer (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9
+                                                        nLT2rVFtkPFIuDax
+                                                        y8FShFh2LLQhSpON
+                                                        FObSR30MXmKFLgi8
+                                                        vn7RQyqn85bLbqbk
+                                                        RahR|)
+                                                    (e |J4NiEw==|))))
+                (subject (public-key (rsa-pkcs1-sha1 (n |CHhQGpcTr5NRPa3
+                                                         P0oVru7buX6i7Dm
+                                                         rwY753vx2i/16sL
+                                                         lAiZqfu/d8kgq4r
+                                                         zJkjznQHD+WC0lK
+                                                         Jmi5sjfyN|)
+                                                     (e |I9gJFw==|))))
+                (tag (*)))
+          (signature (hash sha1
+                           |6xCbBtOWZqh5qlncnO0VaXLi8CY=|)
+                     (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT
+                                                     2rVFtkPFIuDaxy8FShF
+                                                     h2LLQhSpONFObSR30MX
+                                                     mKFLgi8vn7RQyqn85bL
+                                                     bqbkRahR|)
+                                                 (e |J4NiEw==|)))
+                     (rsa-pkcs1-sha1 |BrtIfIPpUC3EjhKe8ha/Ofoy1Orw9YbXGL
+                                      xMSpfGb5j/5ZarnEgnEyzcCC5tK4StQ8Ox
+                                      iTCwfGBCc4i2T9Ng|)))
+EOF
+
+../tools/spki-reduce < testhome/.spki/certificates > test.out \
+    --acl-file=testhome/.spki/acls || die "Reduction failed."
+
+check_sexp test.out <<EOF "Reduction differs"
+(acl (entry (public-key (rsa-pkcs1-sha1 (n |CHhQGpcTr5NRPa3P0oVru7buX6i7
+                                            DmrwY753vx2i/16sLlAiZqfu/d8k
+                                            gq4rzJkjznQHD+WC0lKJmi5sjfyN|)
+                                        (e |I9gJFw==|)))
+            (tag (* prefix f))))
+EOF

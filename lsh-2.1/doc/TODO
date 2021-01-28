@@ -1,0 +1,491 @@
+EXCEPTIONS
+
+When using exceptions in commands like do_request_service, when should
+we use the passed in exception handler, and when should we use the
+handler in the connection struct? Perhaps we should not have any
+connection->e handler at all?
+
+  
+S-EXPRESSIONS
+
+Change the format used for encrypted private key to include the public
+key as well. This way, the private key can be decrypted on-demand.
+This seems cleaner than having the client read both identity and
+identity.pub.
+
+After retiring the complex "streamed" parser, sexp-conv can no longer
+handle arbitrarily large files. That should be fixed some time.
+Perhaps sexp-conv could use a parser of it's own, as that is the only
+program for which it would make sense to understand all features of
+the "advanced" syntax.
+
+
+USERS
+
+Use real ACL:s instead of the authorized keys hack. Implement a
+general user-database abstraction. Also have a look at 'Pluggable Non
+Interactive Authentication Modules' at
+http://www.msu.ru/pniam/pniam.html.
+
+Log a message if user authentication fails because root is not allowed
+to log in.
+
+Create an --telnet-mode/--auth-by-login option to lshd, which will
+accept a none-authentication, but instead of forking a login shell for
+the user, it should fork a /bin/login running as root with options to
+make it display a password prompt.
+
+
+CHARSETS
+
+The conversion from UTF8->unicode->latin1 doesn't handle accented
+characters properly. Probably needs a complete rewrite.
+
+Check out  GNU libidn.
+
+
+CONFIGURATION
+
+Figure out what configuration files we need. 
+
+
+LOGGING
+
+Use syslog to log server startup, shutdown, and user authentication.
+
+
+SERVER ISSUES
+
+For compatibility with other sshd:s and bash, lshd should set some
+more environment variables when starting user processes.
+
+  SSH_CLIENT=<client-ip> <client-port> <server-port>
+  SSH_TTY=<tty-name> (if a pty was allocated)
+  SSH_ORIGINAL_COMMAND
+
+bash looks at SSH_CLIENT, and reads .bashrc if it is set.
+
+The lshd server should register a signal handler, probably for
+SIGTERM, that causes it to close it's listening socket, and exit after
+current connections are gone (or after a timeout).
+
+
+ALLOCATION
+
+Have the allocator initialize all objects automatically.
+
+Consider adding reference counts to strings.
+
+Unify the debug malloc system to add a magic number to every block
+header, with distinct values for space, strings, objects and lists.
+
+
+OBJECT SYSTEM
+
+Better typechecking of non-heap objects. To do this one would also
+need valid isa-pointers in classes (as classes are statically
+allocated). If this is done properly, the meta feature could also be
+cleaned up a little.
+
+Consider adding "const" methods. One such method to use that for is
+ALIST_GET.
+
+Make sure that the first (self) argument to the method-like macros
+never have side effects.
+
+
+CHANNELS
+
+Implement window-change requests on the server side.
+
+Look at client_session.c:do_client_session_eof() and
+server_session.c:do_eof() and see if they can be unified or perhaps
+even deleted.
+
+The CHANNEL_CLOSE_AT_EOF should be enabled by default. It is the
+correct behaviour for all channels except the server side of sessions.
+
+The following bug should be eliminated: I use lshg to get a large
+file,
+
+  src/lshg -v --trace --debug >lsh-test.log.gz sture.lysator.liu.se
+  cat 'incoming/lsh-test.log.gz' 2>lshg.log
+
+The file is 0x614ef9 bytes, but only 0x610000 bytes gets through.
+Looking at the lshg log, the final SSH_MSG_DATA packet(s) is missing,
+so the data is lost either in lsh, or in the remote opensshd.
+
+
+CONTROL LANGUAGE
+
+Improve the tail recursiveness of builtin functions.
+
+
+FORWARDING
+
+Generalize the -L and -R options to
+[<source-ip>:]<source-port>:<target-ip>:<target-port>
+where the first component is optional.
+
+Implement other types of forwarding; ssh-agent, UDP, etc.
+
+Review the naming of functions in tcpforward.c; it appears a little
+inconsistent. 
+
+There's one known bug in lshd's X11 forwarding: It will start sending
+data on the session before the reply to the client's "shell" or "exec"
+request.
+
+
+RANDOMNESS
+
+Look at prngd,
+http://www.aet.tu-cottbus.de/personen/jaenicke/postfix_tls/prngd.html
+(recommended by Oystein Viggen <oysteivi@tihlde.org>), and perhaps
+also at egd.
+
+
+SPKI ISSUES
+
+Use the name "rsa-pkcs1" consistently for all keys, and perhaps
+include the name of the hash function in the signature objects.
+
+Encryption of private keys seems broken, decryption gives the error
+
+  lsh: Unknown encryption algorithm for pkcs5v2.
+  lsh: Decrypting private key failed.
+  
+
+DENIAL OF SERVICE
+
+Implement some limit on the amount of data that may be buffered for
+write on a connection. When the limit is exceeded, the connection
+should be dropped. The problem: if a client connects and sends a lot
+of packets, without ever reading anything from its socket, the server
+will eventually run out of memory.
+
+
+BUILD ISSUES
+
+Have autoconf automatically add -I $prefix/include and -L $prefix/lib ?
+
+Remaking Makefile.am from subdirectories probably cd:s to the wrong
+place, when building outside of the source tree.
+
+Building outside of the source tree creates machine independent
+automatically generated files in the wrong directory (they should be
+in the source tree).
+
+The definition of SBINDIR is broken, in gets the value
+"${exec_prefix}/sbin".
+
+Use separate version.h.in and version.h files, to avoid rebuilding
+everything when the version number is increased.
+
+
+PROTOCOL ISSUES
+
+Update the signal-related messages to conform to
+draft-ietf-secsh-connect-08.txt.
+
+Some SSH Inc sshd server sends USERAUTH_FAILURE messages with a
+trailing ",", like "publickey,password,". Consider hacking
+parse.c:parse_next_atom to allow that.
+
+The server currently allows the client to send random banner text
+before its version string. Such text is not allowed by the protocol
+spec.
+
+Add a timeout, to drop connections that hasn't older than (say) five
+minutes without having authenticated properly.
+
+
+USER INTERFACE ISSUES
+
+Hack do_spki_decrypt() in spki_commands.c to ask again if the provided
+password is incorrect.
+
+Implement an escape char, like ~ with rsh.
+
+The --interface option to lshd can only handle numeric ip addresses.
+
+
+I/O ISSUES
+
+How should we handle POLLERR in io_iter()?
+
+Add a descriptive string to the lsh_fd struct, to aid debugging.
+
+
+TESTING
+
+The testsuite is far from complete. Some parts that it misses are
+
+ * Sending and receiving of SSH_MSG_REQUEST_FAILURE and
+   SSH_MSG_CHANNEL_FAILURE, and handling of the corresponding
+   exceptions.
+
+ * Same for SSH_MSG_CHANNEL_OPEN_FAILURE.
+
+ * All SSH_MSG_CHANNEL_EXTENDED_DATA (i.e. stderr data)
+
+ * i/o exceptions on channels.
+
+ * Failed key exchanges. SRP key exchange.
+
+ * PTY allocation, requests, etc.
+
+ * Userauth banner, failures, passwords,kerberos  password helper.
+
+ * connection_handle_pending(), connection_ignore_handler,
+   connection_fail_handler, connection_unimplemented_handler,
+   connection_forward_handler.
+
+ * Gatewayed channel requests and global requests.
+
+ * lsh-export-key.
+   
+ * sexp-conv with options --select, --*-hash.
+
+ * sexp display types.
+
+ * spki, tag prefix and tag any.
+
+ * Encrypted provate keys.
+
+ * TCP forwarding: cancel-tcpip-forward, various exception.
+
+ * utmp logging.
+
+
+MISC
+
+Try to find out why read() sometimes returns -1 and sets errno==EPIPE,
+on sparc-linux, 2.0.33, redhat-5.1, glibc.
+Note: Debian's sparc port uses glibc2.1, rather than 2.0; maybe Red Hat does
+too? Quite a lot of things have changed between 2.0 and 2.1; this might well
+be a documented feature of 2.1.
+
+"lsh" is already used as the name of a shell (included in Debian;
+Description: Baby Shell for Novices with DOS compatible commands). Perhaps
+we need to change our name?
+
+Make it cleaner wrt. more gcc warnings.
+
+Fix desTest.c to use proper declarations of its function pointers, and
+have autoconf check for rusage().
+
+It seems that it is a little difficult to detect that an asyncronous
+connect() failed; poll() indicates that both reading and writing is
+possible, but write failes (with EPIPE/SIGPIPE) later. Perhaps a
+linux-problem?
+
+Perhaps some of the dh-code in publickey_crypto should be moved to
+keyexchange.c?
+
+Fix the src/symmetric/desTest program. It doesn't complain if the
+desCode is compiled with empty keymap.h, parity.h and rotors.h files.
+
+About POLLHUP:
+
+  I've found something that can either be an io.c or a linux kernel bug.
+  This time it is the poll() system call, which causes troubles. If an
+  AF_UNIX connection is closed by the client, the kernel doesn't set
+  POLLIN in revents, instead it sets only POLLHUP. (and therefore the io
+  backend doesn't read the last zero length packet) The following patch
+  solves the problem for me:
+  
+  -        if (fds[i].revents & POLLIN)
+  -          READ_FD(fd);
+  +        if (fds[i].revents & (POLLIN | POLLHUP))
+  +          READ_FD(fd);
+  
+  jpoll.h doesn't define POLLHUP, so I added a
+  
+  #define POLLHUP         0
+  
+  line there. I seldom use poll() so I don't know what the correct
+  behaviour should be, but I am afraid this is a kernel bug again.
+  
+  --
+  Bazsi
+
+Find out why opening /dev/ptmx failes occasionally (errno = 19, no
+such device).
+
+Add some workaround for the poll()-bug in linux/glibc-2.07 reported by
+Bazsi. Hmm, this is probably not a bug. I have to find out what the
+right way is to handle the poll conditions POLLERR, POLLHUP and
+POLLERR. 
+
+Consider removing the write-attribute from ssh_channel.
+
+Let init_channel take enough arguments to initialize the window- and
+packet-size fields properly. It's too easy to forget them.
+
+Add const to arguments of type struct exception_handler *?
+
+Do something reasonable in do_buffered_read() if want_read is cleared.
+
+The supplied argp is compiled even if it isn't used.
+
+Move miscellaneous lsh_string-functions from format.c to a separate
+file.
+
+Consider moving SPKI tuple-related functions to a separate file.
+
+With SPKI, consider whether or not we should require any specific
+order of subexpressions. The most central function for this is
+sexp_get_un. 
+
+Extend the GABA: (expr ...) constructions with a single parameter
+could be used directly as a command_simple. Extend gaba.scm to do that
+automatically. Extend the (exp ...) construction to take a return
+type, and automatically cast the result to that type.
+
+Add -f, to fork and exit when userauthentication is done and any
+tunneling is set up.
+
+Consider using dynamically allocated strings for exception messages.
+Without this, it is impossible to use non-constant messages, for
+instance messages supplied by the peer.
+
+Try to unify the handling of queued channel requests and global
+requests. 
+
+Get rid of the double close loop in io_iter. Perhaps start using a
+doubly linked list for fds? Add a backend-pointer to fd:s? Use an
+extra stack of fds that should be closed?
+
+If we add the backend field to lsh_fd objects, the code for listen
+could also be simplified, and perhaps we can get rid of the backend
+pointer in some other places as well.
+
+Exceptions from listen are handled badly in several places. 
+
+Should lsh fail if some port forwardings fails? In particular,
+
+  $ lsh -R... -N
+
+is pretty useless if the server doesn't let us bind the remote port.
+
+Add reasonable limits to all calls to parse_bignum(), sexp2bignum_u()
+and sexp_get_un().
+
+There are dsa-specific details in many places, lsh.c
+server_publickey.c, server_authorization.c, server_keyexchange.c. Try
+to write more generic functions that can deal with both dsa and rsa.
+
+Review the default algorithm preference list in
+algorithms.c:default_crypto_algorithms(). Perhaps make the list more
+conservative, and add a "pseudo-algorithm" all to include all
+supported algorithms in the list?
+
+Use static objects for crypto algorithms with fixed key sizes and
+other parameters.
+
+Replace most defines with enums, for improved type checking.
+
+Write more testcases for rsa.
+
+Perhaps change the LOOKUP_VERIFIER method to return an spki_subject?
+
+Make connection_unlock install a callout that calls
+connection_handle_pending(). 
+
+Consider how much we really need to differentiate between
+rsa-pkcs1-sha1 / rsa-pkcs1-md5 and between spki-sign-rsa /
+spki-sign-dss.
+
+Building fails if srp support is disabled. The building of srp-gen
+must be conditionalized.
+
+lshg -L doesn't work. The lsh process dies on the first connection to
+the forwarded port. Hmm. Or rather, it seems that the remote server
+(opensshd) disconnects.
+
+A successful tcp-forwarding (set up using lsh -L... -N):
+
+DEBUG: Sent CHANNEL_OPEN (size 72 = 0x48)
+00000000: 5a0000000c6469726563742d74637069  Z....direct-tcpi
+00000010: 70000000000000271000007f9c000000  p......'........
+00000020: 126b6f6d2e6c797361746f722e6c6975  .kom.lysator.liu
+00000030: 2e73650000131e000000093132372e30  .se........127.0
+00000040: 2e302e3100000dc8                  .0.1....
+
+When using lsh -G -N; lshg -L... -n:
+
+DEBUG: gateway received CHANNEL_OPEN (size 72 = 0x48)
+00000000: 5a0000000c6469726563742d74637069  Z....direct-tcpi
+00000010: 70000000000000271000007f9c000000  p......'........
+00000020: 126b6f6d2e6c797361746f722e6c6975  .kom.lysator.liu
+00000030: 2e73650000131e000000093132372e30  .se........127.0
+00000040: 2e302e3100000dc3                  .0.1....
+
+handle_connection: Received packet of type 90 (CHANNEL_OPEN)
+Allocated local channel number 0
+Allocated local channel number 0
+Registering local channel 0.
+DEBUG: Sent CHANNEL_OPEN (size 29 = 0x1d)
+00000000: 5a0000000c6469726563742d74637069  Z....direct-tcpi
+00000010: 70000000000000271000007f9c        p......'.....
+
+
+
+make_char_classes seems not to work with guile-1.3.4. Bug in guile?
+
+: ERROR: Two copies of (leaf #f (#\377)) (leaf #f (#\377))
+: make[1]: *** [sexp_table.h] Error 2
+
+or
+
+: ERROR: Stack overflow
+: make: *** [sexp_table.h] Error 2
+
+Figure out whether or not to make --cvs-workaround the default.
+According to Neil Jarram, "lsh-1.1.2 with --cvs-workaround=oe always
+succeeds." Update: According to rms, --cvs-workaround=e works, and
+--cvs-workaround=o doesn't, so it seems that it's stderr that causes
+problems. So we need to avoid setting stderr into non-blocking mode.
+
+Add a keep-alive option, which sends SSH_MSG_IGNORE at regular
+intervals.
+
+The lshd --daemonic option doesn't work with the
+RANDOM_POLL_BACKGROUND.
+
+: loic@gnu.org writes:
+: 
+: >       When I run
+: >
+: >       lshd  --daemonic --ssh1-fallback=/usr/sbin/sshd
+: > 
+: >       It dies on first connection and says :
+: >
+: > Apr 25 04:49:02 subversions lshd[25773]: Background randomness poll failed.
+: > Apr 25 04:49:02 subversions lshd[25773]: lshd: Could not get enough entropy from the environment.
+: 
+: Strange. A guess on what's happening:
+: 
+:   1. lshd starts a background process for collecting randomness,
+: 
+:   2. next it forks and exits to get into the background,
+: 
+:   3. it tries to waitpid the process created in 1, but it's no longer
+:      the parent of that process, so waiting fails.
+
+When a forwarding created with lshg -L ... goes down (at the local
+end, I think), the channel is not taken down properly, and there are a
+lot of "lsh: write_buffer: Attempt to write data to closed buffer."
+warnings by lsh:
+
+: bash-2.03$ lshg: Exiting: Connection reset by peer
+: lsh: write_buffer: Attempt to write data to closed buffer.
+: lsh: write_buffer: Attempt to write data to closed buffer.
+
+To fix this, we must put some resources on the lsh's
+gateway-connection's resource list, that closes the chained
+connections. 
+
+According to rms, lsh is significantly slower than ssh when logging in
+over a slow connection. Figure out why.

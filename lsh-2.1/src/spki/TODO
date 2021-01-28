@@ -1,0 +1,27 @@
+Some questions: Computing intersections and inclusions between sets
+and ranges seems tricky. For instance, do one need to handle
+
+   (* set (* range numeric (ge #00#) (le #20#)))
+
+includes
+
+   (* range numeric (ge #05#) (le #15#))
+
+What if certificate reduction ends up with more than one reduced 5
+tuple? I think the function spki_process_sequence_no_signatures (and
+spki_process_sequence, when that is implemented) should return a list
+of 5-tuples, *and* a principal that is the ultimate subject of the
+sequence. I.e. either the final expression of the sequence, if that is
+a public-key or a hash, or the subject of the final certificate in the
+sequence.
+
+Next, the spki_5_tuple_reduce function should return a set of acl:s,
+that all have the principal in question as subject. It could also be
+restricted further, by giving it a date and/or a tag as argument.
+
+All this implies that we need reference counts and cons-lists to handle
+acl lists, as a single acl may be on more than one list.
+
+
+Implement range, and figure out if and how to support all the
+different range types.

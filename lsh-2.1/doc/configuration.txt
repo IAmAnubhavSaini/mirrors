@@ -1,0 +1,228 @@
+This document is a first attempt to describe configuration and user
+interfaces of lsh and related programs. Note that what is said in this
+document is not necessarily implemented. In fact, at the time of this
+writing, most of it is pure vapour.
+
+Consider this a Request for Comments; I want to know what you think
+about it. Criticism is welcome. If there's anything stupid in here,
+the sooner it is pointed out, the better.
+
+
+Configurability
+
+There are many options in lsh that should be configurable by the user.
+The defaults should be to do the right thing most of the time, but I
+think that it should be easily to tweak or configure *anything*; the
+ssh protocol is very flexible, and the default choices may not suit
+every use. The most useful options should be available with short
+options on the command line, while more obscure features will use
+longer options, environment variables, configuration in the personal
+or system-wide configuration file, or some combination thereof.
+
+
+We start with lsh, which is the program that will be used most often.
+lsh will need to know, in order:
+
+1.1. host to connect to (mandatory argument)
+1.2. port number
+
+For keyexchange, we may configure 
+
+2.1. The list of acceptable key exchange methods (in preferred order)
+2.2. The list of acceptable algorithms for servers host key
+2.3. The list of acceptable encryption algorithms
+2.4. The list of acceptable compression methods
+2.5. The list of acceptable languages
+2.6. The conditions under which key exchange should be renegotiated.
+2.7. The database of known hostkeys/certificate authorities, actions
+     for keys that are not recognized, etc.
+
+Of these, some need not be configured the same way for both
+directions. When keyexchange is completed, some service is requested.
+The lsh client should support arbitrary services, but for services
+that are not known to the client, it should just connect its stdin and
+stdout to the encrypted connection.
+
+3.1. Which service to request.
+
+Known services, so far, are ssh-userauth and ssh-connection. Each of
+these are configurable in several ways. For userauthentication, we
+need
+
+4.1. User name
+4.2. Authentication methods to use, in order. For public key methods
+     we need a list of keys to try.
+4.3. Service to start after successful authentication.
+
+ssh connection is the most flexible service specified, and it has the
+most complex configuration.
+
+5.1. TCP/IP forwarding, in either direction.
+5.2. Do direct tcp (i.e. open a tcp connection via the server, but do
+     it directly rather than listening for connections on a local
+     port).
+5.3. Start zero or more sessions (it may be a little difficult to create more
+     than one interactive session, but it is not impossible).
+
+For each of these "actions", there are several configurable options.
+
+6.1. For forwarded ports, whether or not more than one connection
+     should be allowed.
+6.2. For forwarded ports, interface(s) to bind to, and
+     possible other restrictions on who may connect.
+6.3. For sessions, the command to execute (by default, a login shell),
+     if a pty is to be allocated, if ssh-agent or X should be
+     forwarded automatically, and so on.
+6.4. The conditions under which the connection, or a channel, should
+     be closed (for instance, if we want to try to talk to any
+     remaining child processes after that the started process has
+     died.
+
+And at last global options,
+
+7.1. Quiet or verbose operation,
+7.2. Escape character (see below).
+7.3. Convenience features, like forking into background after
+     authentication,  redirecting stdin from /dev/null, etc.
+
+
+Command line options
+
+I'm considering allocating all uppercase single option letters for
+actions, i.e. 3.1 and 5.x. Lowercase options are modifiers that
+affects the next action (uppercase option). Hmm, I think it is more
+intuitive to have modifiers first, but it may be easier to implement
+if we have the action first and modifiers after?
+
+Some short options:
+
+1.x:
+  -p port		Port number
+  -h host               Host to connect to (if not given, host is the
+                        first non-option argument).
+2.x:
+  -c crypto             Use this algorithm, and no else.
+  -z compress           Use this compression algorithm, and no else.
+
+The rest of the configuration in 2.x is considered obscure enough not
+to be given any short options. For -c and -z, the default is a list,
+not a single algorithm. The list can be modified in the configuration
+file.
+
+3.x:
+  -S service-name	Request the named service.
+  -U service-name       Request the named service, after user
+			authentication.
+
+Default is -U ssh-connection.
+
+4.x:
+
+  -l name		Name, for the user authentication service.
+  -i identity		"key id" for public key user authentication.
+
+5.x:
+
+  -L local-port:destination:target-port
+  -R remote-port:destination:target-port
+			Port forwarding, similar to ssh's.
+  -D destination:port	Direct tcp.
+  -S			Start an interactive shell (default if there
+			are no non-option arguments beyond the
+			host-name). 
+  -E command		Execute a command (default if there are
+			non-option arguments left).
+  -N			Do nothing (needed to supress the default action).
+
+6.x:
+
+Many of these options need both positive and negative versions, and
+this should be done in some consistent way. We could use +x to enable
+x, -x to disable it, or -x/-nx. I don't know which is best (it is of
+course easier for long options, --x --no-x). We need (taking most
+names from ssh):
+
+  -a			Agent forwarding.
+  -x			X forwarding.
+  -t			Allocate a pty.
+  -g			Forward port on all interfaces (default:
+			only loopback). 
+
+7.x:
+
+  -v			Verbose operation.
+  -q			Quiet operation.
+  -d			Debug output (doesn't really deserve a short
+			option).
+  -e char		Escape character.
+  -f			Fork into background after authentication.
+  -n			Redirect stdin from /dev/null.
+
+
+Command mode.
+
+ssh has a somewhat limited functionality attached to its escape
+character, by default a new-line preceeded '~'. I think it would be
+nice if this was expanded into a command mode. From command mode, it
+should be possible to monitor the connection, forward new ports, close
+channels, stop forwarding ports, request key renegotiation, etc.
+
+
+
+Shell mode
+
+But the command mode could be extended even further. When using ssh, I
+often find it a little difficult to figure out how to get things like
+redirections and pipes to work as I like. "If i write '>/tmp/foo'
+here, will it be written locally or on the server?". One of the
+problems is that the local shell, i.e. the one I write the ssh
+invocation in, doesn't know anything about remote processes.
+
+Imagine a process syntax that can deal with remote processes. If we,
+for the moment, use "[ command ]" as a process syntax for remote
+processes, analogous to "( command )" for local processes, we could
+deal with this. For example
+
+  lsh $ [ du | tee /tmp/foo ] | grep -f x | [ sort ]
+
+to connect one local and a few remote processes in a pipeline. The
+ssh2 protocol could easily handle this. As only stdin, stdout and
+stderr are specified in the ssh spec, we would need to extend it a
+little to support more general redirections, but that should be fairly
+straight forward (just use a channel request to allocate a "virtual
+fd", and use the CHANNEL_EXTENDED_DATA message to send the data.
+Globbing and tab-completion should also be done on the right host,
+etc.
+
+We could also introduce "remote job control".
+
+  lsh $ [ job_a ]& [job_b]& local_job &
+  lsh $ jobs
+  [1 remote] job_a
+  [2 remote] job_b
+  [3]        local_job
+  lsh $ fg %2
+  ...
+
+The ssh2 protocols allows several sessions to exist simultaneously,
+but we would need a client that can take advantage of that. To make it
+even better, there's no reason lsh couldn't handle several ssh
+connections at once, so we could have a "current connection", which is
+where non-builtin commands will be executed, and a cc or ch (change
+host) builtin command to switch between them. I think that would be
+pretty cool ;).
+
+So, how would we go about this? Perhaps it is not a good idea to
+incorporate bash, screen and scsh and any other program with
+useful process handling features into lsh. 
+
+The most obvious alternative is to extend one's favourite shell with
+code to use liblsh.a. Another way would be to have lsh speak a simpler
+command language on some port, and write some shell commands do remote
+things through that port; how much of the above that could be
+implemented this way, I don't know. But I suspect it would be easier
+to integrate those features into something like scsh than into a more
+traditional shell like bash.
+
+/Niels Möller
+

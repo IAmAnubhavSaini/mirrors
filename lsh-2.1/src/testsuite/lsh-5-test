@@ -1,0 +1,15 @@
+#! /bin/sh
+
+echo lsh, test 5, using an RSA hostkey
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+HOSTKEY=$srcdir/key-2.private
+
+spawn_lshd && run_lsh "exit 0" && test_success
+
+test_done

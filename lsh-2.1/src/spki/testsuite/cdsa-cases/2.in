@@ -1,0 +1,3 @@
+(8:red-test(3:acl(5:entry(7:subject(4:hash4:sha120:ÐÈD}ržš7LáöšÑeÓ))(9:propagate)(3:tag(3:foo))(5:valid(9:not-after19:2001-11-22_13:24:59))))(8:sequence(4:cert(6:issuer(4:hash3:md516:[—ƒn,*Éµ";ÆB))(7:subject(4:hash3:md516:y“©ßç¿[ÝÞ>Dª×ÜM±))(3:tag(3:foo))(5:valid(10:not-before19:2000-05-05_00:00:00)(9:not-after19:2002-01-01_00:00:00)))(10:public-key2:k1)(10:public-key2:k2)))
+
+

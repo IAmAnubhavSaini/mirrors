@@ -1,0 +1,3149 @@
+1999-12-20  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/scm/compiler.scm (split-list-at): New utility function. 
+	Fixed spelling of make-application.
+	(do-let): Invoke the preprocessor on the value list.
+	(make-flat-application): Accept a list of arguments.
+	(flatten-application): Handle applications with more than one
+	argument. 
+	(reduce-expr): New function to try to reduce expressions, mostly
+	for debugging.
+
+	* src/spki_commands.c (RETURN_USERKEYS): New macro.
+	(spki_read_acl, spki_read_hostkeys): Use prog1 for proper
+	evaluation order.
+	(make_spki_read_userkeys): New function.
+
+	* src/spki.c (do_spki_tag_list_match): Bug fix.
+	(spki_sexp_to_tag_list): Bug fix.
+	(spki_make_verifier): Take an sexp rather than an sexp_iterator as
+	argument. 
+	(do_spki_lookup): Use the right syntax for public-key-expressions. 
+
+	* src/sexp_streamed_parser.c (do_parse_base64): Less trace info.
+	(do_parse_literal_data): -"-
+
+	* src/sexp_parser.c (sexp_parse_list_canonical): Bug fix: Advance
+	buffer pointer after closing parenthesis.
+	(sexp_parse_advanced, sexp_parse_canonical): Don't advance buffer
+	pointer in the default case.
+
+
+	* src/sexp.c (sexp2string): Bug fix.
+
+	* src/lsh.c (do_options2identities): Bug fixes.
+
+1999-12-14  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/lshd.c: General cleanup.
+	* src/lsh.c: General cleanup.
+
+	* src/client.h (REQUEST_SHELL): New macro.
+	(CLIENT_START_IO): New macro.
+
+1999-12-12  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/spki.h: Removed old code.
+	* src/sexp.h: Removed old code.
+	* src/server_session.c: Removed old code.
+	* src/server_keyexchange.c: Removed old code.
+	* src/resource.h: Removed old code.
+	* src/publickey_crypto.h: Removed old code.
+	* src/lsh.h: Removed old code.
+	* src/lsh.c: Removed old code.
+	* src/keyexchange.h: Removed old code.
+	* src/keyexchange.c: Removed old code.
+	* src/io_commands.c: Removed old code.
+	* src/io.c: Removed old code.
+	* src/format.h: Removed old code.
+	* src/exception.c: Removed old code.
+	* src/dsa.c: Removed old code.
+	* src/digit_table.c: Removed old code.
+	* src/daemon.h: Removed old code.
+	* src/daemon.c: Removed old code.
+	* src/connection_commands.c: Removed old code.
+	* src/command.c: Removed old code.
+	* src/channels.c: Removed old code.
+	* src/combinators.c: Removed old code.
+	* src/client_userauth.c: Removed old code.
+	* src/client_keyexchange.c (do_init_client_dh): Removed old code. 
+	* src/client.c: Removed old code.
+	* src/channel.c: Removed old code.
+	* src/alist.c: Removed old code.
+
+	* configure.in (AC_OUTPUT): Generate contrib/Makefile and
+	contrib/lsh.spec. 
+
+	* Makefile.am.in (SUBDIRS): Added contrbi directory.
+
+	* contrib/Makefile.am (EXTRA_DIST): Added files.
+
+	* Added rpm spec file and redhat init script from Thayne Harbaugh
+	<thayne@northsky.com>
+
+	* configure.in: Bumped version to 0.1.19.
+
+1999-12-09  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/testsuite/macros.m4: Various bug fixes.
+
+	* src/testsuite/des-test.m4: Fixed tests.
+
+	* src/testsuite/Makefile.am (EXTRA_DIST): Added .m4 files.
+
+	* src/Makefile.am.in (SUBDIRS): Build testsuite subdir last.
+
+	* make_am (SUBDIRS): Don't recurse on . in SUBDIRS.
+
+	* configure.in (M4): Check for m4, and m4 handling eight-bit quote
+	characters. 
+
+1999-12-07  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* configure.in: Generate src/testsuite/Makefile.
+	Bumped version to 0.1.18.
+
+	* src/Makefile.am.in (SUBDIRS): Added testsuite.
+	(liblsh_a_SOURCES): Added spki_commands.c.
+	(liblsh_a_LIBADD): Add @LIBOBJS@ here.
+	(LDADD): Removed @LIBOBJS@.
+
+	* src/client_keyexchange.c (do_init_client_dh): Use EXTRA argument
+	as a hostkey lookup_verifier. Deleted the association
+	algorithm->lookup_verifier. 
+	(make_dh_client): Deleted VERIFIERS argument.
+
+	* src/spki_commands.h: Added extern keyword to declarations of
+	commands. 
+
+	* src/spki_commands.c: Use three arguments with for_sexp. Better
+	tracing. 
+
+	* src/spki.h (spki_context): New method add_tuple.
+
+	* src/spki.c (spki_private2public): New command, that replaces the
+	private2public command.
+	(parse_private_key): Use continuations and exceptions.
+	(do_spki_parse_key): Parse c and e on to parse_private_key.
+	(spki_parse_private_key_command): New command.
+	(spki_add_acl): New function. Replaces spki_read_acls.
+	(do_spki_add_tuple): New function.
+
+	* src/sexp_commands.c (for_sexp_command): New command.
+	Better trace output.
+
+	* src/server_keyexchange.c (do_init_server_dh): Use the EXTRA
+	argument as an alist algorithm->hostkey.
+	(make_dh_server): Deleted the KEYS argument.
+
+	* src/lshd.c: Adapted to new functions for reading keys and acls. 
+
+	* src/lsh_proxy.c: Some (possible broken) changes to get it to
+	compile. 
+
+	* src/lsh.c: Various bugfixes. Seems to work again now.
+
+	* src/keyexchange.c (do_handle_kexinit): Disconnect if there is no
+	common host key algorithm. Pass on "extra" to KEYEXCHANGE_INIT().
+
+	* src/keyexchange.h: Added argument "extra" to init-method.
+	(make_kexinit_handler): Added "extra" argument.
+
+	* src/io_commands.h (LOG_PEER): New macro.
+
+	* src/exception.h (EXC_ALL): New macro.
+
+	* src/dsa.c (do_dsa_public_key): New function.
+
+	* src/connection_commands.c (do_handshake): Pass "extra" argument
+	to make_kexinit_handler.
+	(handshake_info): New class.
+	(handshake_command): New static command.
+
+	* src/command.c (do_catch_apply): Bugfix for the ignore_value
+	feature. 
+	(do_catch_simple): Initialize the ignore_value flag properly.
+	(do_trace_continuation): Better tracing.
+
+	* src/scm/gaba.scm (process-class): Fixed output of meta classes;
+	mode #define to the declaration part of the output file.
+
+	* src/lsh_writekey.c: Adapted to new functions for reading and
+	converting keys. 
+
+	* src/lsh.c: Adapted to new functions for reading keys and acls.
+	Not working yet.
+
+	* src/io_commands.c: Use COMMAND_SIMPLE where possible.
+
+	* src/io.c (io_read_file): New function.
+
+	* src/digits.c (simple_decode_hex): New function.
+
+	* src/command.h (COMMAND_SIMPLE): New macro (and renamed the old
+	one to COMMAND_SIMPLE_CALL).
+
+	* src/command.c (do_catch_apply): New ignore_Value option. 
+	Use COMMAND_SIMPLE where possible.
+
+	* src/combinators.c: Use COMMAND_SIMPLE where possible.
+
+	* src/channel.c (connection_service_command): Use COMMAND_SIMPLE.
+
+	* src/abstract_crypto.c (crypt_string): New function.
+
+	* src/spki_commands.c, src/spki_commands.h: New files.
+
+1999-11-29  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/client_userauth.h (format_userauth_password,
+	make_client_userauth, make_client_password_auth,
+	make_client_publickey_auth): Moved from userauth.h.	
+
+	* src/userauth.h: Moved stuff to server_userauth.h.
+
+	* src/userauth.c (format_userauth_failure,
+	format_userauth_success): Moved to server_userauth.c.
+
+	* src/server_session.c (server_connection_service): Removed
+	backend attribute.
+	(make_server_connection_service): Removed backend argument.
+
+	* src/server_password.c (do_authenticate): Added service
+	argument. 
+
+	* src/server_publickey.c (do_authenticate): Added service
+	argument. 
+
+	* src/connection.h (ssh_connection): Added chain attribute, needed
+	for proxying.
+
+	* src/lshd.c (main): Don't pass backend to
+	make_server_connection_service. 
+
+	* src/lsh.c: #include client_userauth.h
+
+	* src/server_userauth.c (make_userauth_handler): New function. 
+	(format_userauth_failure): Moved here.
+	(format_userauth_success): Moved here.
+	(do_userauth): Use make_userauth_handler().
+	(userauth_service): Moved to header file.
+	
+	* src/server_userauth.h (userauth_service): Moved from
+	server_userauth.c. 
+	(userauth): Moved from userauth.h. 
+
+	* src/client_userauth.c (format_userauth_password): Made non-static.
+
+	* src/proxy.c, src/proxy.h, src/proxy_session.c,
+	src/proxy_session.h, src/proxy_userauth.h, src/proxy_userauth.c:
+	New files (Bazsi)
+
+	* src/lsh_proxy.c: New program (Bazsi). 
+
+	* src/Makefile.am.in (sbin_PROGRAMS): Added lsh_proxy.
+	(liblsh_a_SOURCES): Added proxy.c proxy_session.c
+	and proxy_userauth.c. 
+
+	* configure.in: Bumped version to 0.1.17.
+
+	* AUTHORS: Added Bazsi to the list of authors.
+
+	* src/sexp.c (sexp_assq): Bug fix.
+
+	* src/lshd.c (main): Changed invocation of read_spki_key_file. 
+
+	* src/lsh.c (do_client_lookup): Better error messages. Write
+	hostname properly in the ACL file.
+	(main_argp_parser): Added options --strict, --sloppy and
+	--capture-to. 
+
+1999-11-28  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/dsa.c (make_dsa_signer): #if:ed out some debug output. 
+
+	* src/server_authorization.c (do_key_lookup): Some
+	simplifications. Use make_ssh_dss_verifier().
+
+	* src/lshd.c (main): Don't pass any signature algorithm to
+	make_authorization_db().
+
+	* src/lsh.c (client_host_db): Use SPKI ACL:s for authentication.
+
+	* src/io.h: Removed forward declaration of lsh_fd.
+
+	* src/dsa.c (do_dsa_sign_spki): New function.
+	(do_dsa_verify_spki): New function.
+	(make_dsa_signer): Use s-expressions for keys.
+	(make_dsa_verifier): Use s-expressions for keys.
+	(make_ssh_dss_verifier): New function.
+	(ssh_dss_public_key): New function.
+
+	* src/connection.h: Removed forward declaration of ssh_connection;
+	it's now in the lsh.h.
+
+	* src/bignum.c, src/bignum.h: Fewer includes in the header file. 
+
+	* src/atoms.in: Added r and s (for spki-style dsa signatures). 
+
+	* src/atoms.c: Use const tables.
+
+	* src/abstract_crypto.h (signer, verifier, signature_algorithm):
+	Use s-expressions for keys and signatures.
+
+	* src/abstract_crypto.c (hash_string): New function.
+
+	* src/publickey_crypto.h: Include fewer files.
+
+1999-11-25  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/spki.h (spki_context): Added verifier argument to
+	the lookup-method. 
+
+	* src/spki.c (make_ssh_hostkey_tag): New function.
+	(dsa_to_spki_public_key): New function.
+	(do_spki_hash): Simplified.
+	(parse_dsa_private_key): #ifdef'd out.
+	(parse_private_key): Use an algorithm alist.
+	(read_spki_key_file): Take algorithm alist as argument.
+	(make_spki_subject): New function.
+	(subject_match_hash): New function.
+	(spki_state): New class.
+	(spki_subject_by_hash): New function.
+	(spki_make_verifier): New function.
+	(do_spki_lookup): New function.
+	(do_spki_authorize): New function.
+	(make_spki_context): New function.
+
+	* src/lsh.h: Forward declare various structs.
+
+	* src/Makefile.am.in (atoms_gperf.c): Changed the flags to gperf,
+	to avoid collision between "name" and "none". Allso added -C, to
+	make the tables const.
+
+1999-11-24  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/sexp.c (sexp_assq): Check length.
+
+	* src/spki.h (make_spki_subject, make_spki_context): New
+	functions. 	
+
+	* src/atoms.in: Added signature and name.
+
+1999-11-22  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/spki.h (spki_subject): New class. 
+	(spki_context): New class.
+
+	* src/spki.c (make_spki_5_tuple): New function.
+	(spki_acl_entry_to_5_tuple): New function.
+	(spki_read_acls): New function.
+
+	* src/sexp_parser.c (sexp_parse_list_canonical): Use
+	queue_to_list_and_kill(). 
+
+	* src/sexp.c (sexp_atom_eq): Bug fix.
+
+	* src/queue.c (queue_to_list_and_kill): New function.
+
+	* src/atoms.in: Added version, entry and propagate.
+
+1999-11-21  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/spki.c (spki_sexp_to_tag): New function.
+	Added classes for representing authorizations or (tag ...)
+	expressions, for certificates and acl:s.
+
+	* src/spki.h (spki_tag): New class.
+
+	* src/sexp.c (sexp_atom_eq): New function.
+
+	* src/process_atoms: Handle atoms with "*" in. Quote better, and
+	output C symbols with sed 's/*/STAR/'. 
+
+	* src/format.c (lsh_string_prefixp): New function.
+
+	* src/atoms.in: Added symbols for ACL:s and certificates. 
+
+1999-11-18  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* configure.in (SCHEME_PROGRAM): Use AC_PATH_PROGS, not
+	AC_PATH_PROG. Reported by Kalle Olavi Niemitalo.
+
+	* src/xalloc.c (number_of_strings): Global variable to keep track
+	of the number of allocated strings.
+
+	* src/blocking_write.c (do_blocking_write): Handle exceptions
+	differently.
+
+1999-11-16  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* Changed "Balazs" to "Balázs" in many files.
+	
+	* src/spki.h (spki_5_tuple): New class. Not used for anything yet. 
+
+	* src/spki.c (spki_check_type): Use sexp_check_type().
+	(dsa_private2public): Use sexp_assq().
+	(parse_dsa_private_key): Use make_dsa_spki_signer().
+
+	* src/sexp_streamed_parser.c (do_skip_comment): New function.
+	(make_parse_comment): New function.
+	(make_parse_advanced_sexp: New function. Implements only some
+	features of the advanced syntax.
+
+	* src/sexp.c (sexp_check_type): New function.
+	(do_cons_assoc): New function.
+	(do_cons_left): New function.
+	(do_vector_assoc): New function.
+	(do_vector_left): New function.
+	(make_iter_vector): Return SEXP_NIL for empty vectors.  
+	(sexp_eq): New function.
+	(sexp_assq): New function.
+
+	* src/sexp.h (sexp_iterator): Added methods left and assoc. 
+
+	* src/lsh.c (do_sloppy_lookup): Works now (but doesn't save any
+	keys). 
+	(main): Call lsh_open_tty.
+
+	* src/lookup_verifier.h (lookup_verifier): Added method-argument. 
+	* src/server_authorization.c (do_key_lookup): Added method
+	argument. 
+	* src/server_publickey.c (do_authenticate): Pass algorithm to
+	lookup function.
+
+	* src/io.c (write_raw_with_poll): Return an exception on error.
+	(write_raw): -"-
+
+	* src/format.c (lsh_string_eq, lsh_string_eq_l): Replaces
+	lsh_string_cmp() and lsh_string_cmp_l(). 
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added interact.c
+
+	* src/interact.h: New file.
+
+	* src/interact.c: New file.
+
+1999-11-10  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/dsa.c (spki_init_dsa_public): New function.
+	(make_dsa_spki_verifier): New function.
+	(make_dsa_spki_signer): New function.
+
+	* src/atoms.in: Added "x".
+
+1999-11-09  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/dsa.c: Removed dsa_classic functions.
+
+1999-11-08  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/lsh.c (sloppy_host_db): Renamed from fake_host_db. 
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added sexp_parser again. 
+
+	* src/sexp_parser.c: Cleaned up, updated, and stripped down to
+	handle canonical syntax only.
+
+	* src/sexp_parser.h: Obsolete now.
+
+	* src/sexp.h: Removed sexp_handler.
+	(sexp_parse_canonical, string_to_sexp): Added prototypes for
+	non-streamed parser.
+
+1999-11-07  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/exception.h (EXCEPTION_RAISE): Better tracing.
+
+	* src/atoms.in: Added "md5" and "hash".
+
+	* src/algorithms.c (lookup_hash): New function.
+
+	* src/Makefile.am.in (bin_PROGRAMS): Install sexp_conv.
+	(bin_SCRIPTS): Added lsh-authorize.
+
+	* src/spki.c (make_spki_hash): New function.
+
+	* src/sha.c (sha1_algorithm): Renamed from sha_algorithm.
+
+	* src/sexp_streamed_parser.c (do_parse_transport_sexp): Ignore
+	white space.
+
+	* src/sexp_conv.c (main_options): Added options --spki-hash,
+	--raw-hash, --hash and --once. Used by the lsh-authorize script.
+
+	* src/sexp_commands.c: Renamed print_sexp to sexp_print.
+	(sexp_print_raw_hash): New command. 
+
+	* src/lsh-authorize: New script.
+
+	* src/lsh.c: New option --no-publickey to disable publickey user
+	authentication. 
+
+	* configure.in: Bumped version to 0.1.15.
+
+	* src/lsh.c (do_lsh_default_handler): Report i/o exceptions, but
+	don't pass them on.
+
+	* src/lshd.c (main): Use sha1 for authorized keys.
+
+	* src/server_userauth.h (user_db): New class (not used for
+	anything yet).
+
+	* src/server_userauth.c (do_userauth_continuation): Ignore all
+	userauth messages, when we have sent USERAUTH_SUCCESS.
+
+	* src/publickey_crypto.h (keypair): Use int, not UINT32, for key
+	type.
+
+	* src/lsh.c: Publickey related bugfixes.
+
+	* src/client_userauth.c (format_userauth_publickey_query): New
+	function. (Bazsi)
+	(format_userauth_publickey): New function. (Bazsi)
+	Incorporated Bazsi's patch, with some reorganization.
+
+	* src/ssh.h (SSH_FIRST_USERAUTH_GENERIC): New constant.
+	(SSH_FIRST_USERAUTH_SPECIFIC): -"-
+	(SSH_FIRST_CONNECTION_GENERIC): -"-
+	(SSH_FIRST_CONNECTION_CHANNELS): -"-
+	(SSH_FIRST_RESERVED): -"-
+	(SSH_FIRST_LOCAL): -"-
+
+	* src/version.h (SOFTWARE_SERVER_VERSION,
+	SOFTWARE_CLIENT_VERSION): Use correct version numbers.
+
+1999-11-06  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/lsh.c (main_argp_parser): Move reading of ~/.lsh/identity
+	here, and check for getenv("HOME") being NULL.
+
+1999-11-03  Balázs Scheidler  <bazsi@balabit.hu>
+
+	* src/atoms.in: removed ssh-dss-kludge atom, 
+
+	* src/spki.c: spki_parse_key command added, read_spki_key_file() added
+
+	* src/client.c: fixed flow control bug, ssh2 uses an initial
+	window size != 0, and this caused problems in lsh client
+
+	* src/client_userauth.c: reorganized, publickey auth added
+
+	* src/connection_commands.c: changed a bug in buggy ssh peer detection
+
+	* src/daemon.c: fixed a memory leak
+
+	* src/lsh.c: added argument parsing for -i (identity)
+
+	* src/lshd.c: lshd uses the new read_spki_key_file() function to read
+	the hostkey
+
+	* src/publickey_crypto.h: type field added to keypair
+
+	* src/dsa.c: removed dsa_algorithm_kludge
+
+	* src/server_authorization.c: fixed a few bugs
+
+	* src/server_publickey.c: fixed a few bugs
+
+1999-11-03  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* doc/NOTES: Added some thought about the client side of user
+	authentication.  
+
+	* src/lshd.c (do_read_key): Moved key reading to spki.c. (Bazsi)
+
+	* src/spki.c (parse_dsa_private_key): Moved from lshd.c. (Bazsi)
+	(parse_private_key): New function (Bazsi).
+	(do_spki_parse_key): New function (Bazsi).
+	(make_spki_parse_key): New function (Bazsi).
+	(read_spki_key_file): New function (Bazsi).
+
+
+	* src/server_publickey.c (do_authenticate): Changed the handling
+	of PEER_SSH_DSS_KLUDGE. (Bazsi)
+
+	* src/server_keyexchange.c (do_init_server_dh): Handle
+	PEER_SSH_DSS_KLUDGE. (Bazsi)
+
+	* src/publickey_crypto.c (make_keypair): Added type argument. (Bazsi)
+
+	* src/publickey_crypto.h (keypair): Added type attribute. (Bazsi) 
+
+	* src/lsh.c (main_options): Added identity argument. (Bazsi)
+
+	* src/keyexchange.c (do_handle_kexinit): Don't use
+	ATOM_SSH_DSS_KLUDGE. (Bazsi)
+
+	* src/exception.h (EXC_IO_OPEN_READ): New exception type. (Bazsi) 
+
+	* src/connection_commands.c (do_line): Fixed detection of ssh2.
+
+	* src/client_keyexchange.c (dh_client): Added hostkey_algorithm
+	attribute. (Bazsi)
+	(do_handle_dh_reply): Handle the dss kludge here. (Bazsi)
+	(do_init_client_dh): Don't use ATOM_SSH_DSS_KLUDGE. (Bazsi)
+
+	* src/atoms.in: Removed ssh-dss-kludge. (Bazsi)
+
+	* src/lshd.c (main): Deal with pid files after forking and
+	daemonization, to get the right pid.
+
+1999-10-25  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/werror.c (set_error_syslog): Call openlog(). Added id
+	argument. 
+
+	* src/lshd.c (main): Daemonization support and options.
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added daemon.c.
+	(EXTRA_DIST): Removed mempcpy.h and strndup.h.
+
+	* configure.in: Bumped version to 0.1.14.
+
+1999-10-24  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/werror.c (werror_vformat): Added %a format specifier.
+
+	* src/tcpforward.c (do_channel_open_direct_tcpip): Use a better
+	exception handler.
+	(do_channel_open_forwarded_tcpip): -"-
+
+	* src/server_keyexchange.c (do_handle_dh_init): Use trace()
+	instead of verbose():
+
+	* src/read_line.c (make_read_line): Added assert().
+
+	* src/lshd.c (main): Handle i/o exceptions.
+
+	* src/io_commands.c (listen_command_callback): Added exception
+	handler. 
+	(do_listen_continue): Use the proper exception handler.
+	(make_listen_command_callback): Take an exception handler as
+	argument. 
+
+	* src/io.c (io_iter): Moved assert.
+	(do_buffered_read): Treat unexpected EPIPE as an ordinary I/O
+	error.
+	(io_listen): Take an exception handler as argument.
+
+	* src/format.c (ssh_vformat_write): Bug fix.
+
+	* src/exception.c (do_report_exception_handler): Add newline at
+	end of messages.
+	(exception_raise): Fixed format string.
+
+	* src/connection_commands.c (do_connection): Pass the right
+	exceptionhandler to the make_ssh_connection constructor, instead
+	of passing it to connection_init_io later on. This way,
+	make_connection_read_line picks up the right exception handler.
+
+	* src/connection.c (make_ssh_connection): Take an exception
+	handler argument. 
+	(connection_init_io): Don't install any exception handler here;
+	moved to make_ssh_connection instead.
+
+	* src/client_keyexchange.c (do_handle_dh_reply): Use trace() instead
+	of verbose():
+
+	* src/channel_commands.c (do_install_global_request_handler):
+	Friendlier trace messages.
+	(do_install_channel_open_handler): -"-
+	(do_install_fix_global_request_handler): -"-
+	(do_install_fix_channel_open_handler): -"-
+
+1999-10-19  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/mempcpy.c, src/mempcpy.h, src/strndup.c, src/strndup.h:
+	Removed (definitions incorporated where needed in the files in
+	src/argp/) 
+
+	* src/server_authorization.c (do_key_lookup): Some cleanup
+	(Bazsi). Uses new instance variable index_name to construct the
+	file name.
+	(make_authorization_db): Added argument index_name (Bazsi).
+
+	* src/server_publickey.c (do_authenticate): Fixed type (Bazsi).
+	(do_authenticate): Include session id length field in the
+	signature data. 
+
+	* src/lshd.c (main): Pass "keys_md5" to make_authorization_db().
+	(Bazsi). 
+
+	* src/format.c (format_hex_string): New function (Bazsi).
+	(ssh_vformat_length): Added hex 'x' modifier. (Bazsi).
+	(ssh_vformat_write): -"-
+
+1999-10-18  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* configure.in (AC_CHECK_MEMBER): New macro.
+	(AC_CHECK_VAR): New macro.
+	Check for program_invocation_name and
+	program_invocation_short_name. 
+	Check for thread-safe i/o functions.
+
+	* src/argp/argp.h: Don't include argp-comp.h. lsh-specific
+	handling of getopt.h and PRINTF_STYLE.
+
+	* src/argp/argp-help.c (strndup): Defined, if needed.
+	(mempcpy): -"-
+
+	* src/argp/argp-fmtstream.h: Removed inclusion of argp-comp.h. 
+	Include argp.h. Use PRINTF_STYLE for prototypes.
+
+	* src/argp/Makefile.am (libargp_a_SOURCES): Added arp-pin.c. 
+
+	* acconfig.h: Added HAVE_PROGRAM_INVOCATION_NAME and
+	HAVE_PROGRAM_INVOCATION_SHORT_NAME.
+
+	* Makefile.am.in (MAKEFILESAM): Removed src/argp/Makefile.am. 
+
+Thu Oct 14 20:35:43 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/argp/argp-fmtstream.h: #include argp-comp.h.
+
+	* configure.in: Check for fwrite_unlocked and fputs_unlocked. 
+
+Wed Oct 13 22:40:49 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/argp/argp-comp.h: Added ugly hack for fwrite_unlocked and
+	fputs_unlocked. 
+
+1999-10-13  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/scm/Makefile.am.in (EXTRA_DIST): Added Makefile.am.in.
+
+	* src/argp/argp.h: Use PRINTF_STYLE() instead of explicit
+	__attribute__:s in declarations.
+
+	* src/argp/argp-parse.c (parser_init): Added cast to void * to
+	STORAGE macro.
+	(__argp_usage, __option_is_short, __option_is_end ): Replicated
+	definitons from argp.h.
+
+	* src/argp/argp-help.c (argp_doc): Use strndup() instead of
+	__strndup(). I couldn't get preprocessor hackery to work.
+
+	* src/Makefile.am.in (EXTRA_DIST): Added mempcpy.h and strndup.h. 
+
+	* configure.in (gmp_header_found): Check for mempcpy and strndup. 
+
+Wed Oct 13 17:59:24 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/argp/argp.h: #include argp-comp.h.
+
+	* src/argp/argp-parse.c (parser_init): Don't rely on GNU C's
+	arithmetic on void *.
+
+	* configure.in: Fix tests for --with-system-argp.
+
+Tue Oct 12 18:08:39 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/argp/argp-help.c (fill_in_uparams): Use unsigned char.
+	(canon_doc_option): Cast to unsigned char before passing
+	characters to ctype macros.
+	(hol_entry_cmp): Use unsigned char.
+
+1999-10-11  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/argp/Makefile.am.in (libargp_a_SOURCES): Fixed typo (forgot
+	the .c suffix).
+
+	* src/sexp_conv.c (main): Pass HANDLER_CONTEXT.
+
+	* src/sexp_commands.c (make_read_sexp_exception_handler): Added
+	context argument.
+	(do_read_sexp): Pass HANDLER_CONTEXT.
+
+	* src/sexp.c (lookup_sexp_format): Use strcmp rather than
+	strcasecmp. 
+	(sexp_input_argp, sexp_output_argp): Split sexp_argp into two
+	parsers. 
+
+	* src/server_userauth.c (make_exc_userauth_handler): Added context
+	argument. 
+	(do_userauth): Pass HANDLER_CONTEXT.
+
+	* src/server_session.c (do_spawn_shell): Pass HANDLER_CONTEXT.
+
+	* src/io.c (io_iter): Poll only on active fd:s.
+	(init_file): Pass HANDLER_CONTEXT.
+	(make_exc_finish_read_handler): Added context argument.
+
+	* src/exception.h (exception_handler): Added context attribute.
+	(HANDLER_CONTEXT): New macro.
+
+	* src/exception.c (make_exception_handler): Added context argument.
+	(make_report_exception_handler): -"-
+	(exception_raise): New function.
+
+	* src/connection_commands.c (do_connection): Pass HANDLER_CONTEXT.
+
+	* src/connection.c (make_exc_protocol_handler): Added context argument.
+	(connection_init_io): Pass HANDLER_CONTEXT.
+
+	* src/command.h: Use DEBUG_TRACE.
+
+	* src/command.c (make_trace): Define only if DEBUG_TRACE is
+	defined. 
+	(make_catch_handler): Added context argument.
+	(do_catch_apply): Pass HANDLER_CONTEXT.
+
+	* src/client.c (do_client_io): Pass HANDLER_CONTEXT.
+
+	* src/channel.c (make_exc_finish_channel_handler): New context
+	argument. 
+	(make_channel_io_exception_handler): -"-
+	(register_channel): Pass HANDLER_CONTEXT.
+
+	* configure.in: Bumbed version number to 0.1.13.
+
+	* src/sexp_conv.c (main): Make both input and output formats
+	configurable.
+
+	* src/lsh.c: Added argp support.
+	* src/lshd.c: -"-
+	* src/lsh_keygen.c: -"-
+	
+	* src/algorithms.c (algorithms_argp): Added argp parser.
+	(init_algorithms_options): New function.
+
+	* configure.in: Added with-debug-trace option.
+
+1999-10-10  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/lsh.c: Use argp instead of getopt.
+
+1999-10-07  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/lsh_types.h: Use HAVE_GCC_ATTRIBUTE.
+	(FUNCTION_NAME): New define.
+
+	* src/client.c (do_exit_status): Removed test of CHANNEL_SENT_EOF flag. 
+	(do_exit_signal): -"-
+
+	* src/channel.c (do_channel_eof): Removed test of
+	CHANNEL_SENT_CLOSE flag.
+	(do_channel_write): Removed test of CHANNEL_SENT_EOF flag. 
+	(do_channel_write_extended): -"- 
+
+	* src/Makefile.am.in: Added correct path to compiler.scm.
+	(SUBDIRS): Added argp sub directory.
+
+	* configure.in: Added --with-system-argp.
+
+	* acconfig.h: Renamed HAVE_ATTRIBUTE to HAVE_GCC_ATTRIBUTE. Added
+	HAVE_GCC_FUNCTION. 
+
+1999-10-04  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/sexp_conv.c (main): Added argp support.
+	* src/sexp.c (sexp_argp): -"- 
+	* src/werror.c (werror_argp): -"-
+	
+
+1999-10-02  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/Makefile.am.in (EXTRA_DIST): Removed make_class,
+	make_char_classes and compiler.scm (which now live in the scm
+	subdirectory). 
+
+	* src/tcpforward_commands.c (new_tcpip_channel): Register the fd
+	on the channel's resources list.
+
+	* configure.in: Bumped version to 0.1.12.
+
+	* src/tcpforward.c (tcpip_channel_start_io): Use
+	make_channel_read_close_callback rather than
+	make_channel_close_callback. I haven't looked into exception
+	handling for i/o errors yet.
+
+	* src/server_session.c (do_alloc_pty): Put the pty on the
+	channel's resources list rather than the connection's.
+
+	* src/client.c (do_send_first): Removed this function.
+	(do_client_io): Fixed setup of fd:s, and their close-callbacks and
+	exception handlers. Also register the fd:s on the channel's
+	resources list.
+
+	* src/server_session.c (do_spawn_shell): Fixed close-callbacks and
+	exception handlers for stdio. Also registers the fd:s on the
+	channel's rather than the connection's resources list.
+
+	* src/read_data.c: Removed all EOF-handling. Perhaps the rest of
+	the code should be moved to channel.c?
+
+	* src/channel.c (do_exc_finish_channel_handler): Kill the channel's
+	resources when it is closed.
+	(register_channel): Register the channel's resources list as an
+	item on the connection's.
+	(init_channel): Initialize resources list.
+	(make_channel_read_close_callback): Renamed from
+	make_channel_close_callback, for the same reason.
+	(channel_io_exception_handler): Exception handler to close the
+	channel on i/o errors. Primarily useful for fd:s the channel
+	writes to.
+	(make_channel_io_exception_handler): New function.
+
+	* src/channel.c (channel_read_close_callback): Renamed from
+	channel_close_callback. The previous behaviour, which used the
+	callback for fd:s the channel writes to, was completely bogus.
+
+	* src/channel.c (channel_close): Do nothing if we have already
+	sent CHANNEL_CLOSE. 
+	(channel_eof): Do nothing if we have already sent CHANNEL_EOF, or
+	either sent or received CHANNEL_CLOSE.
+
+	* src/channel.h (ssh_channel): Added a resources attribute.  
+
+	* src/scm/gaba.scm: Renamed the struct-special type to
+	indirect-special, as it is useful for non-structs.
+
+	* src/debug.c (send_debug_message): New function, to
+	unconditionally send a DEBUG message.
+	(send_debug, send_verbose): Change argument type from struct
+	ssh_connection to struct abstract_write.
+
+	* src/resource.h: Made resource_list inherit
+	resource. This means that KILL_RESOURCE_LIST is now more or less
+	an alias for KILL_RESOURCE. Also made the resource-list behave a
+	little like a weak list.
+
+	* src/resource.c: Dead resources are unlinked from the list
+	automatically while garbage collecting. This means that references
+	from a resource list won't keep a dead resource from being garbage
+	collected.
+
+1999-09-30  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* configure.in: If no SCHEME_PROGRAM is found, use false.
+
+1999-09-27  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/Makefile.am.in (SUBDIRS): Added scm subdirectory.
+	(SCHEME): Added -l flag to load compatibility code for the right
+	scheme implementation. Changed rules to use gaba.scm and
+	make-char-classes.scm which have moved to the scm subdir.
+
+	* configure.in: Bumped version to 0.1.11. Added --with-scheme
+	option to select scheme implementation. Generate src/scm/Makefile.
+
+Wed Sep 22 00:30:47 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/channel.c (channel_close_callback): Check the
+ 	CHANNEL_SENT_CLOSE flag before calling channel_close().
+
+	* configure.in: Bumped version to 0.1.10.
+
+	* src/server_publickey.c (do_authenticate): Initialize
+	signature_start. 
+
+	* src/server.c (format_service_accept_kludge): Made function static.
+
+	* src/spki.c (keyblob2spki): Reorganized a little, and initialize
+ 	and free the dsa_public struct properly.
+
+	* src/lshd.c (do_read_key): Replaced keypair_info with keypair. 
+
+	* src/server_keyexchange.c (do_init_server_dh): -"-
+
+	* src/lsh.c (main): Added trailing zeros in the getopt
+ 	initializer.
+
+	*src/sexp_conv.c (main): -"-
+	
+	* src/dsa.c (init_dsa_public): New function.
+	(make_dsa_signer): Use init_dsa_public.
+
+	* src/exception.c: Use STATIC_EXCEPTION_HANDLER and
+	STATIC_EXCEPTION.
+
+Tue Sep 21 22:41:47 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/keyexchange.h: removed keypair_info class.
+
+	* src/keyexchange.c: removed make_keypair_info function..
+	
+	* src/publickey_crypto.h: renamed keypair_info to keypair, and
+ 	moved here.
+
+	* src/publickey_crypto.c: renamed make_keypair_info
+ 	renamed to make_keypair, and moved here.
+
+	* src/sexp_streamed_parser.c (make_parse_transport_sexp): Fixed
+	error message.
+
+1999-09-21  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/read_data.c: Removed the EXC_IO_EOF handler.
+
+1999-09-19  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward_commands.c (forward_remote_port): Added a call to
+	prog1, to get things evaluated at the right time.
+
+	* src/server_session.c (do_spawn_shell): Simplified handling of
+	exceptions. In particular, removed all handling of EXC_IO_EOF.
+
+	* src/make_class (string-upcase): New function.
+	(make-output): Associate any otherwise undefined global with a C
+	symbol with the same name, but in uppercase.
+
+	* src/lsh_writekey.c (read_sexp): Use transport syntax.
+
+	* src/io.h (callback, callout): New classes. 
+
+	* src/io.c (do_buffered_read): Close fd on EOF.
+	(do_consuming_read): On EOF, pass NULL to the consumer, and close
+	fd. 
+
+	* src/exception.h (EXC_IO_EOF): Commented out this constant.
+
+	* src/channel.c (do_channel_write): Handle EOF here.
+	(do_channel_write_extended): -"-
+
+	* src/sexp_streamed_parser.c (do_parse_base64): Bugfix: Increase
+	done at the start of the loop.
+
+1999-09-09  Balázs Scheidler  <bazsi@balabit.hu>
+
+	* src/lsh.c, src/lshd.c, src/sexp_conv.c: added some uninitialized
+ 	fields to structure inits to avoid warning
+
+	* src/command.c: fixed typo, make_once_continution ->
+	make_once_continuation
+
+	* src/server_password.h: removed, contents moved to server_userauth.h
+
+	* src/server_publickey.h: removed, contents moved to server_userauth.h
+
+	* src/server_userauth.h: merged with former server_password.h &
+	server_publickey.h
+
+	* src/server_userauth.c: unix account handling funtions moved
+	here, userauth_handler class.
+
+1999-09-07  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* abstract_io.h channel.c channel.h channel_commands.c client.c
+	command.c gc.c gc.h io.c lsh.c lsh.h lsh_writekey.c lshd.c
+	read_data.c read_packet.c server_password.c service.h sexp_conv.c
+	sexp_parser.c sexp_streamed_parser.c tcpforward_commands.c
+	tcpforward_commands.h werror.c: Cleaned up and deleted old dead
+	code.
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Removed sexp_parser.c 
+
+	* configure.in: Bumbed version to 0.1.9.
+
+	* src/server_session.c (do_spawn_shell): Use better exception
+	handlers. 
+
+	* src/read_data.c (do_exc_read_eof_channel_handler): Bugfix: Don't
+	call channel_close() twice.
+
+	* src/io_commands.c (do_listen): Raise a better exception.
+
+	* src/io.h (close_callback): Changed return type to void.
+
+	* src/exception.h (EXC_IO_LISTEN): New constant.
+
+	* src/exception.c (make_report_exception_handler): New function.
+
+	* src/connection.c (packet_types): Made this table public. 
+
+	* src/channel_commands.c (do_channel_open_command): Raise a more
+	sensible exception.
+
+	* src/channel.c (register_channel): Take a connections as
+	argument, in order to install the right exception handler.
+	(prepare_channel_open): -"-
+
+	* src/debug.c (do_debug): Display packet type. Don't display
+	USERAUTH_REQUEST messages.
+
+	* src/channel.h (ssh_channel): Added a connection argument to
+	CHANNEL_SEND.
+
+	* src/client.c (do_send_first): New function, to add stdin to the
+	connection's resources.
+
+	* src/userauth.h (authenticate): Added connection argument.
+
+	* src/userauth.c (format_userauth_failure): Moved here (from
+	server_userauth.c). 
+	(format_userauth_success): -"-
+	(make_userauth_special_exception): New function.
+
+	* src/spki.c: Assorted bug fixes.
+
+	* src/sexp_streamed_parser.c (make_parse_transport_sexp): New
+	function. 
+	(make_parse_base64): New function.
+
+	* src/sexp_conv.c (main): Simplified exception handling.
+
+	* src/sexp_commands.c: Commands to read and write s-expressions.
+
+	* src/sexp.c (sexp2string): New function.
+	(sexp2atom): New function.
+
+	* src/server_userauth.c (do_exc_userauth_handler): Added handler
+	for EXC_USERAUTH_SPECIAL.
+
+	* src/server_password.c (do_authenticate): Added connection
+	argument. 
+
+	* src/server_keyexchange.c (do_handle_dh_init): Make sending of
+	debug messages conditional on the peer-flags.
+
+	* src/read_scan.h: Flagged as obsolete.
+
+	* src/lsh_writekey.c (do_write_key): Deleted function. Use the
+	appropriate commands instead.
+	(main): Adapted to new sexp parser.
+
+	* src/keyexchange.c (invoke_ssh2_dsa_kludge_p): Removed this
+	function. 
+	(do_handle_kexinit): Use the connection's peer_flags rather than
+	an explicit check of the version string.
+
+	* src/io_commands.c (do_io_write_file, do_io_read_fd): New
+	commands to read and write files.
+	(make_io_write_file_info): New function.
+
+	* src/io.c (do_buffered_read): Attempt to recover if the handler
+	disappears. 
+	(do_exc_io_handler): New exception handler.
+	(init_file): Install exception handler to close the file on i/o
+	errors. 
+	(io_write_file): New function.
+
+	* src/exception.c (make_exception_handler): New function.
+
+	* src/dsa.c (do_dsa_sign_kludge): Fixed ssh2 compatibility hack.
+	(do_dsa_verify_kludge): -"-
+
+	* src/digits.h (BASE64_PARTIAL): New constant.
+
+	* src/digits.c (base64_init): Moved function to this file.
+	(base64_decode): -"-
+
+	* src/connection.h (ssh_connection): Added peer_flags field.
+
+	* src/compiler.scm: Added comments describing the combinators
+	used. 
+
+	* src/command.h (PROG1): New global command.
+
+	* src/client_keyexchange.c: instead of a simple verifier, an alist
+	of verifiers is passed to make_dh_client(). Removed sending "Key
+	exchange successful!" debug message, because it bugs ssh2. (Bazsi)
+
+
+1999-09-06  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/atoms.c: Bugfix: Include <string.h> rather than <strings.h>. 
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added lookup_verifier.c,
+	server_authorization.c, server_publickey.c and spki.c. Removed
+	read_scan.c. 
+
+	* src/lshd.c (main): Create an authorization_db class (Bazsi).
+
+1999-07-23  Balázs Scheidler  <bazsi@balabit.hu>
+
+	* configure.in: merged different DATAFELLOWS workaround defines to
+	a simple DATAFELLOWS_WORKAROUNDS, this affects a few files, for a
+	list grep for DATAFELLOWS_WORKAROUNDS *.{c,h}
+
+	* src/connection.h: peer_flags added to ssh_connection, workarounds
+	and peer features have a flag here, which is then checked at
+	appropriate places. 
+
+	* src/connection_commands.c (do_line): peer_flags is set according
+	to the peer version,
+	(split_version_string): new function
+
+	* src/dsa.c (parse_dsa_public): made public, moved public key
+	mpz_t initialization here. [No, I didn't move the initialization.
+	/nisse] 
+
+	* src/server_authorization.c: new file, some public key checking
+	is done
+	
+1999-07-22  Balázs Scheidler  <bazsi@balabit.hu>
+
+	* src/lookup_verifier.{c,h}: new files. moved lookup_verifier
+	class from client_keyexchange.h to separate files. It is also used
+	by publickey authentication. Added an additional parameter to
+	LOOKUP_VERIFIER: keyholder, which determines which host, or which
+	user's keys should be checked.
+
+	* src/dsa.c: do_dsa_verify_kludge() cleaned up
+	
+1999-07-11  Balázs Scheidler  <bazsi@balabit.hu>
+
+	* src/client.c: added DataFellows workaround for
+	SSH_MSG_SERVICE_ACCEPT, compiled in conditionally if
+	DATAFELLOWS_SSH2_SERVICE_ACCEPT_KLUDGE is defined.
+
+	* src/server.c: -"-
+
+	* configure.in: changed --with-ssh-dss-kludge option to
+	--with-datafellows-workarounds
+
+	* src/dsa.c: ssh2 dsa kludge fixes, added dsa_kludge_algorithm
+	(only creates verifiers!)
+	
+	* src/lsh.c: added support for alist maps of lookup verifiers 
+
+	* src/debug.c: fixed a bug in packet_debug class
+
+	* src/connection.c: added debug messages for sent packets
+
+	* src/server_keyexchange.c: removed "Key exchange successful!"
+	[actually, made conditional. /nisse]
+	
+1999-09-05  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/exception.h: Added SPKI-related exceptions.
+
+	* src/atoms.in: Added spki-related names.
+
+	* src/sexp_streamed_parser.c: Rewrote parser to use continuations
+	and exceptions. For now, support for any encoding but
+	SEXP_CANONICAL is dropped.
+
+	* src/read_packet.c (do_read_packet): Handle available == 0 (EOF).
+	* src/read_line.c (do_read_line): Handle available == 0 (EOF).
+
+	* src/exception.h (EXC_SEXP, EXC_SEXP_SYNTAX, EXC_SEXP_EOF): New
+	constants.
+
+	* src/command.c: First attempt at a catch-command.
+
+	* src/io.c (io_iter): Check for POLLNVAL.
+	(do_buffered_read): Pass EOF to the read handler, rather than
+	raising an exception.
+
+	* src/Makefile.am.in: Added sexp_conv, sexp_commands.c.
+
+	* sexp_commands.c, sexp_commands.h, sexp_conv.c, sexp_conv.h: New
+	files. 
+
+1999-09-04  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/lsh.c (do_lsh_default_handler): Improved handling of I/O
+	exceptions. 
+
+	* src/io_commands.c (do_connect): Improved exception handling.
+
+	* src/io.c (io_connect): Added an exception_handler argument.
+
+1999-08-30  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* Lots of files: Removed the exception argument from the
+	A_WRITE-method. 
+
+	* src/exception.h (PROTOCOL_ERROR): New macro.
+
+1999-08-29  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/read_packet.c (do_read_packet): The MAC memcmp test was
+	inverted. A real old bug.
+
+	* src/io.c (do_consuming_read): Use CAST_SUBTYPE.
+	(do_buffered_read): Stop processing if fd->read is NULL. For
+	example, if an exception handler tried to close the file.
+
+	* src/exception.c (do_default_handler): Fixed format string.
+
+	* src/channel.c (alloc_channel): Update in_use table properly. .
+
+	* configure.in: Bumped version to 0.1.8.
+
+1999-08-28  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added esception.c.
+
+1999-07-04  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/command.c, src/command.h, src/lsh.c, src/lshd.c: Don't allow
+	a NULL continuation. Instead, use discard_continuation to ignore
+	the value.
+
+1999-07-01  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward_commands.c (new_tcpip_channel): Don't initialize
+	rec_window_size and rec_max_packet hare; let make_tcpip_channel
+	handle that.
+	(forward_remote_port): Noted that this doesn't work; connect gets
+	called too early.
+
+	* src/tcpforward.c (make_tcpip_channel): Initialize
+	rec_window_size and rec_max_packet.
+
+	* src/channel.c (prepare_channel_open): Added debug output.
+
+	* configure.in: Bumped version to 0.1.3
+
+	* NEWS: Wrote an entry for 0.1.3
+
+1999-06-30  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward_commands.c (new_tcpip_channel): Initialize
+	max_window and rec_window_size.
+	(remote_port_install_continuation): Added a port variable.
+	Various bug fixes.
+
+	* src/tcpforward.c (make_tcpip_channel): Set the max_window
+	attribute.
+	(do_tcpip_channel_die): New function.
+	(do_open_forwarded_tcpip_continuation): Initialize channel->write,
+	and call tcpip_channel_start_io, if the connection was successful.
+
+	* src/sexp_parser.c, src/sexp_streamed_parser.c: Use digits.h
+	rather than duplicating code.
+
+	* src/lsh.c (main): Fixed -N flag.
+
+	* src/io_commands.c (connect_with_port): Fixed name. Was
+	connect_with_connection. 
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added digits.c.
+
+	* src/digit_table.c (main): Remove #defines and static
+	declarations from output.
+
+	* src/command.h (COMMAND_RETURN): Evaluate the return value even
+	if the continuation is NULL.
+
+	* src/command.c (discard_continuation): New continuation.
+
+	* src/channel_commands.c (do_install_global_request_handler):
+	fixed format string to trace() call.
+	(do_install_channel_open_handler): -"-
+	(do_install_fix_global_request_handler): -"-
+	(do_install_fix_channel_open_handler): -"-
+
+	* src/digits.h: New file.
+
+	* src/digits.c: New file.
+
+	* src/channel.c (channel_start_receive): New function, to replace
+	the LSH_CHANNEL_READY_REC flag.
+	(do_channel_open_failure): Clear the open_continuation attribute.
+	(do_channel_open_confirm): -"-
+	(channel_close_callback): Handle the case reason == 0.
+
+1999-06-28  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward.h: Bugfix: Declare channel_open_forwarded_tcpip
+	extern. 
+
+	* src/channel.c (do_global_request_success): New function. 
+	(do_global_request_failure): New function.
+	(do_connection_service): Install handlers for
+	SSH_MSG_REQUEST_SUCCESS and SSH_MSG_REQUEST_FAILURE.
+
+	* src/lsh.c (main): Install a handler for forwarded-tcpip
+	requests.
+
+	* src/command.c (trace_command): New command.
+
+1999-06-23  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward_commands.c (forward_local_port): Use
+	CAST_SUBTYPE() rather than CAST().
+
+	* src/lsh.c (main): Added -R option.
+
+	* src/io_commands.c (collect_listen): The _first_ argument is the
+	callback function.
+
+	* channel_commands.c, combinators.c, connection_commands.c,
+	io_commands.c, tcpforward.c, tcpforward_commands.c: In collect_*
+	functions, don't assert that info == NULL. It's info->next that
+	should be NULL.
+	
+	* src/channel_commands.h (STATIC_INSTALL_GLOBAL_HANDLER): Bug fix,
+	use STATIC_COLLECT_2_FINAL.
+	(STATIC_INSTALL_OPEN_HANDLER): -"-
+
+	* doc/TODO: Updated the section on the control language.
+
+	* src/lshd.c (lshd_connection_service): Call connection_service to
+	initialize the connection, before logging in. 
+
+	* src/lsh.c (make_client_connect): Take advantage of
+	connection_service being a constant.
+
+	* src/make_class (process-expr): Generate a call to trace().
+
+1999-06-22  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/command.h: Never pass a NULL as the first argument of a
+	collect_* function.
+
+Mon Jun 21 19:11:57 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server_session.c (make_server_connection_service):
+	Reorganized the commands to initialize a connection.
+
+	* src/lshd.c: Use the "hook"-mechanism to install handlers on the
+	connection. 
+
+	* src/lsh.c (main): Don't use the old function
+ 	make_connection_service.
+
+	* src/io_commands.c (connect_port): Renamed from
+	connect_connection.
+	(connect_connection): New command.
+
+	* src/connection_commands.c (do_connection_remember): Commented
+	out this unused function.
+
+	* src/channel_commands.h (STATIC_INSTALL_GLOBAL_HANDLER): New
+	macro. Currently broken.
+	(STATIC_INSTALL_OPEN_HANDLER): -"-
+
+	* src/channel_commands.c (make_install_fix_channel_open_handler):
+	New function.
+	(make_install_fix_global_request_handler): -"-
+
+	* src/channel.c: Keep information about channel_types and
+	global_requests in the channel_table, rather than in the packet
+	handlers. 
+	(make_connection_service): Removed this function. The command is
+	now statically allocated.
+
+1999-06-20  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/command.h (STATIC_COLLECT_1_FINAL): Commented out this
+	redundant macro.
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added
+	tcpforward_commands.c. 
+
+1999-06-17  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward.c, src/tcpforward_commands.c: Reorganization.
+	Keep low-level protocol stuff in tcpforward.c, and move higher
+	level functionality in tcpforward_commands.c.
+	
+	* src/io_commands.c (make_connect_connection): New function.
+
+	* src/connection_commands.c (connection_remember_command): New
+	command, currently not used.
+
+	* src/command.h (STATIC_COMMAND): New macro.
+
+	* src/tcpforward_commands.h: New file
+	* src/tcpforward_commands.c: New file	
+
+1999-06-15  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* src/tcpforward.c: Made forwarded_port a super class for
+	local_port and remote_port. 
+	(do_channel_open_direct_tcpip): Free dest_host on failure.
+	(make_forward_listen): Added backend parameter.
+	(remote_port): New class.
+	(make_remote_port): New function.
+	(remote_port_install_continuation): New class.
+	(make_remote_port_install_continuation): New function.
+	(request_tcpip_forward_command): New class.
+	(make_request_tcpip_forward_command): New function.
+	(remote_listen_value): New class.
+	(make_remote_listen_value): New function.
+	(start_forwarded_client_io): New command.
+	(make_start_forwarded_client_io) New function.
+	(make_forward_remote_port): New expression.
+	(forward_remote_port): New function.
+
+	* src/lsh.c (main): Pass backend to forward_local_port(). 
+
+	* src/io_commands.c (collect_listen): Use CAST_SUBTYPE rather than
+	CAST. 
+
+	* src/connection.h (ssh_connection): Removed forwarded_pots
+	attribute (moved to channel_table). 
+
+	* src/command.h (STATIC_COLLECT_1_FINAL): New macro.
+
+	* src/channel_commands.c (do_channel_global_command): New
+	function. 
+
+	* src/channel.h (channel_table): Moved information about forwarded
+	ports here.
+
+	* src/channel.c (make_channel_table): Initialize queues for
+	handling global requests.
+
+1999-06-14  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* configure.in: Added option -with-tcp-forward.
+	Bumped version to 0.1.2.
+
+	* src/queue.c (object_queue_init): New function.
+	(object_queue_is_empty): New function.
+	(object_queue_add_head): Update length.
+	(object_queue_add_tail): -"-
+	(object_queue_remove_head): -"-
+	(object_queue_remove_tail): -"-
+	(queue_to_list): New function.
+	(object_queue_kill): New function.
+
+	* src/queue.h (object_queue): Added length attribute.
+	(FOR_OBJECT_QUEUE_REMOVE): Update length.
+
+	* src/read_data.c (do_read_data): When the channel
+	is closed because  of a read failure, don't throw away the
+	return value from channel_close().
+
+	* src/tcpforward.h (forwarded_port): Don't inherit resource.
+
+	* src/tcpforward.c (do_direct_tcp_server_start_io): Fix flow control.
+	(make_tcpip_channel): -"-
+	(channel_open_direct_tcpip): Renamed (was open_direct_tcp).
+	(do_channel_open_direct_tcpip): Renamed similarly.
+	(make_channel_open_direct_tcpip): -"-
+	(open_forwarded_tcpip_command): Renamed (was open_tcpip_command).
+	(new_forwarded_tcpip_channel): Renamed similarly.
+	(make_open_forwarded_tcpip_command): -"-
+	(do_forward_start_io): Removed redundant assignment to
+	channel->socket.
+	(open_direct_tcpip_command): New class.
+	(new_direct_tcpip_channel): New function.
+	(make_open_direct_tcpip_command): New function.
+	(open_direct_tcp): New command.
+	(make_forward_local_port): New expression.
+	(forward_local_port): New function.
+
+	* src/server_session.c (do_spawn_shell): Fix flow control.
+
+	* src/client.c (make_client_session): Fix flow control.
+
+	* src/channel.h (ssh_channel): Inherit flow_controlled. 
+
+	* src/channel.c (adjust_rec_window): Adapted for flow control.
+	(channel_process_status): On LSH_CHANNEL_READY_REC, call
+	prepare_window_adjust and c->write directly, rather than
+	adjust_rec_window. 
+	(do_channel_data): Don't call adjust_rec_window.
+	(do_channel_extended_data): -"- 
+	(init_channel): Install adjust_rec_window as flow control callback.
+
+	* src/lshd.c (main): Added a --no-forward option.
+
+	* src/lsh.c (make_client_connect): Don't invoke open_session here;
+	instead use progn to apply a list of "actions"-commands to the
+	connection. 
+	(make_start_session): New command, do open a session and send some
+	requests to it.
+	(parse_forward_arg): New function, to parse arguments to -L and -R.
+	(main): Build a list of "actions" when parsing the options. Added
+	options -L, -N, -g.
+
+	* src/write_buffer.h (flow_controlled): New class.
+	(write_buffer): Added REPORT attribute.
+
+	* src/write_buffer.c (write_buffer_consume): Do flow control. 
+
+	* src/publickey_crypto.h (make_dsa_verifier_kludge,
+	make_dsa_signer_classic, make_dsa_verifier_classic): New
+	functions.
+
+	* src/publickey_crypto.c: Moved the dsa-ralated code to a separate
+	file. 
+
+	* src/io.c (io_iter): Close fd:s that report POLLHUP.
+
+	* src/Makefile.am.in (liblsh_a_SOURCES): Added dsa.c.
+
+	* src/dsa.c: New file. Extracted from publickey_crypto.c. Also
+	fixed the dsa signature format to match the latest draft.
+
+1999-06-12  Niels Möller  <nisse@cuckoo.localdomain>
+
+	* configure.in: Bump version to lsh-0.1.1
+
+	* src/lsh.c (main): Reset the tty mode before return.
+
+1999-06-12    <nisse@cuckoo.localdomain>
+
+	* src/lsh_keygen.c (main): Use %xn rather than %hn for debug().
+	* src/lshd.c (do_read_key): -"-
+	* src/publickey_crypto.c (dsa_hash): -"-
+	(generic_dsa_sign): -"-
+	(do_dsa_verify): -"-
+
+	* src/channel.c (make_channel_table): Initialize
+	active_global_requests and pending_global_requests.
+	* src/channel.c, src/channel.h: object_queues should be declared
+	as structs.
+	* src/connection.c, src/connection.h: -"-
+	* src/tcpforward.c: -"-
+	
+1999-06-11    <nisse@cuckoo.localdomain>
+
+	* src/tcpforward.c (direct_tcp_server_start_io): Renamed class,
+	and related functions. Was forward_server_start_io.
+	(do_forward_start_io): Renamed. Was do_forward_client_io.
+
+	* src/io_commands.h (LISTEN_COMMAND): New define.
+
+	* src/tcpforward.c (do_tcpip_forward_request): Use GLOBAL_REQUEST_CALLBACK().
+	(do_tcp_forward_continuation): -"-
+	Various bug fixes.
+
+	* src/channel.c (global_request_status): New class. 
+	(make_global_request_status): New function.
+	(global_request_response): New class.
+	(do_global_request_response): New function.
+	(make_global_request_response): New function.
+	(do_global_request): Pass a callback object to the handler.
+
+	* src/channel.h (channel_table): New attributes
+	active_global_requests and pending_global_requests.
+	(global_request_callback): New class.
+	(global_request): Let the handler method take a
+	global_request_callback as argument.
+
+	* src/channel_commands.h (global_request_command): New class. 
+	(do_channel_global_command): New function (not yet implemented).
+
+	* src/queue.c (lsh_queue_peek_head): New function.
+	(lsh_queue_peek_tail): -"-
+	(object_queue_peek_head): -"-
+	(object_queue_peek_tail): -"-
+	(object_queue_get_contents): Cast here, rather than in all calling
+	functions. 
+
+	* src/io_commands.c (listen_connection): Adapted to the needs for
+	tcp forwarding.
+	(make_listen_command): New function.
+
+	* src/make_class (process-expr): Include the compiler output in a
+	comment. 
+
+1999-06-07    <nisse@cuckoo.localdomain>
+
+	* src/werror.c (werror_vformat): Removed 'h'-modifier. Use 'x'
+	instead. 
+
+	* src/queue.h (struct object_queue_node): Made this structure public.
+	(FOR_OBJECT_QUEUE): Traverse an object_queue (Bazsi).
+	(FOR_OBJECT_QUEUE_REMOVE): Somewhat ugly macro to delete the
+	current node inside a for-loop.
+
+	* src/lshd.c (main): Added tcpforward support (Bazsi).
+
+	* src/io.h (address_info): Renamed the ADDRESS field. Is now
+	called IP.
+
+	* src/io.c (io_iter): When closing a file, always invoke its close
+	callback (if it is non-NULL). Previously, the callback was never
+	invoked if fd->close_reason was zero.
+
+	(io_iter): Some handling of POLLHUP and POLLPRI.
+
+	* src/format.h (lsh_string_cmp, lsh_string_cmp_l): New functions
+	(don't really belong in this file).
+
+1999-06-06    <nisse@cuckoo.streamserve.com>
+
+	* src/dsa_keygen.c (dsa_nist_gen): Bugfix: Removed extra mpz_init().
+
+1999-06-07    <nisse@cuckoo.localdomain>
+
+	* src/connection.h (ssh_connection): New field forwarded_ports
+	(Bazsi).  
+
+Wed May 26 18:54:43 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/client.c: #include signal.h (reported by MArtin Jabobsson).  
+
+Wen May 12 21:35:22 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* Configure tests for strerror and strsignal.
+
+Tue May 11 20:22:05 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/sexp_test.c (main): Create the fd objects properly (old
+	problem).
+
+	* src/server_session.c (do_spawn_shell): Fixed typo.
+	(do_send): Handle the case that session->err is NULL.
+
+	* src/server_pty.c: Added a better warning message if opening
+ 	/dev/ptmx failes.
+
+	* src/keyexchange.c (parse_kexinit): Use the improved
+	parse_atom_list() function.
+
+	* src/parse.c (parse_atoms): New function.
+	(parse_atom_list): Read length field first, so that callers don't
+	have to call parse_sub_buffer() manually.
+
+	* src/client_pty.c (do_pty_continuation, make_pty_request): Moved
+	the call of CFMAKERAW (Bazsi). 
+
+	* src/channel.c (adjust_rec_window): Don't touch the
+ 	rec_window_size attribute here; that's done in
+ 	prepare_window_adjust().
+	(do_channel_data, do_channel_extended_data): rec_window_size was
+ 	updated too many times, fixed. (Bazsi).
+
+Mon May 10 23:20:54 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server_session.c (make_pty): Added BASH_WORKAROUND (Bazsi).
+	(server_session, do_spawn_shell): Allow the session->err field to
+	be NULL. Probably some more functions need updating.
+
+	* src/server_pty.c (pty_check_permissions): New function,
+ 	extracted from pty_grantpt_uid.
+	(pty_allocate): Do some permissions check also on BSD (Bazsi).
+	Also disabled the openpty() version.
+
+	* src/crypto.h, src/Makefile.am.in: IDEA support (Bazsi).
+
+	* src/idea.c: New file (Bazsi).
+
+Sun May  9 20:17:27 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/keyexchange.c, src/keyexchange.h (kex_build_secret): New
+ 	function, implementing the changed session key generation in the
+	transport-05 draft (pointed out by Joseph Galbraith).
+	
+	* src/server_keyexchange.c (do_handle_dh_init): Use
+ 	kex_build_secret().
+
+	* src/client_keyexchange.c (do_handle_dh_reply): Use
+ 	kex_build_secret().
+
+	* src/Makefile.am.in (EXTRA_DIST): Added compiler.scm to the dist.
+
+Sun Apr 25 15:47:13 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/channel.c, src/channel.h, src/client.c, src/client.h,
+ 	src/client_pty.c, src/client_pty.c, src/command.h,
+ 	src/connection.c, src/keyexchange.c, src/lsh.c, src/lshd.c,
+ 	src/queue.c, src/resource.c, src/server.h, src/server_password.c,
+ 	src/server_pty.h, src/server_session.c, src/service.c,
+ 	src/service.h, src/session.c, src/tcpforward.c,
+ 	src/write_buffer.c, src/zlib.c: Removed old #if:ed out code.
+
+	* src/server_session.c (do_close): Return a status code, rather
+	than void.
+
+	* src/lshd.c (main): Added pty support.
+
+	* src/client_pty.c (make_pty_request): Bugfix: Select raw mode.
+
+	* src/client.c (do_client_session_eof): Renamed the
+	close_client_session function.
+	(do_client_session_close): New function, to set the PENDING_CLOSED
+	flag when the session is closed.
+	(make_client_session): Install a close method.
+
+	* src/channel.h (ssh_channel): Let the close method return a
+	status value.
+	* src/channel.c (channel_process_status): Moved processing of
+	LSH_CHANNEL_PENDING_CLOSE after LSH_CHANNEL_FINISHED. This way, it
+	is possible for the channels close-callback to return
+	LSH_CHANNEL_PENDING_CLOSE. 
+
+Tue Apr 20 00:00:58 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/resource.c (do_kill_all): Bugfix (use CAST_SUBTYPE rather
+ 	than CAST).
+
+	* src/lsh.c (make_client_connect): Added calls die_on_null and
+ 	init_connection.
+
+	* src/client.c (new_session): Initialize session->write from the
+	connection. 
+
+Mon Apr 19 16:23:22 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/channel.c (do_channel_success, do_channel_failure): Bugfix
+ 	(use CAST_SUBTYPE rather than CAST).
+
+	* src/lsh.c: Adapted to the command language.
+
+	* src/command.c (do_progn): Bug fix.
+
+	* src/client_pty.c (make_pty_request): New function.
+
+	* src/client.c (do_client_io): Renamed the do_io function, and
+	turned it into the client_io command.
+	(make_client_session): Removed the requests argument.
+	(do_format_shell_request): New function.
+	(request_shell): New command.
+	#if:ed out a lot of old code. pty handling moved to client_pty.h. 
+
+	* src/channel_commands.c (do_channel_request_command): Pass
+	continuation pointer to the FORMAT_CHANNEL_REQUEST method.
+
+	* src/invert-defs: Don't use echo "\n" (Bazsi).
+
+Sun Apr 18 23:03:20 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/channel_commands.h (channel_request_command): Pass a pointer
+ 	to a pointer to the command's continuation as an argument. This
+	replaces the want_reply argument, and it also makes it possible
+	for the command to add a new continuation which is invoked when
+	the peers response is received. 
+
+Wed Apr 14 00:32:34 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/command.c (make_parallell_progn): New command.
+
+	* src/channel_commands.h (channel_request_command): New class. 
+
+	* src/channel_commands.c (do_channel_open_command): Bugfix: Use
+	CAST rather than CAST_SUBTYPE for connection argument.
+
+	* src/channel_commands.c (do_channel_request_command): New
+ 	function.
+
+	* src/channel.c (init_channel): Init pending_requests queue.
+	Deleted channel_success and channel_failure.
+	(do_channel_success): Use pending_requests queue rather than
+	channel_success and channel_failure.
+	(do_channel_failure): Likewise.
+
+	* src/channel.h (ssh_channel): New attribute pending_requests
+	(a queue). Removed methods channel_success and channel_failure.
+
+	* src/io.c (connect_callback): Fixed call to getsockopt.
+
+	* src/io_commands.c (do_connect_continue): Check for fd < 0, and
+	in this case, invoke the continuation with a NULL value.
+
+	* src/io.c (connect_callback): Check socket error status, and
+	invoke th FD_CALLBACK with -1 as argument if the connection
+	failed.
+
+	* src/resource.c, src/resource.h: Use the object_queue struct.
+	Deleted struct resource_node, and associated allocation and gc
+	functions.  
+
+	* src/queue.c (object_queue_add_head): New function.
+	(object_queue_add_tail): Likewise
+	(object_queue_remove_head): Likewise
+	(object_queue_remove_tail): Likewise
+
+	* src/queue.h (object_queue): New struct. 
+
+Tue Apr 13 21:24:08 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server_pty.c (pty_grantpt_uid): Fixed pid/uid typo (Noted by
+	Bazsi).
+
+Mon Apr 12 22:20:01 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server_session.c (do_alloc_pty): Pass uid on to
+	pty_allocate(). 
+
+	* src/server_pty.c (pty_grantpt_uid): New function to set up the
+	permissions properly, when the current uid is different from the
+	user that should own the pty.
+	(pty_allocate): Added uid-argument, to take avantage of
+	pty_grantpt_uid. 
+
+Sun Apr 11 22:56:02 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server.c, src/server.h, src/server_session.c,
+	src/server_session.h: Moved session features (i.e. shell and pty
+	handling) into a separate file.
+
+	* src/password.h (unix_user): Moved definition to
+	server_password.h. 
+
+	* src/lshd.c (main): Added user authentication and connection
+	service, now using the command language.
+
+	* src/channel.h (make_connection_service): Removed START argument.
+	Now returns a struct command *. 
+
+	* src/channel.c (connection_service): Removed START attribute. 
+	(do_connection_service): Use the command's continuation rather than
+	the START attribute.
+
+	* src/io.c (tcp_addr): Added this function again.
+	(address_info2sockaddr_in): Use tcp_addr().
+
+Wed Apr  7 21:30:35 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/channel.c, src/server.c: Started adapting the functions to
+ 	the command framework.
+
+	* src/service.c, src/service.h: These files are almost obsolete
+	now. #if:ed out most of them. 
+
+	* src/userauth.h, src/server_userauth.c, src/server_password.c:
+ 	Reorganized user authentication. An authentication method takes
+ 	the data from a USERAUTH_REQUEST message, and returns some
+ 	userinfo-object if authentication was successful. The general
+	(server-side) userauth-code invokes the right service with the
+ 	user-info as argument, and the result (typically a command taking
+ 	a connection as argument) is passed to the continuation of the
+ 	userauth command.
+
+	* src/queue.h (FOR_QUEUE): Bugfix (Bazsi).
+
+Tue Apr  6 21:17:15 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/compiler.scm: Added support for let and let*.
+	(make-preprocess): New function.
+	
+Mon Apr  5 11:43:12 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/werror.c (werror_hex): Bugfix.
+
+	* src/service.c: Moved server-specific functionality to server.c. 
+
+	* src/server.c (make_service_request_handler): New function
+	(replaces make_service_handler in service.c).
+	(make_offer_service): New function (replaces the meta_service in
+	service.c). 
+
+	* src/lsh.c (make_client_connect): Invoke commands to perform user
+ 	authentication.
+
+	* src/connection.c (handle_connection): Display packet type in
+	debug messages. Uses packet_types.h.
+
+	* src/command.h (COMMAND_RETURN, COMMAND_CALL, COMMAND_SIMPLE):
+	Cast arguments to struct lsh_object *.
+
+	* src/Makefile.am.in: Added packet_types.h and channel_commands.c.
+	
+	* src/client_userauth.c: Bent the user authentication mechanism
+ 	into a command.
+
+	* src/client.c (request_service): Rewrote as a command. Also
+	removed some other old code. 
+	(make_request_service): Renamed function (was request_service()). 
+
+Sun Apr  4 22:18:54 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server.c (do_spawn_shell): Use the make_io_fd function.
+
+	* src/lsh_writekey.c, src/sexp_test.c (main): Use the make_io_fd
+ 	function.
+
+	* src/tcpforward.c (do_tcpip_connected): Use the make_io_fd
+ 	function.
+
+	* src/lsh.c, src/lshd.c: Use the control language language.
+ 	Commented out a lot of features that are currently broken.
+
+	* src/keyexchange.c (make_kexinit_handler): Removed finished
+	argument. 
+
+	* src/keyexchange.h (keyexchange_algorithm): Removed finished
+	argument from the init method. 
+
+	* src/connection_commands.c (connection_line_handler): Removed
+	continuation attribute.
+	(do_line): Don't invoke any continuation here; return LSH_OK and
+	let the keyexchange-init handlers do their work.
+	(make_connection_read_line): Removed continuation argument.
+
+	* src/connection_commands.c (connection_command): Added randomness
+ 	attribute.
+	(do_connection): Added call to connection_init_io.
+	(make_handshake_command): Added randomness argument.
+
+	* src/client_keyexchange.c (do_client): Removed finished
+ 	attribute.
+	(do_handle_dh_reply): Pass connection to the
+ 	connection->established continuation (if non-NULL).
+
+	* src/server_keyexchange.c (dh_server): Removed finished
+	attribute.
+	(do_handle_dh_init): Pass connection to the
+	connection->established continuation (if non-NULL).
+
+	* src/channel_commands.h (channel_open_command): Fixed declaration
+	of the new_channel method. 
+
+	* src/channel.c (do_channel_open_confirm, do_channel_open_failure,
+ 	init_channel): Use the channel_open_continuation attribute.
+
+	* src/io_commands.c (do_listen, do_connect): Use new
+ 	address_info2sockaddr_in() function.
+	(do_listen): If listen() failes, return LSH_COMMAND_FAILED, and
+	never invoke the command's continuation.
+	(make_simple_listen): New function.
+	(io_log_peer_command): New command.
+
+	* src/lsh.h (LSH_COMMAND_FAILED): New status code.
+
+	* src/io.c (get_portno): New function.
+	(tcp_addr): Commented out this function.
+	(make_address_info_c): New function.
+	(sockaddr_in2address_info): Renamed from sock
+	(sockaddr2info): Fixed bug in format string.
+	(address_info2sockaddr_in): New function.
+
+	* src/format.c (format_decimal): New function (previously
+	duplicated in several places).
+	(ssh_format): New format %di to write decimal integers.
+	(write_decimal_length): Use the format_decimal() function.
+
+	* src/werror.c (werror_decimal): Use the format_decimal() function.
+
+Fri Apr  2 17:00:13 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/make_class (process-expr): Fixed handling of the PARAMS
+	attribute. Declare generated functions static.
+
+	* src/io_commands.c (make_simple_connect): New function.
+
+Tue Mar 30 21:48:08 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/read_line.c (do_read_line): Bug fix noticed by Bazsi.
+
+Fri Mar 26 03:05:16 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/io_commands.c (listen_command_callback): Added BACKEND
+	variable.  
+	(do_connect): New function.
+
+	* src/client_keyexchange.c (do_handle_dh_reply): Invoke the
+ 	connection's ESTABLISHED continuation if the key exchange is
+ 	successful.
+	(dh_client_exchange, do_init_client_dh): Removed FINISHED
+ 	attribute.
+
+	* src/command.c, src/command.h (command_die_on_null): New command.
+ 	Don't know how useful it is.
+
+	* src/connection.c (make_ssh_connection): Take a continuation as
+	argument. 
+
+	* src/connection.h (ssh_connection): Added an ESTABLISHED
+	continuation, which replaces the FINISHED field previously found
+	in the keyexchange-related objects.
+
+	* src/keyexchange.c (kexinit_handler): Removed the FINISHED
+	attribute. 
+	(initiate_keyexchange): Deleted some of the arguments. The kexinit
+	is found inside the connection object, and so is any
+	first_kex_packet. 
+
+	* src/keyexchange.h: Changed the MAKE_KEXINIT method back. Added a
+	first_kex_packet field to the kexinit object, which may be filled
+	in by MAKE_KEXINIT.
+
+Wed Mar 24 02:56:41 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/channel_commands.c, src/channel_commands.h: New files.
+
+	* src/client.c (session_open_command): New class.
+
+	* src/channel.h (ssh_channel): Replaced the open_confirm and
+	open_failure methods with a command_continuation.
+
+	* src/connection_commands.c: New file. The connection_command
+	unifies some of the logic from in client.c and server.c.
+
+	* src/io.h (address_info): New class.
+	(fd_listen_callback): Use address_info rather than struct
+ 	sockaddr.
+
+	* src/io.c (make_io_fd): New function.
+	(io_read_write, io_read, io_write): Now takes a io_fd as argument,
+ 	rather than a numerical fd.
+
+	* src/keyexchange.h (make_kexinit): New definition of the
+ 	MAKE_KEXINIT method. Should create and register a kexinit message,
+	and return a string consisting of this message and any extra
+	speculative message. Should not actually write anything.
+
+Tue Mar 23 03:12:15 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/io_commands.c, src/io_commands.h: New files, for listen and
+	connect commands.
+
+Fri Mar 19 18:15:38 1999    <nisse@idonex.se>
+
+	* src/make_class (process-expr): Generate code using more
+	combinators. 
+
+Fri Mar 19 01:03:50 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/combinators.c: New file. Implemented all of the I, K, S, B,
+ 	C S', B' and C' combinators.
+
+	* src/command.c, src/command.h: Added collect_info_N and
+	collect_state_N (n=1, 2, 3, 4) to handle builtin functions that
+	need to collect some arguments before actually doing anything.
+
+Wed Mar 17 00:07:07 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/compiler.scm (let-and): New macro.
+	(match): Simple pattern matcher for optimizations.
+	(optimize): New optimizer.
+	(preprocess): Use the formal arguments in the right order.
+
+	* src/algorithms.c: Enable CAST. Bug fixes.
+
+Tue Mar 16 03:36:20 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/publickey_crypto.c (dh_process_server_msg,
+ 	dh_process_client_msg): Use GROUP_MEMBER to determine if dh-values
+ 	are valid. Currently, this method checks the size of the number,
+ 	but doesn't check that is indeed a member of the cyclic subgroup
+ 	used.
+
+	* src/read_packet.c (do_read_packet): Handle the case where the
+	first block contains an entire ssh packet (happens with twofish).
+
+	* src/tcpforward.c (tcpforward_foo): Use COMMAND_UNIMPLEMENTED, so
+	that the expression compiles.
+
+	* src/make_class (output-expression): Bug fix.
+
+	* src/io.c (do_read): Warn when called with a zero length.
+
+	* src/command.c (command_unimplemented): New command (which aborts
+	if called).
+
+Mon Mar 15 00:56:18 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/digit_table.c (main): Fixed hex digits a-f.
+
+	* configure.in: Disabled the AM_MAINTAINER_MODE macro.
+
+Sun Mar 14 21:04:58 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* README (ZLIB): Added canonical location of zlib (James Young). 
+
+Fri Mar 12 17:03:47 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.in: Added AM_MAINTAINER_MODE (Ray). Added changequote
+ 	calls when testing for specific utmp fields (Ray).
+
+Tue Mar  9 06:25:11 1999    <ray@zensunni>
+
+	* doc/TODO: Fixed typo.
+
+Sun Mar  7 20:32:52 1999    <ray@zensunni>
+
+	* src/cast.c: New.
+	* src/Makefile.am.in, src/crypto.c, src/crypto.h, src/algorithms.c:
+	Adapted for CAST-128.
+
+	* src/symmetric/include/cast.h, src/symmetric/cast.c: Added consts.
+	Added cast_selftest().
+
+	* src/symmetric/twofish.c (twofish_selftest): Fixed.
+	
+	* src/io.c, src/read_line.c, src/read_packet.c, src/read_scan.c: Added
+	asserts to ensure read() is called with a length > 0.
+
+	* doc/TODO: Removed the entry about CAST's patent status. RFC 2144
+	doesn't mention patents, and the abstract suggests CAST-128 is
+	unencumbered.
+
+	* doc/TODO, src/userauth.h: Fixed typos.
+
+Fri Mar  5 20:09:09 1999    <ray@zensunni>
+
+	* src/symmetric/twofish.c: Buglet fix by Ruud.
+
+	* make_am: Inserted space required for latest bash. (Noted by Ruud)
+
+Fri Mar 12 02:00:53 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/tcpforward.c (tcpforward-foo): Added a first test expression
+ 	for the compiler.
+
+	* src/make_class: Changed the magic tag. Now is "/* GABA:".
+ 	(process-expr): New function interfacing to compiler.scm.
+	(process-input, process-class): Splitted the process-class
+ 	function into several functions.
+
+	* src/command.c (gaba_apply, gaba_apply_S_1, gaba_apply_S_2): New
+ 	functions, to be called by automatically generated code.
+	(command_K, command_K_1) : Implemented the K combinator.
+
+Thu Mar 11 18:07:25 1999    <nisse@idonex.se>
+
+	* src/bignum.c (bignum_next_prime): Fixed off-by-one overflow.
+
+Wed Mar 10 17:26:59 1999    <nisse@idonex.se>
+
+	* src/command.c (do_call_simple_command): COMMAND_CALL method for
+	any command_simple instances.
+
+Thu Mar 11 03:01:00 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/server_pty.c (tty_setctty): Fixed error message.
+
+	* src/command.c: Made the builtin commands instances of
+ 	command_simple, which means that they can return results directly,
+ 	without any continuation function.
+
+Wed Mar 10 17:26:59 1999    <nisse@idonex.se>
+
+	* src/command.h (command_simple): New class. Like command, but can
+	return a value immediately, rather than using a continuation
+	function. 
+	(STATIC_COMMAND_SIMPLE): New macro to define a static command.
+
+Tue Mar  9 22:18:40 1999    <nisse@idonex.se>
+
+	* src/command.c (make_apply): New function.
+	Implemented the S and B combinators (no idea if they will turn out
+	to be useful), and a listen function.
+
+	* src/server.c (server_initiate, make_server_callback): Use new
+ 	fd_listen_callback type.
+
+	* src/io.h (fd_listen_callback): New class.
+
+	* src/io.c (tcp_addr): Moved this function from tcpforward.c.
+	(listen_callback): Pass the peer address to the listen callback.
+
+Mon Mar  8 19:22:30 1999    <nisse@idonex.se>
+
+	* src/publickey_crypto.c (make_zn): New argument: order.
+
+Mon Mar  8 00:29:17 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/command.c: New file.
+
+	* src/io.c (write_callback): Use the write_buffer_consume()
+	function. 
+
+	* src/resource.c, src/resource.h, src/write_buffer.c,
+	src/write_buffer.h: Use struct lsh_queue. 
+
+	* src/write_buffer.h (write_buffer->length): New instance
+ 	variable.
+
+	* src/write_buffer.c (write_buffer_consume): New function.
+
+	* src/queue.c, src/queue.h: New files. Generic doubly linked list.
+
+Sun Mar  7 15:21:43 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/werror.c (werror_decimal): Bug fix.
+
+	* src/server.c (do_open_session): Adapted to the new CHANNEL_OPEN
+ 	convention.
+	(make_server_connection_service): Renamed (was
+ 	make_server_session_Service).
+	(server_connection_service): New instance variable, backend.
+	Needed for tcp forwarding.
+
+	* src/io.c (io_read_write): Changed return type to struct io_fd *
+	(Bazsi). 
+
+	* src/tty.h (CFMAKERAW): Set the VMIN and VTIME attributes.
+
+	* src/tcpforward.c, src/tcpforward.h: New files (Bazsi). 
+
+	* src/channel.h (channel_open_callback): New class, for
+	opening new channels asyncronously.
+	* (channel_open): Handler method now takes a channel_open_callback
+	argument.
+
+	* src/channel.c (channel_open_response): New class.
+	(format_global_success): New function.
+	(do_channel_open_response): New function. 
+	(make_channel_open_response): New function.
+	(do_channel_open): Moved most processing into do_channel_open
+	response. 
+
+Fri Mar  5 03:23:06 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/symmetric/twofish.c, src/symmetric/twofish.h
+ 	(twofish_selftest): Made non static.
+	(twofish_setup): Removed memory allocation. Instead, a
+ 	TWOFISH_pointer is given as an argument.
+	(twofish_encrypt, twofish_decrypt): Use correct pointer types. No
+ 	void * or casts.
+
+	* src/symmetric/Makefile.am.in (noinst_PROGRAMS): Added
+	twofish_test and generate_q.
+	(Makefile.am): Updated the rule for this target.
+
+	* src/twofish.c (twofish_instance): Include the context struct
+	directly in the instance, without extra indirection.
+
+	* src/crypto.c: Marked this file as obsolete.
+
+	* src/algorithms.c (default_crypto_algorithms): Added
+	ATOM_TWOFISH_CBC and ATOM_IDEA_CBC.
+
+Wed Mar  3 13:26:02 1999    <ray@zensunni>
+
+	* src/symmetric/twofish.c, src/symmetric/include/twofish.h: New.
+	LGPL-ed Twofish implementation by Ruud de Rooij <ruud@debian.org>.
+	* src/twofish.c: New. Based on src/blowfish.c .
+	* src/atoms.in, src/Makefile.am.in, src/algorithms.c, src/crypto.c,
+	src/crypto.h: Updated for Twofish.
+
+Mon Mar  1 01:36:54 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/publickey_crypto.c (init_diffie_hellman_instance): Include
+ 	length fields when hashing.
+
+	* src/publickey_crypto.c: Some support for broken ssh2 signatures
+	(Bazsi).
+ 	(generic_dsa_sign): New function.
+	(do_dsa_sign_kludge): New function.
+	(make_dsa_signer_kludge): New function.
+
+	* src/client_keyexchange.c (do_init_client_dh): Renamed the
+	do_init_dh function.
+
+	* src/keyexchange.h (keypair_info): New type. 
+
+	* src/keyexchange.c (do_handle_kexinit): Added ssh2-dss kludge
+	(Bazsi). 
+	(make_keypair_info): New function.
+
+	* src/lshd.c: Deleted old code. Use a keypair_info alist for the
+ 	host key(s).
+
+	* src/server_keyexchange.h, src/server_keyexchange.c: Use a
+	keypair_info alist.
+	
+	* src/format.c (ssh_format): Added 'u' modifier, for unsigned
+	bignums. 
+
+	* src/connection.h (connection): Replaced the client_version and
+	server_version fields with an array. 
+
+	* src/atoms.in: Added ssh-dss-kludge atom (used for supporting
+ 	buggy ssh2 versions).
+
+	* configure.in: Test for syslog.h.
+	New --with-ssh2-dsa-kludge option.
+
+Sun Feb 28 19:29:36 1999    <ray@zensunni>
+
+	* configure.in: Fixed struct utmp member tests.
+
+	* misc/Makefile.am.in: Include ctags.mk.
+
+	* src/symmetric/twofish.c, src/symmetric/include/twofish.h: New.
+	Placeholders.
+	* src/symmetric/Makefile.am.in: Updated for twofish.
+
+	* src/atoms.in: With the updated draft, 256-bit TwoFish is now
+	recommended.
+
+Sun Feb 28 20:01:32 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/cvs_headers, src/used_headers: Fixes for compatibility with
+	non-GNU sed. 
+
+Sat Feb 27 04:43:25 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/werror.c, src/werror.h (set_error_ignore): New function.
+
+	* src/string_buffer.c (string_buffer_clear): Bug fix.
+
+	* src/server_pty.h (pty_info): Use string type for the tty_name
+	field. 
+
+	* src/server_pty.c (pty_allocate): Save the file name of te slave
+	tty. Corrected the returned values.
+	(tty_setctty): Ugly "fix" in the SysV-version of this function.
+	Better error messages.
+
+	* src/server.c (do_spawn_shell): Do child's pty handling before
+ 	closing fd:s. Pass struct pty_info to tty_setctty(). More debug.
+
+	* AUTHORS, src/reaper.c: Fixed typos. (Ray)
+	
+	* configure.in, acconfig.h: Check for ut_addr_v6 in struct utmp; check
+	for utmpx.h . Fixed openpty check. Check for syslog(). (Ray)
+
+Mon Feb 22 22:49:09 1999  Niels Möller  <nisse@lysator.liu.se>
+
+	* src/werror.c (werror_hex): Was completely broken. Fixed.
+
+	* configure.in: Fixed uses of AC_TRY_COMPILE.
+
+Thu Feb 18 21:48:54 1999    <ray@zensunni>
+
+	* (many files): Updated FSF address.
+
+	* AUTHORS: added getopt origin.
+	
+	* configure.in, acconfig.h: Check for ut_addr_v6 in struct utmp; check
+	for utmpx.h . Fixed openpty check. Check for syslog(). Fixed utmp
+	variations detection.
+
+	* doc/DSA.5, doc/SHA.5, doc/SPKI.5, doc/lsh.1, doc/lsh_keygen.1,
+	doc/lsh_writekey.1, doc/lshd.8, doc/secsh.5: New.
+
+	* src/server.c: Include strings.h if available (for bzero()); utmp
+	support; uptmx support.
+
+	* AUTHORS, src/reaper.c: Fixed typos.
+	
+Thu Feb 18 03:35:45 1999    <nisse@idonex.se>
+
+	* src/zlib.c: Reorganized. Now uses string_buffer for allocation.
+
+	* src/xalloc.c (debug_malloc, debug_free): Allocate memory in
+	units of long. Hopefully, this should solve the alpha alignment
+	problems. 
+
+	* src/werror.c: Initial syslog support.
+	(write_syslog): New function (Ray).
+	(set_error_syslog): New function.
+
+	* src/tty.c (tty_encode_term_mode): New implementation, by
+	Keresztg.
+
+	* src/string_buffer.c, src/string_buffer.h: New files. Handling of
+	strings whose lengths are not known in advance. Currently used
+	only by zlib.c.
+
+	* src/server_pty.c (pty_allocate): Added Ray's UNIX98-style pty
+	allocation. 
+	(tty_setctty): Moved from tty.c, and adapted to SysV/UNIX98.
+
+	* src/memcmp.c: Copied implementation from GNU textutils.
+
+	* src/abstract_crypto.c (memxor): Moved this function into a
+	separate file.
+
+	* make_am: Use a less efficient, but appearantly more rubust
+	method to generate the .dist_headers files.
+
+	* configure.in: Added tests for syslog, utmp, unix98/sysv ptys,
+	and fixed zlib configuration.
+
+Tue Feb 16 23:32:51 1999    <nisse@idonex.se>
+
+	* src/tty.h, src/tty.c: Fallback macro for the cfmakeraw function.
+
+	* src/lsh.c, src/lshd.c: Make it possible to disable pty support a
+ 	compile time.
+
+	* src/zlib.c: Temporarily disable zlib support, as it is a
+	dysfunctional state at when I'm building the 1999-02-16 snapshot.
+
+	* src/channel.h, optionchannel.c, optionconnection.c,
+ 	optionclient.c: Moved the channel table pointer to the connection
+ 	object, and general cleanup
+	(Bazsi).
+
+	* configure.in: New option --without-pty to disable pty support. 
+
+	* make_am, Makefile.am.in: Use BASH variable to start scripts.
+
+	* misc/ctags.mk: New file.
+
+Sat Feb 13 17:21:07 1999    <nisse@idonex.se>
+
+	* configure.in: Added test for the cfmakeraw function. 
+
+	* src/client.c (CFMAKERAW): Define this as a macro, if there is no
+	cfmakeraw function. (Rafal Maszkowski <rzm@icm.edu.pl>)
+
+	* configure.in: Check if libutil defines openpty.
+
+	* src/server.c (do_spawn_shell): Use STDIN_FILENO when calling
+	tty_setctty, not pty->slave. The latter fd is already closed.
+	(Noted by Keresztg).
+
+	* configure.in (SHUTDOWN_WORKS_WITH_UNIX_SOCKETS): Use AF_UNIX,
+	not AF_LOCAL (reported by Heinz Knutzen <heinz.knutzen@landsh.de>)
+
+Thu Feb 11 14:43:51 1999    <nisse@idonex.se>
+
+	* src/channel.c (do_channel_request): Delay freeing of packet
+	(reported by Ray Dassen). 
+
+Sun Jan 31 04:25:30 1999    <nisse@puck>
+
+	* src/werror.c (werror_vformat): New function, with different
+ 	format specifiers than standard printf. Many more specialized
+ 	public functions removed.
+
+	* src/format.c (format_size_in_decimal): Renamed and exported the
+	size_in_decimal() function.
+
+	* src/charset.c: New function.
+	(low_utf8_to_local): New function.
+	(utf8_to_local): New argument STRICT.
+
+Thu Jan 28 08:51:18 1999    <nisse@puck>
+
+	* src/tty.c (tty_encode_term_mode): New function (dummy).
+	(tty_decode_term_mode): New function (moved from server_pty.c).
+
+	* src/server.c (do_spawn_shell): pty support. Support for the
+	argv0 = "-*sh" convention.
+	(make_pty_handler): New function.
+
+	* src/parse.c (parse_uint8): Use unsigned for the result.
+
+	* src/lshd.c (main): Integrated sshd1 and pty support.
+
+	* src/lsh.h (LSH_CHANNEL_CLOSE): New status value.
+
+	* src/lsh.c (main): pty support.
+
+	* src/hmac.c (make_hmac_instance): Bug fix (Joseph Galbraith
+ 	<galb@rt66.com>)
+
+	* src/encrypt.c (do_encrypt): Update sequence number even if no
+	mac is in use. (Reported by Joseph Galbraith <galb@rt66.com>).
+
+	* src/client.c (make_shell_request): New function.
+	(make_pty_request): New function.
+	(do_open_confirm): Handle the new linked list of channel requests.
+	(request_info): New class.
+
+	* src/channel.c (channel_process_status): Handle
+ 	LSH_CHANNEL_CLOSE.
+	(do_channel_success, do_channel_failure): Ignore messages that
+ 	there is no handler for
+	(most likely, becase we have decided to give up and close the
+ 	channel).
+
+	* src/Makefile.am.in: Removed most program_SOURCES definitions.
+
+	* configure.in: Commented out the sshd1 related tests.
+	
+	* configure.in: Check for openpty(). Test for BSD style pty names.
+
+1999-01-19  Gordon Matzigkeit  <gord@trick.fig.org>
+
+	* server.c (do_spawn_shell): Make sure session->user->shell is not
+	null before we dereference it.
+	Set argv[0] to be the shell name wth a prepended hyphen.
+
+1999-01-19  Gordon Matzigkeit  <gord@trick.fig.org>
+
+	* src/Makefile.am: Don't clobber files unless the new one was
+	correctly regenerated.
+	
+Tue Jan 26 06:11:47 1999    <nisse@puck>
+
+	* client_pty.c client_pty.h server_pty.c server_pty.h tty.c tty.h:
+	Added new files.
+
+1999-01-21  Gordon Matzigkeit  <gord@trick.fig.org>
+
+	* src/server.h: Always include ssh1_fallback.h, and fix typo.
+
+	* src/server.c (server_initiate): If we need to delay the key
+	exchange, initialize a kexinit here and save it in
+	CONNECTION->KEXINITS[CONNECTION_SERVER] until DO_LINE has a chance
+	to use it.
+
+	* src/connection.c (make_ssh_connection): Use macros rather than
+	magic numbers to index KEXINITS and LITERAL_KEXINITS.
+
+	* src/server.c (do_line): Fix transposed arguments and missing
+	comma in SSH1_FALLBACK call.
+
+	* acconfig.h: Remove references to SSHD1.
+
+	* configure.in: Get rid of all the checks for SSHD1.  The user
+	should supply it at runtime.
+
+	* src/lshd.c (main): Implement the `--ssh1-fallback' flag to allow
+	people to specify an sshd1 at runtime.
+
+	* src/version.h (SSH1_SERVER_PROTOCOL_VERSION): Only use version
+	1.99 if we were told to fallback to ssh1.
+
+	* src/ssh1_fallback.h: SSHD1 does not need the port number because
+	we invoke it as if we were inetd.
+	src/ssh1_fallback.c: Likewise.
+	
+Tue Jan 19 16:12:16 1999    <nisse@puck>
+
+	* src/read_line.h: Changed prototype for line handlers.
+	* src/read_line.c (do_read_line): Changed prototype for line handlers.
+	* src/client.c (do_line): Changed prototype for line handlers.
+
+	* src/server.c (server_initiate): Pass fd and fallback object to
+	make_server_read_line.
+	(server_initiate): If ssh1 fallback is enabled,delay
+	initiate_keyexchange until after that the clients version string
+	has been received.
+	(do_line): Do the delayed initiate_keyexchange now.
+	(do_line): Invoke the fallback method.
+
+	* src/ssh1_fallback.h, src/ssh1_fallback.c: New files.
+
+Thu Jan 14 13:48:04 1999    <ray@zensunni>
+
+	* doc/lsh.1, doc/lsh_keygen.1, doc/lsh_writekey.1 doc/DSA.5, doc/SHA.5,
+	doc/secsh.5, doc/lshd.8: new.
+
+Thu Jan 14 09:09:06 1999    <ray@zensunni>
+
+	* lsh_keygen.c (usage, main): The algorithm employed is called DSA, not
+	DSS. DSS is the name of the standard that describes DSA.
+
+Sat Jan  9 16:12:16 1999    <ray@zensunni>
+
+	* server.c (do_line) Rearranged SSH1 fallback skeleton code.
+
+	* io.c (read_callback), reaper.c: Fixed typos.
+
+	* lib/Makefile.am.in, include/Makefile.am.in: added rule for making
+	.dist_headers (via the toplevel Makefile).
+
+Fri Jan  8 22:26:44 1999    <ray@zensunni>
+
+	* Makefile.am.in (depend): Run "make depend" in lib too.
+	  "make dist" now works out of the box.
+	
+	* server.c (do_line): Started SSH1 fallback code.
+
+Thu Jan  7 20:16:10 1999    <ray@zensunni>
+
+	* Makefile.am.in: remove .dist_classes and the various .dist_headers
+	and Makefile.am's as part of maintainer-clean.
+	Added rule to remake the various Makefile.am's from the toplevel dir. 
+
+	* Makefile.am.in, lib/Makefile.am.in, include/Makefile.am.in (ctags):
+	Improved the ctags generation.
+
+Wed Jan  6 22:03:16 1999    <ray@zensunni>
+
+	* Makefile.am.in: Added rules to generate .dist_classes and the various
+	.dist_headers . Added dist-hook target which depends on these to get
+	"make dist" closer to being sane.
+
+	* make_am: Don't output the double backslash for continuation when
+	./cvs_headers or ./used_headers output is empty, so no broken
+	Makefile.am's are generated (due to the definition of cvs_headers
+	and/or dist_x_files assimilating the text following them/it).
+
+Tue Jan  5 19:12:36 1999    <ray@zensunni>
+
+	* Makefile.am.in: New try at building dependency files.
+
+Tue Jan  5 18:26:01 1999    <ray@zensunni>
+
+	* NEWS, connection.c, keyexchange.c, zlib.c: Fixed typos.
+
+Tue Jan 19 03:20:29 1999    <nisse@puck>
+
+	* make_am: Recurse to find all subdirectories *before* invoking
+	the used_headers script. 
+
+Thu Jan 14 04:36:41 1999    <nisse@puck>
+
+	* dss_keygen.c (dss_nist_gen): Fixed off-by-one bug, discovered by
+	"Joseph Galbraith" <galb@rt66.com>.
+
+	* configure.in: Check for poll.h, sys/poll.h and crypt.h.
+
+Mon Jan 11 15:35:02 1999    <nisse@puck>
+
+	* Makefile.am.in (EXTRA_DIST): Add jpoll.c, jpoll.h, getopt.h,
+	getopt.c and getopt1.c to the distribution.
+
+	* io.c (get_inaddr): Check HAVE_INET_ATON.
+
+Sun Jan 10 21:56:37 1999    <nisse@puck>
+
+	* lshd.c (usage): Improved message.
+	(read_host_key): New function.
+	(main): Read host key from a file.
+
+	* sexp.c (sexp_n, sexp_un): Renamed and fixed this functiom
+	(doesn't use ssh_format anymore).
+	(sexp_sn): Implemented.
+	(sexp_assz): New function.
+	(sexp_get_un): New function.
+
+	* io.c (blocking_read): New function.
+
+Fri Jan  8 09:44:12 1999    <nisse@puck>
+
+	* sexp_streamed_parser.c (base64_decode): Fixed test for leftover
+	bits. 
+
+	* configure.in (CPPFLAGS): Add -I$srcdir (needed for lsh_types.h
+ 	to be found, when compiling in subdirectories, with VPATH).
+
+	* sexp.c (sexp_contents): New function.
+	(sexp_display): New function.
+	(do_vector_get): Use CAST_SUBTYPE.
+	(sexp_eqz): New function.
+	(sexp_check_type): New function.
+
+	* read_scan.c (do_read_scan): Check if the current scanner is NULL
+ 	_after_ scanning each character.
+
+	* bignum.h: Fix tests for gmp2/gmp.h (patches from Kalle Olavi
+ 	Niemitalo <tosi@ees2.oulu.fi>).
+
+Thu Jan  7 16:25:50 1999    <nisse@puck>
+
+	* sexp_streamed_parser.c: Added base 64 decoder.
+
+	* sexp.c (encode_base64): Bug fix (don't use several ++ in an
+ 	expression without sequence points).
+
+	* read_scan.h (TOKEN_NONE): New constant (used by the base64
+ 	decoder).
+
+Tue Jan  5 05:54:34 1999    <nisse@puck>
+
+	* keyexchange.c (kex_make_key): Fixed key expansion.
+
+	* des.c (make_des_instance): Fix _odd_ parity.
+
+	* cbc.c (do_cbc_encrypt): Bug fix.
+	(do_cbc_decrypt): Handle the case src == dst correctly.
+
+	* cascade.c (do_make_cascade): Make sure keys are applied in the
+	right (i.e. reversed) order when decrypting.
+
+	* Makefile.am.in (depend): Disabled the rule to explicitly build
+ 	dependency files.
+
+Sun Jan  3 16:54:29 1999    <ray@zensunni>
+
+	* digit_table.c: Fixed declaration of main.
+
+	* Makefile.am.in: remove .x files as part of maintainer-clean.
+
+	* Makefile.am.in, lib/Makefile.am.in, include/Makefile.am.in: added
+	support for ctags.
+
+	* configure.in: Remove superfluous spacing in compiler warnings.
+
+	* version.h, client.c (client_initiate), server.c (server_initiate):
+	Split PROTOCOL_VERSION in CLIENT_PROTOCOL_VERSION and
+	SERVER_PROTOCOL_VERSION, so the client won't report version 1.99 .
+
+	* configure.in: Look for SSH1 daemon as plain `sshd' too. Test that it
+	is usable.
+
+Sat Jan  2 18:25:16 1999    <ray@zensunni>
+
+	* TODO: Added logging; Noted we can't currently use Rivest's sexp code.
+
+	* resource.h, lsh_types.h: fixed typo.
+
+	* Makefile.am.in, lib/Makefile.am.in: Added pattern rule for
+	dependencies; added phony target `depend' to force dependencies to be
+	remade; remove dependency files (.P) as part of maintainer-clean.
+
+Fri Jan  1 18:08:03 1999    <ray@zensunni>
+
+	* acconfig.h, configure.in, server.c, version.h: Added skeleton for
+	SSH1 fallback support.
+
+	* TASKLIST: Added SSH1 fallback support.
+
+	* configure.in: Rewrote the comment about _GNU_SOURCE .
+
+	* AUTHORS, HACKING, NOTES, README, TODO: spelling, grammar fixes.
+
+	* TASKLIST: We have zlib support now.
+
+Mon Jan  4 11:25:43 1999    <nisse@puck>
+
+	* werror.c: Avoid using stdio functions.
+
+	* keyexchange.c (make_test_kexinit): Commented out this function.
+
+	* io.c (write_raw): New function.
+	(write_raw_with_poll): -"-
+
+	* alist.c (alist_addv): New function.
+	(alist_add): -"-
+
+Fri Jan  1 04:20:10 1999    <nisse@puck>
+
+	* make_char_classes (make-char-classes): Use #ifdef to separate
+	the table from the #defines.
+
+	* lsh_types.h (LSH_PARSED_OBJECT): New status code.
+
+	* io.c: Include lsh headers *before* system headers.
+	Use jpoll.h, not poll.h.
+
+	* io.c: (get_inaddr): Use inet_aton. How portable is that?
+
+	* poll.h, poll.c, pollemu.h, pollemu.c: Use the names jpoll (that
+ 	is the names used originally by Sean Reifschneider
+ 	<jafo@tummy.com>).
+
+Thu Dec 31 15:29:59 1998    <ray@penguin.wi.leidenuniv.nl>
+
+	* PORTS: new file.
+
+	* io.c: #include "config.h" so the #ifdef HAVE_POLL works.
+
+	* poll.h, pollemu.h: Renamed poll.h to pollemu.h; thus it will not be
+	found instead of a system poll.h whith -I. or -I$(srcdir) .
+	* pollemu.c, pollemu.h: Renamed too.
+	* io.c, pollemu.c: Changed #include accordingly.
+	* configure.in: Changed accordingly.
+
+	* configure.in: check for `gethostbyname' instead of `hostbyname'.
+
+	* io.c: define INADDR_NONE if the system doesn't provide it (e.g.
+	Solaris).
+
+	* io.c: #include <netinet/in.h> for struct in_addr.
+
+Wed Dec 30 17:38:03 1998    <ray@penguin.wi.leidenuniv.nl>
+
+        * io.c (get_inaddr): use symbolic constant to check inet_addr
+        result; fixes name resolving on Linux/Alpha.
+
+Thu Dec 31 00:06:43 1998    <nisse@puck>
+
+	* server.c (do_open_session): Mark arguments as UNUSED.
+
+	* read_packet.c (do_read_packet): Signedness fixes.
+
+	* publickey_crypto.c (make_dss_verifier): Mark closure algorithm
+	as UNUSED.
+
+	* packet_ignore.c (do_ignore): Mark arguments as UNUSED.
+
+	* make_class (do-struct-free-function, do-struct-mark-function):
+	Avoid warnings about unused parameters when the generated
+	functions are empty functions.
+
+	* keyexchange.c (kex_make_key): Signedness fix.
+
+	* io.c (get_inaddr): Use the protocol argument.
+
+	* disconnect.c (do_disconnect): Mark arguments as UNUSED.
+
+	* des.c (make_des_instance): Mark arguments as UNUSED.
+
+	* debug.c (do_rec_debug): Mark arguments as UNUSED.
+
+	* connection.c (do_fail): Marked connection argument UNUSED.
+
+	* configure.in (CPPFLAGS): Add more warning flags. But *not*
+	-Wcast-align.
+
+	* client_userauth.c (do_userauth_banner): Marked connection
+	argument UNUSED.
+
+	* client_password.c (read_password): Marked max_length argument
+	UNUSED.
+
+	* client.c (client_close_die): Marked closure argument UNUSED.
+
+	* channel.c (do_window_adjust): Marked connection argument UNUSED.
+	(do_channel_data): -"-
+	(do_channel_extended_data): -"-
+	(do_channel_eof): -"-
+	(do_channel_close): -"-
+	(do_channel_open_confirm): -"-
+	(do_channel_open_failure): -"-
+	(do_channel_success): -"-
+	(do_channel_failure): -"-
+
+	* arcfour.c (make_arcfour_instance): Mark mode argument UNUSED.
+
+	* io.c (get_inaddr): use symbolic constant to check inet_addr
+ 	result; fixes name resolving on Linux/Alpha.
+
+Wed Dec 30 11:57:28 1998    <ray@zensunni>
+
+	* atoms.in: added algorithms names used by SSH 2.0.11 (commented
+ 	out).
+
+	* configure.in: Enable a few more warnings.
+
+	* lib/desTest.c (method, encode, decode): ANSIfied function
+	declarations.
+
+	* include/des.h, desCode.h, desKerb.c, desQuick.c, desTest.c,
+ 	desUtil.c, desdata.c, desinfo.h: The DES code's copyright notice
+ 	is distributed in descore.README rather than plain README.
+
+	* abstract_crypto.c (gcd): Avoid unsigned underflow.
+
+	* sexp.c, sexp.h (sexp_nullp, sexp_c, sexp_a, sexp_z, sexp_n,
+ 	sexp_sn, sexp_format, encode_base64): Added const.
+
+	* TODO: removed obsolete entries; made a separate section for
+ 	freeness issues, and noted scsh's non-freeness.
+
+	* TASKLIST, TODO: Fixed typos.
+
+Wed Dec 30 01:14:28 1998    <nisse@puck>
+
+	* lsh_types.h (LSH_SYNTAX): New error code.
+
+	* lib/desTest.c (now): Disable use of rusage.
+
+	* sexp.c: Started on parser. Not at all working yet.
+	* sexp.h (sexp_iterator): Added iterator abstraction.
+
+	* lsh_types.h (MAX): Bug fix (by ceder).
+
+Mon Dec 28 14:14:57 1998    <nisse@puck>
+
+	* keyexchange.c (kex_make_key): Expand keys, when the required key
+	length is longer than tha hash output. (Bazsi).
+
+Sun Dec 27 06:37:40 1998    <nisse@puck>
+
+	* compress.c (packet_compressor): Removed the mode variable.
+
+	* server.c (do_line): Compression support.
+
+	* make_class: New type special-struct.
+
+	* lsh.c (main): Zlib support.
+	* lshd.c (main): Zlib support.
+
+	* keyexchange.c (kex_make_deflate): New function.
+	(kex_make_inflate): New function.
+	(do_handle_newkeys): Compression support.
+	(make_newkeys_handler): -"-
+	(do_install): -"-
+
+	* compress.h, compress.c, abstract_compress.c,
+	abstract_compress.h, zlib.h, zlib.c: New files (by Bazsi).
+	
+	* connection.c (connection_init_io): Compression support.
+	* client.c (do_line): Compression support.
+
+	* client.c (do_exit_signal): Send CHANNEL_EOF.
+
+	* configure.in: Fixed the configure test for shutdown. Check for
+	zlib.
+
+Sat Dec 26 02:37:18 1998    <nisse@puck>
+
+	* keyexchange.c (do_install): Bugfix: Look at closure->is_server
+	when generating MAC-keys (noted by Bazsi).
+
+	* lsh_keygen.c (main): Added getopt support. New options for
+	algorithm and output style.
+
+Wed Dec 23 23:06:45 1998    <nisse@puck>
+
+	* format.c (ssh_vformat_length): Added 'd' modifier, for
+	sexp-style length prefixes.
+	(ssh_vformat_write): -"-
+
+Sun Dec 20 20:11:02 1998    <nisse@puck>
+
+	* arcfour.c, blowfish.c, cascade.c, cbc.c, des.c, hmac.c, md5.c,
+	sha.c: New files, extracted from crypto.c and abstract_crypto.c.
+	
+	* server.c (do_line): Accept client version 1.99, if
+	DATAFELLOWS_SSH2_GREETING_WORKAROUND is defined.
+
+	* randomness.c (make_poor_random): Allow NULL init string. Use pid
+	for seeding.
+	(make_device_random): New function.
+	(make_reasonably_random): New function.
+
+	* bignum.c (bignum_write): New function.
+	(bignum_random_size): New function.
+	(bignum_small_factor): New function.
+	(bignum_next_prime): New function.
+
+	* Makefile.am.in (noinst_LIBRARIES): Collect most object files
+	into liblsh.a.
+
+Fri Dec 18 01:53:22 1998    <nisse@puck>
+
+	* server.c (do_eof): Consider closing (if CHANNEL_SENT_EOF and
+	CHANNEL_CLOSE_AT_EOF are both set).
+
+	* keyexchange.c (make_test_kexinit): Added hmac-md5 to the list of
+	acepted mac algorithms.
+
+	* io.h (CLOSE_EOF): Changed the meaning of this constant. Now used
+	also for EOF on writing.
+	* io.c (prepare_write): Use the close_reason CLOSE_EOF when a
+ 	closed write_buffer has been flushed successfully.
+
+	* io.c (write_callback): Report EPIPE and other write failures
+	differently.
+	
+
+	* crypto.c: Added md5 support by Balázs Scheidler.
+
+	* client.c (do_exit_status): Bugfix: Changed && to &.
+
+	* channel.c (channel_close_callback): Don't close channel when a
+	connected file is closed when we expect it.
+
+	* resource.c (do_free_resources): *Never* call lsh_object_free,
+	except from the gc_sweep function!
+
+Thu Dec 17 16:27:22 1998    <nisse@puck>
+
+	* server.c (make_process_resource): New function.
+	(server_die): Kill resources associated with the connection.
+	(do_close): New callback function till kill the process if the
+	channel is closed unexpectedly.
+
+	server.c (do_exit_shell): Don't close the process's stdin, or the
+ 	channel, until the client asks for it.
+
+	* server.c (make_server_close_handler): Take connection as
+	argument.
+
+Wed Dec 16 01:33:25 1998    <nisse@puck>
+
+	* resource.h, resource.c: New files.
+	
+	* channel.h (CHANNEL_CLOSE_AT_EOF): This flag now means that
+	the channel should be closed when EOF have been both sent and
+	received.
+	* channel.c (channel_eof): New meaning of CHANNEL_CLOSE_AT_EOF
+	flag.
+
+	* client.c (do_exit_status): Send eof, if we haven't done that
+	already.
+
+	* channel.c (do_channel_eof): Don't initiate close automatically
+	when eof has been both sent and received.
+
+	* list.c (make_int_listv): New function
+	(make_object_listv): New function
+
+	* keyexchange.c (do_install): Unified key installation.
+
+	* client_keyexchange.c (do_handle_dh_reply): Better handling of
+	weak keys (i.e. INSTALL_KEYS() returning NULL).
+	* server_keyexchange.c (do_handle_dh_init): -"-
+
+Tue Dec 15 00:01:33 1998    <nisse@puck>
+
+	* xalloc.c (lsh_list_alloc): Avoid unsigned under flow when length
+	is zero.
+
+Mon Dec 14 21:58:27 1998    <nisse@puck>
+
+	* parse.c (parse_atom_list): New limit argument; longer lists will
+	return NULL.
+
+Sat Dec 12 11:11:23 1998    <ray@zensunni>
+
+	* configure.in: Clarified comment. Added several warnings.
+
+	* keyexchange.c (select_algorithm): Had a terminiation condition
+ 	"i < LIST_LENGTH(client_list) >= 0" in a for loop, which is
+ 	probably nonsensical. Removed >= 0 part.
+
+	* lsh_types.h: Introduced UNUSED annotation. Enable GNU libc
+	extensions. Note: lsh_types.h must be included before any system header
+	for this to work properly.
+
+	* Makefile.am.in: Make gperf produce ANSI C output, and postprocess it
+	to fully initialise wordlist.
+
+	* lshd.c, lsh.c: Added a short usage string.
+
+	* include/crypto_types.h: Improved error messages.
+
+	* process_atoms: removed `.sh' from generator name in output.
+
+	* include/idea.h, lib/idea.c: Added note about IDEA being patent
+	encumbered.
+
+	* channel.c, keyexchange.c, lib/md5.c, lib/sha.c, pad.c, parse.c,
+	randomness.c, write_buffer.c: #include <string.h> for memcpy().
+
+	* bignum.c: #include <stdlib.h> for alloca().
+
+	* server_password.c: #include <crypt.h>
+
+	* io.c, reaper.c: Removed obsolete use of sa_restorer field of struct
+	sigaction. (This broke compilation on Linux/Alpha with glibc 2.0.high).
+	Initialised struct sigaction in a more portable fashion.
+
+	* bignum.c, charset.c, client_userauth.c, format.c, format.h, io.c,
+	list.c: Signedness/type fixes.
+	
+	* channel.c, client.c, client.h, debug.c, debug.h, disconnect.c,
+	disconnect.h, format.c, format.h, keyexchange.c, keyexchange.h,
+	process_atoms, server.c, server.h, werror.c, werror.h: Constness
+	improvements.
+
+	* client_userauth.c, format.c: Added internal prototypes.
+	
+	* crypto.c: Added UNUSED annotations.
+
+	* lib/util.c, lib/util.h, include/types.h: New. Bridge from GPG style
+	to lsh style, for blowfish.
+
+	* include/blowfish.h, lib/blowfish.c: Added blowfish code from GPG.
+
+	* crypto.c, crypto.c.x, crypto.h, lib/Makefile.am.in, lshd.c, lsh.c:
+	Added blowfish support.
+
+	* lib/Makefile.am.in: added dependency of desUtil.o on the generated
+	DES header files.
+
+	* TODO: Additions.
+
+	* Various spelling fixes.
+
+Tue Dec  8 10:29:50 1998    <nisse@puck>
+
+	* server_password.c (lookup_user): Integrated support for shadow
+ 	passwords, by Keresztg <kg230@hszk.bme.hu>.
+
+	* server.c (do_exit_shell): Close channel, if we have already sent
+	EOF.
+
+	* xalloc.c (lsh_object_clone): New function.
+
+	* server_keyexchange.c (do_init_dh): Copy the server key (as
+	strings can't be shared).
+
+	* crypto.c (do_sha_copy, ): Use the CLONE macro instead of memcpy to
+	copy instances.
+	(do_hmac_copy): -"-
+
+Fri Dec  4 02:30:28 1998    <nisse@puck>
+
+	* (practically every file): Adapted to new gc and object system.
+
+	* xalloc.c (lsh_object_check_subtype): Allow NULL pointers. They
+	are occasionally permissible (for instance, the NULL crypto
+	algorithm), and when they aren't the error will be detected early
+	anyway.
+	(lsh_object_check): -"-
+
+	* keyexchange.c (do_handle_kexinit): Use an object_list for
+ 	passing around the selected algorithms. The void ** that was used
+ 	earlier was unfriendly to the gc.
+
+Sun Nov 22 00:57:16 1998    <nisse@puck>
+
+	* lsh.c (main): Bug fix (pass *address* of crypto_rc4_algorithm).
+ 	Thanks to Keresztg <kg230@hszk.bme.hu>.
+
+	* lshd.c (main): -"-
+
+	* lsh_types.h: Moved definitions of UINT* to
+	include/crypto_types.h.
+
+	* io.c: Use Sean Reifschneider's poll-by-select emulation if
+	poll() is unavailable.
+

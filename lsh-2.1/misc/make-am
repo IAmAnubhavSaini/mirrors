@@ -1,0 +1,49 @@
+#! /bin/bash
+
+used_headers () {
+    (
+	extension=${1:-h}
+
+	cat .deps/*.Po \
+	    | tr ' ' '\n' \
+	    | grep `echo "\\.$extension"'$'` \
+	    | sed 's%^.*/\([^/]*\)$%\1%' \
+	    | sort | uniq
+    )
+}
+
+cvs_headers () {
+    sed -e 's%^/\([^/]*\.h\)/.*$%\1%' -e t -e d CVS/Entries | sort
+}
+
+make_include () {
+    (
+	name="$1"
+	echo "$1 = \\"
+	sed -e '$! s%$% \\%' -e 's%^%    %'
+    )
+}
+
+headers () {
+    comm -12 <(cvs_headers) <(used_headers) | make_include dist_headers
+}
+
+classes () {
+    used_headers x | make_include dist_classes
+}
+
+case "${1:-all}" in
+    headers)
+        headers
+    ;;
+    classes)
+        classes
+    ;;
+    all)
+        headers > .dist_headers
+	classes > .dist_classes
+    ;;
+    *)
+        exit 1
+    ;;
+esac

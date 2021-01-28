@@ -1,0 +1,33 @@
+#! /bin/sh
+
+echo lsh, encrypted key test
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+#exec  2>/dev/null >/dev/null
+
+
+fname="$TEST_HOME/lsh-encrypted-key-test-helper"
+keyname="$TEST_HOME/lsh-encrypted-key-test-key"
+
+rm -f "$fname" "$keyname"
+
+LSH_FLAGS="$LSH_FLAGS --identity=$keyname --askpass=$fname"
+
+# Set up the helper program
+# The password output should not include any trailing newline
+echo '#!/bin/sh' > $fname
+echo 'printf bar' >> $fname
+
+chmod u+rx $fname
+
+../lsh-keygen  | ../lsh-writekey -o $keyname -caes256-cbc -pbar || die "lsh-keygen failed"
+HOME=$TEST_HOME "$srcdir/../lsh-authorize" $keyname.pub
+
+HOME=$TEST_HOME spawn_lshd && run_lsh 'echo Hello world' && test_success
+
+test_done

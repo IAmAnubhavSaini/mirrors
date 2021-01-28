@@ -1,0 +1,35 @@
+#! /bin/sh
+
+echo lsh-decrypt-key-test
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+
+fname="$TEST_HOME/test-decrypt-helper"
+keyname="$TEST_HOME/test-decrypt-key"
+
+rm -f "$fname" "$keyname" "$keyname.decrypted" \
+ "$keyname.origkey" "$keyname.pub" "$keyname.nevercrypted" \
+ "$keyname.nevercrypted.pub"
+
+
+# Set up the helper program
+# The password output should not include any trailing newline
+echo '#!/bin/sh' > $fname
+echo 'printf bar' >> $fname
+
+chmod u+rx $fname
+
+../lsh-keygen > $keyname.origkey 
+../lsh-writekey -o $keyname -caes256-cbc -pbar <$keyname.origkey || die "lsh-writekey failed"
+../lsh-writekey -o $keyname.nevercrypted -c none <$keyname.origkey || die "lsh-writekey failed"
+
+../lsh-decrypt-key --in=$keyname --out=$keyname.decrypted --askpass=$fname || die "lsh-decrypt-key failed"
+
+cmp $keyname.decrypted  $keyname.nevercrypted >/dev/null && test_success
+
+test_done

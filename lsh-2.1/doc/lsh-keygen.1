@@ -1,0 +1,153 @@
+.\" COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" Copyright (C) 1999 J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are 
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a 
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this manual
+.\" into another language, under the above conditions for modified versions,
+.\" except that this permission notice may be stated in a translation approved
+.\" by the Free Software Foundation, Inc. <URL:http://www.fsf.org>
+.\"
+.\" END COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" If you make modified versions of this manual, please notify the current 
+.\" maintainers of the package you received this manual from and make your
+.\" modified versions available to them.
+.\"
+.TH LSH-KEYGEN 1 "NOVEMBER 2004" LSH-KEYGEN "Lsh Manuals"
+.SH NAME
+lsh-keygen \- Generates a keypair and write it on stdout.
+.SH SYNOPSIS
+.B lsh-keygen
+[\fIOPTION\fR...]
+
+.SH DESCRIPTION
+.B CAUTION! The information in this manpage may be invalid or outdated. For authorative
+.B information on lsh, please see it's Texinfo manual (see the
+.I SEE\ ALSO
+.B section).
+
+Generates a new private key for the desired algorithm 
+and security level and write it on stdout.
+
+You will usually want to pipe the new key into a program like
+.B lsh-writekey,
+to split it into its private and public parts, and
+optionally encrypt the private information.
+
+
+.SH OPTIONS
+
+
+.TP
+\fB\-a\fR, \fB\-\-algorithm\fR=\fIAlgorithm\fR
+DSA or RSA. Default is to generate RSA keys
+.TP
+\fB\-l\fR, \fB\-\-nist\-level\fR=\fISecurity\fR level
+For DSA keys, this is the NIST security level:
+Level 0 uses 512-bit primes, level 8 uses 1024 bit
+primes, and the default is 8. For RSA keys, it's
+the bit length of the modulus, and the default is
+2048 bits.
+.TP
+\fB\-\-server\fR
+Use the server's seed-file
+.TP
+\fB\-\-debug\fR
+Print huge amounts of debug information
+.TP
+\fB\-\-log\-file\fR=\fIFile\fR name
+Append messages to this file.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Suppress all warnings and diagnostic messages
+.TP
+\fB\-\-trace\fR
+Detailed trace
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Verbose diagnostic messages
+.TP
+-?, \fB\-\-help\fR
+Give this help list
+.TP
+\fB\-\-usage\fR
+Give a short usage message
+
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print program version
+.PP
+Mandatory or optional arguments to long options are also mandatory or optional
+for any corresponding short options.
+.PP
+
+.SH DIAGNOSTICS
+See the 
+.B --log-file
+,
+.B --verbose
+,
+.B --trace
+and 
+.B --debug
+options.
+
+.SH "REPORTING BUGS"
+Report bugs to <bug-lsh@gnu.org>.
+
+
+
+.SH ENVIRONMENT
+.B LSH_YARROW_SEED_FILE 
+may be used to specify the random seed file.
+
+
+
+.SH COPYING
+The lsh suite of programs is distributed under the GNU General Public
+License; see the COPYING and AUTHORS files in the source distribution for
+details.
+.SH AUTHOR
+The lsh program suite is written mainly by Niels M\[:o]ller <nisse@lysator.liu.se>.
+
+This man-page was written for lsh 2.0 by Pontus Freyhult
+<pont_lsh@soua.net>, it is based on a template written by
+J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>.
+
+.SH "SEE ALSO"
+.BR DSA (5),
+.BR lsh (1),
+.BR lsh-authorize (1),
+.BR lsh-decode-key (1),
+.BR lsh-decrypt-key (1),
+.BR lsh-export-key (1),
+.BR lsh-make-seed (1),
+.BR lsh-upgrade (1),
+.BR lsh-upgrade-key (1),
+.BR lsh-writekey (1),
+.BR lshd (8),
+.BR secsh (5),
+.BR SHA (5),
+.BR SPKI (5),
+.BR ssh-conv (1)
+
+The full documentation for
+.B lsh
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B lsh
+programs are properly installed at your site, the command
+.IP
+.B info lsh
+.PP
+should give you access to the complete manual.

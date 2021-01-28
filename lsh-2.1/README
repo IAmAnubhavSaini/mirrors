@@ -1,0 +1,134 @@
+LSH - a GNU implementation of the Secure Shell protocols.
+
+
+COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation. See the file COPYING for details.
+
+
+INSTALLATION
+
+If you have downloaded a release, you should be able to compile it
+with
+
+   ./configure
+   make
+   make install
+
+You need GNU make. Some shells have had bugs preventing them from
+executing the configure script; if you experience problems, try
+running
+
+  bash configure
+
+If you want to hack lsh, you need some more tools:
+
+ * autoconf
+
+ * automake
+
+ * bash,
+
+ * gcc,
+
+ * gperf (at least version 2.7)
+
+ * a scheme implementation. The currently supported schemes are guile
+   and scsh.
+
+All but scsh can be found at your local GNU mirror site. scsh,
+Olin Shiver's Scheme Shell, can be downloaded from <URL:
+http://www.scsh.net>. If you use guile, you also need the slib
+library, which is usually distributed separately. It's also available
+at the GNU mirrors.
+
+Optional programs that are needed to get the most out
+of the lsh testsuite:
+
+ * tcputils, available at ftp://ftp.lysator.liu.se/pub/unix/tcputils.
+
+ * tsocks (plus the supplied patch misc/tsocks-forcelocal.patch). It
+   can be downloaded from http://tsocks.sourceforge.net/.
+
+If you have checked out lsh from git, things are a little more
+complicated. Run the ./.bootstrap script, which will run aclocal,
+autoconf, autoheader and automake for you. This creates the configure
+script and several Makefile.in. Now run ./configure, to create
+Makefile. Next run make bootstap. This will create various
+automatically generated files. Then you are ready to run make, to
+build the programs.
+
+
+NEEDED LIBRARIES
+
+GNU GMP (version 3.1 or better), available at ftp.gnu.org, or some of
+its mirrors.
+
+GNU Nettle (version 2.2 or later), also available at ftp.gnu.org.
+
+ZLIB can be found at http://www.zlib.org. Older versions zlib have a
+known security problems, so make sure you get the latest one.
+
+liboop (version 0.8 or better) can be found at
+http://http://www.lysator.liu.se/liboop/.
+
+
+GETTING STARTED
+
+After install, the first thing you need to do is creating a seed-file
+for the randomness generator. Use
+
+  lsh-make-seed
+
+to create a personal seed file. If you want to run the lshd server,
+you also need to run
+
+  lsh-make-seed --server
+
+as root.
+
+Some examples...
+
+Create a new RSA key pair, and save it in ~/.lsh/identity and
+~/.lsh/identity.pub: 
+
+  lsh-keygen | lsh-writekey
+
+To create a key for the server, using the server's seed-file and
+storing the result as /etc/lsh_host_key and /etc/lsh_host_key.pub, run
+
+  lsh-keygen --server | lsh-writekey --server
+
+Start an lshd server in the background, on the default port, using the
+key at /etc/lsh_host_key, created above:
+
+  lshd --daemonic
+
+Connect to an lshd server running on port 4711 on HOST, and attempt to
+log in as USER:
+
+  lsh -p 4711 -l USER HOST
+
+
+MORE INFORMATION
+
+For more information on using LSH, read the LSH manual, doc/lsh.info
+or doc/lsh.html.
+
+For an introduction to the inner workings of LSH, see the file
+doc/HACKING.
+
+Several people have contributed to LSH, see the AUTHORS file for
+details.
+
+If you are interested in lsh, you may want to subscribe to the
+psst-list. Subscription address is psst-request@net.lut.ac.uk.
+
+LSH releases are available at
+<http://www.lysator.liu.se/~nisse/archive/> and
+<ftp://ftp.lysator.liu.se/pub/security/lsh>.
+
+Happy hacking,
+/Niels Möller <nisse@lysator.liu.se>

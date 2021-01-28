@@ -1,0 +1,14 @@
+#! /bin/sh
+
+echo lsh, cat test
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+spawn_lshd && exec_lsh "cat `pwd`/../lshd" > test.out1
+cat ../lshd > test.out2
+
+compare_output "lsh-cat-test"

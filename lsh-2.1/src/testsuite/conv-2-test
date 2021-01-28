@@ -1,0 +1,35 @@
+#! /bin/sh
+
+# Tests the conversion programs
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+# Keep silent unless -v is used.
+
+if [ x$1 != x-v ]; then
+    exec 2>/dev/null
+fi
+
+# All output is diagnostic
+exec 1>&2
+
+echo "conv-2-test: Testing ssh-conv and sexp-conv"
+
+($srcdir/../ssh-conv --decode-with ../lsh-decode-key | "$SEXP_CONV" |tee test.out1) <<EOF
+ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEApUmWhj0f4TD/XcDW88zcKo1ZYBn09jT0RzP1aoPwKuzFbvupfbvKjPB3SC6r8cXTH0OY60EdfcQs1YmteIJNMEnWEvV9ZHPJYanU6dVSlajnbKwEhqrFMLlRuS4UKJQ67A5NFt0WV9DjYaLIzY5RmPJYci/C8bo+Pawj8r/j1As= markus@cvs.openssh.com
+EOF
+
+cat >test.out2 <<EOF
+(public-key (rsa-pkcs1-sha1 (n |AKVJloY9H+Ew/13A1vPM3CqNWWAZ9PY09Ecz9WqD
+                                8CrsxW77qX27yozwd0guq/HF0x9DmOtBHX3ELNWJ
+                                rXiCTTBJ1hL1fWRzyWGp1OnVUpWo52ysBIaqxTC5
+                                UbkuFCiUOuwOTRbdFlfQ42GiyM2OUZjyWHIvwvG6
+                                Pj2sI/K/49QL|)
+                            (e "#")))
+EOF
+
+compare_output "conv-2-test"

@@ -1,0 +1,25 @@
+;; sexp_chars.in  -*-scheme-*-
+;;
+;; Character classes for the sexp syntax. Should be processed with
+;; make_char_classes to create tables and definitions.
+
+((lower . "abcdefghijklmnopqrstuvwxyz")
+ (upper . "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+ (alpha . (lower upper))
+ ;; SPC, TAB, LF, CR
+ (space . (#x20 #x9 #xa #xd))
+ (digit . "0123456789")
+ (octal . "01234567")
+ (hex . (digit "abcdefABCDEF"))
+ ;; base 64 digits, including the '=' pad character
+ (base64 . (alpha digit "+/="))
+ (base64_space . (space "="))
+ (control . ( (0 . #x1f) (#x80 . #x9f) #x7f))
+ ;; Characters that can (and must!) be escaped in quoted strings:
+ ;; \b \t \n \v \f \r \" \\
+ (escapable . (#x8 #x9 #xa #xb #xc #xd #x22 #x5c))
+ (punctuation . "-./_:*+=")
+ (token_start . (alpha punctuation))
+ (token . (token_start digit))
+ ;; Non-ascii characters defined by most iso-8859-x character sets
+ (international . (#xa0 . #xff)))

@@ -1,0 +1,51 @@
+/* -*- c -*-
+ *
+ * Defines file names and environment variables used by the lsh
+ * programs. Substitutions are performed at make time, not configure
+ * time. */
+
+#define PREFIX "@prefix@"
+#define BINDIR "@bindir@"
+#define SBINDIR "@sbindir@"
+#define LIBEXECDIR "@libexecdir@"
+#define SYSCONFDIR "@sysconfdir@"
+
+/* Filenames of installed lsh programs. Names of external programs, in
+ * particular xauth, are in config.h. */
+#define PATH_SEXP_CONV		BINDIR "/sexp-conv"
+#define PATH_KERBEROS_HELPER	SBINDIR "/lsh-krb-checkpw"
+#define PATH_EXECUV		SBINDIR "/lsh-execuv"
+
+/* Some other files: /dev/null, /tmp/.X11-unix..., /var/run, /, /tmp,
+ * /var/spool/lsh/yarrow-seed-file, /etc/lsh_host_key,
+ * /var/run/lsh_proxy.pid, /var/run/lshd.pid, /dev/ptmx, /dev/ptyxx,
+ * /dev/ttyxx, /tmp/.X11-unix, /var/adm/wtmp, /var/adm/wtmpx,
+ * /bin/sh. */
+
+/* Environment variables. These definitions serve mostly as a way to
+ * keep track of all the environment variables that are used.*/
+
+#define ENV_DISPLAY	"DISPLAY"
+#define ENV_HOME	"HOME"
+#define ENV_LOGNAME	"LOGNAME"
+#define ENV_SEED_FILE	"LSH_YARROW_SEED_FILE"
+#define ENV_PATH	"PATH"
+#define ENV_SEXP_CONV	"SEXP_CONV"
+#define ENV_SHELL	"SHELL"
+#define ENV_SSH_CLIENT	"SSH_CLIENT"
+#define ENV_SSH_TTY	"SSH_TTY"
+#define ENV_TERM	"TERM"
+#define ENV_TMPDIR	"TMPDIR"
+#define ENV_TZ		"TZ"
+#define ENV_USER	"USER"
+#define ENV_XAUTHORITY	"XAUTHORITY"
+
+/* To get the name of the logged in user, we need to check both
+   $LOGNAME (Sys V convention) and $USER (BSD convention). Consult
+   them in the same order as emacs and rcs. */
+
+#define USER_NAME_FROM_ENV(s) do {		\
+  (s) = getenv(ENV_LOGNAME);			\
+  if (!(s))					\
+    (s) = getenv(ENV_USER);			\
+} while (0)

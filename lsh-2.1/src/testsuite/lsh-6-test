@@ -1,0 +1,29 @@
+#! /bin/sh
+
+echo lsh, test 6, using various encryption algorithms
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+OLD_FLAGS="$LSH_FLAGS"
+
+ALGORITHMS="arcfour twofish blowfish 3des aes-cbc aes-ctr rijndael cast128 all"
+
+LSHD_FLAGS="$LSHD_FLAGS -c all"
+
+if spawn_lshd ; then
+    for c in $ALGORITHMS ; do 
+	echo Trying encryption flag $c
+	if LSH_FLAGS="$OLD_FLAGS -c $c" exec_lsh "exit 0"; then
+	    echo "   Ok"
+	else
+	    echo "   Fail"; test_fail
+	fi
+    done
+    test_success
+fi
+
+test_done

@@ -1,0 +1,4 @@
+#! /bin/sh
+
+make && make check && \
+  ./make_am --rethink && ./make_am && make && make distcheck

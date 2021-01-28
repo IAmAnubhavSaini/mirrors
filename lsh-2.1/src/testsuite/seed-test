@@ -1,0 +1,29 @@
+#! /bin/sh
+
+# Tests the randomness seeding
+
+echo Testing lsh-make-seed
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+for f in test-seed-1 test-seed-2 ; do
+    rm -f "$f"
+    ../lsh-make-seed --sloppy -q -o "$f" && [ -s "$f" ] || die "lsh-make-seed failed"
+done
+
+# Seeds should be different, so that cmp returns the exit code 1.
+if cmp test-seed-1 test-seed-2 ; then
+  test_fail
+else
+  if [ $? -eq 1 ] ; then
+    test_success
+  else
+    test_fail
+  fi
+fi
+
+test_done

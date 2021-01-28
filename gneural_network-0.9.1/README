@@ -1,0 +1,14 @@
+I am pleased to announce the version 0.9.1 of gneural_network.
+
+Even if the author has worked hardly and accurately on this project, surely, some bugs are still present.
+
+The implementation of this advanced program is brought to you by the efforts of Jean Michel Sellier.
+
+The basic algorithms implemented in this software are described in the documentation of gneural_network.
+
+See the file INSTALL for building and installation instructions.
+
+Please send all bug reports by electronic mail to:
+    jeanmichel.sellier@gmail.com
+
+gneural_network is free software.  See the file COPYING for copying conditions.

@@ -1,0 +1,22 @@
+#! /bin/sh
+
+conv () {
+    echo "$1" | sexp-conv -s transport | tee test.in
+}
+
+die () {
+    echo "Test failed:" "$@"
+    exit 1
+}
+
+echo foo | ../tools/spki-make-signature "$srcdir/key-1" \
+         | sexp-conv -s transport > test.in
+
+echo foo | ../tools/spki-check-signature "`cat test.in`" \
+     || die "Valid signature failed"
+
+if echo fooo | ../tools/spki-check-signature "`cat test.in`" ; then
+    die "Invalid signature accepted as valid"
+fi
+
+exit 0

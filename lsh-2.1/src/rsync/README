@@ -1,0 +1,10 @@
+This is some experimental stuff for using the rsync algorithm to
+transfer files.
+
+For protocol description, see protocol.txt.
+
+generate.c id for generating and sending a list of checksums.
+
+receive.c is for reconstructing a file at the receiver.
+
+

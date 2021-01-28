@@ -1,0 +1,285 @@
+.\" COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" Copyright (C) 1999 J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are 
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a 
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this manual
+.\" into another language, under the above conditions for modified versions,
+.\" except that this permission notice may be stated in a translation approved
+.\" by the Free Software Foundation, Inc. <URL:http://www.fsf.org>
+.\"
+.\" END COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" If you make modified versions of this manual, please notify the current 
+.\" maintainers of the package you received this manual from and make your
+.\" modified versions available to them.
+.\"
+.TH LSHD 8 "NOVEMBER 2004" LSHD "Lsh Manuals"
+.SH NAME
+lshd \- secsh (SSH2) server
+.SH SYNOPSIS
+.B lshd
+[\fIOPTION\fR...]
+.SH DESCRIPTION
+.B CAUTION! The information in this manpage may be invalid or outdated. For authorative
+.B information on lsh, please see it's Texinfo manual (see the
+.I SEE\ ALSO
+.B section).
+
+lshd is a server for the SSH-2 (secsh) protocol. 
+.SH OPTIONS
+.TP
+Miscellaneous options:
+
+.TP
+\fB\-h\fR, \fB\-\-host\-key\fR=\fIKey\fR file
+Location of the server's private key.
+.TP
+\fB\-\-interface\fR=\fIinterface\fR
+Listen on this network interface.
+.TP
+\fB\-p\fR, \fB\-\-port\fR=\fIPort\fR
+Listen on this port.
+.TP
+\fB\-\-debug\fR
+Print huge amounts of debug information
+.TP
+\fB\-\-log\-file\fR=\fIFile\fR name
+Append messages to this file.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Suppress all warnings and diagnostic messages
+.TP
+\fB\-\-trace\fR
+Detailed trace
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Verbose diagnostic messages
+.TP
+Algorithm selection:
+.HP
+\fB\-c\fR, \fB\-\-crypto\fR=\fIAlgorithm\fR
+.HP
+\fB\-\-hostkey\-algorithm\fR=\fIAlgorithm\fR
+.TP
+\fB\-\-list\-algorithms\fR
+List supported algorithms.
+.HP
+\fB\-m\fR, \fB\-\-mac\fR=\fIAlgorithm\fR
+.TP
+\fB\-z\fR, \fB\-\-compression\fR[=\fIAlgorithm\fR]
+Default is zlib.
+.TP
+\fB\-\-banner\-file\fR=\fIFile\fR name
+Banner file to send before handshake.
+.TP
+Keyexchange options:
+.TP
+\fB\-\-dh\-keyexchange\fR
+Enable DH support (default).
+.TP
+\fB\-\-no\-dh\-keyexchange\fR
+Disable DH support.
+.TP
+\fB\-\-no\-srp\-keyexchange\fR
+Disable experimental SRP support (default).
+.TP
+\fB\-\-srp\-keyexchange\fR
+Enable experimental SRP support.
+.TP
+User authentication options:
+.TP
+\fB\-\-kerberos\-passwords\fR
+Recognize kerberos passwords, using the helper
+program "/usr/local/sbin/lsh-krb-checkpw". This
+option is experimental.
+.TP
+\fB\-\-login\-auth\-mode\fR
+Enable a telnet like mode (accept
+none-authentication and launch thelogin-shell,
+making it responsible for authenticating the
+user).
+.TP
+\fB\-\-login\-shell\fR=\fIProgram\fR
+Use this program as the login shell for all users.
+(Experimental)
+.TP
+\fB\-\-no\-kerberos\-passwords\fR
+Don't recognize kerberos passwords (default
+behaviour).
+.TP
+\fB\-\-no\-login\-auth\-mode\fR
+Disable login-auth-mode (default).
+.TP
+\fB\-\-no\-password\fR
+Disable password user authentication.
+.TP
+\fB\-\-no\-publickey\fR
+Disable publickey user authentication.
+.TP
+\fB\-\-no\-root\-login\fR
+Don't allow root to login (default).
+.TP
+\fB\-\-password\fR
+Enable password user authentication (default).
+.TP
+\fB\-\-password\-helper\fR=\fIProgram\fR
+Use the named helper program for password
+verification. (Experimental).
+.TP
+\fB\-\-publickey\fR
+Enable publickey user authentication (default).
+.TP
+\fB\-\-root\-login\fR
+Allow root to login.
+.TP
+Offered services:
+.TP
+\fB\-\-no\-pty\-support\fR
+Disable pty allocation.
+.TP
+\fB\-\-no\-tcpip\-forward\fR
+Disable tcpip forwarding.
+.TP
+\fB\-\-no\-x11\-forward\fR
+Disable x11 forwarding.
+.TP
+\fB\-\-pty\-support\fR
+Enable pty allocation (default).
+.TP
+\fB\-\-subsystems\fR=\fIList\fR of subsystem names and programs
+For example
+`sftp=/usr/sbin/sftp-server,foosystem=/usr/bin/foo'
+(experimental).
+.TP
+\fB\-\-tcpip\-forward\fR
+Enable tcpip forwarding (default).
+.TP
+\fB\-\-x11\-forward\fR
+Enable x11 forwarding (default).
+.TP
+Options controlling daemonic mode and related options:
+.TP
+\fB\-\-daemonic\fR
+Run in the background, redirect stdio to
+/dev/null, and chdir to /.
+.TP
+\fB\-\-enable\-core\fR
+Dump core on fatal errors (disabled by default).
+.TP
+\fB\-\-no\-daemonic\fR
+Run in the foreground, with messages to stderr
+(default).
+.TP
+\fB\-\-no\-pid\-file\fR
+Don't use any pid file. Default in non-daemonic
+mode.
+.TP
+\fB\-\-no\-syslog\fR
+Don't use syslog (by default, syslog is used when
+running in daemonic mode).
+.TP
+\fB\-\-pid\-file\fR=\fIfile\fR name
+Create a pid file. When running in daemonic mode,
+the default is /var/run/lshd.pid.
+.TP
+-?, \fB\-\-help\fR
+Give this help list
+.TP
+\fB\-\-usage\fR
+Give a short usage message
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print program version
+.PP
+Mandatory or optional arguments to long options are also mandatory or optional
+for any corresponding short options.
+.SH FILES
+lshd doesn't use any traditional configuration file, but must have a random 
+seed file and the server key.
+By default 
+
+/var/spool/lsh/yarrow-seed-file 
+
+is used as random seed file (see 
+.B ENVIRONMENT
+for changing this) and
+
+/etc/lsh_host_key
+
+is the default key file.
+
+/var/run/lshd.pid
+
+is used to store the process id of the server by default.
+
+Authorized keys are stored in the directory
+
+$HOME/.lsh/authorized_keys_sha1/
+
+.SH DIAGNOSTICS
+Log messages are normally sent to syslog(3) when running in daemonic mode.
+
+See the 
+.B --verbose
+,
+.B --trace
+and 
+.B --debug
+options.
+
+.SH "REPORTING BUGS"
+Report bugs to <bug-lsh@gnu.org>.
+
+
+.SH ENVIRONMENT
+.B LSH_YARROW_SEED_FILE
+may be used to specify the random seed file.
+
+lshd mimics OpenSSH behaviour with respect to 
+.B SSH_CLIENT
+and 
+.B SSH_TTY
+for processes it starts where applicable.
+
+.SH COPYING
+The lsh suite of programs is distributed under the GNU General Public
+License; see the COPYING and AUTHORS files in the source distribution for
+details.
+.SH AUTHOR
+The lsh program suite is written mainly by Niels M\[:o]ller <nisse@lysator.liu.se>.
+
+This man-page was originally written by J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>. 
+It was modified and updated for lsh 2.0 by Pontus Freyhult <pont_lsh@soua.net>
+.SH "SEE ALSO"
+.BR lsftp (1),
+.BR lsh (1),
+.BR lsh-authorize (1),
+.BR lsh-keygen (1),
+.BR lsh-make-seed (1),
+.BR lsh-upgrade (1),
+.BR lsh-upgrade-key (1),
+.BR lsh-writekey (1),
+.BR secsh (5),
+.BR sftp-server (8),
+.BR syslogd (8)
+
+The full documentation for
+.B lsh
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B lsh
+programs are properly installed at your site, the command
+.IP
+.B info lsh
+.PP
+should give you access to the complete manual.

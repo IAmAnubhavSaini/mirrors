@@ -1,0 +1,44 @@
+lsh is written by Niels Möller, and distributed under the terms and
+conditions of the GNU General Public License (see the file COPYING for
+details). Several parts of lsh, in particular tcpforwarding,
+public-key user authentication, and the lsh_proxy program, were
+contributed by Balázs Scheidler.
+
+Many other people have written free code which is used in lsh.
+
+TWOFISH implementation by Ruud de Rooij. Released under the LGPL.
+
+BLOWFISH implementation from Werner Koch's and FSF's GNU Privacy
+Guard. Released under the GPL.
+
+CAST implementation by Steve Reid. Released into the public domain.
+
+DES implementation by Dana L. How. Released under the LGPL.
+
+IDEA implementation originally by Xeejia Lai, optimized by Colin
+Plumb. Released into the public domain.
+
+GMP, the GNU multiple precision arithmetic library, was written by
+Torbjörn Granlund and many contributors. It is not actually included
+in lsh, but it is needed for all public key computations. GMP is
+released under the LPGL.
+
+MD5 implementation by Colin Plumb, somewhat hacked by Andrew Kuchling.
+Released into the public domain.
+
+RIJNDAEL implementation by Rafael Sevilla.  Released under the LGPL.
+
+SHA implementation by Peter Gutmann, somewhat hacked by Andrew
+Kuchling. Released into the public domain.
+
+SERPENT implementation by Ross Anderson, Eli Biham, and Lars Knudsen,
+somewhat hacked by Rafael Sevilla.  Released under the GPL.
+
+TCPUTILS networking code by Thomas Bellman. Released into the public
+domain.
+
+POLL emulation code (for systems that have select(), but not poll())
+written by Sean Reifschneider, released for unlimited use.
+
+argp and getopt option parsing from the the GNU C library, released
+under the LGPL.

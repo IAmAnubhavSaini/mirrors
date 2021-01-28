@@ -1,0 +1,235 @@
+#!/bin/sh -e
+#
+# Script to build packages for solaris.
+#
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+
+CURRENT_ARCH="@BUILD_ARCH@"
+CURRENT_OSREV="@BUILD_OSREV@"
+CURRENT_OSSYS="@BUILD_OSSYS@"
+pkgname="pkg@PACKAGE_NAME@-@PACKAGE_VERSION@-$CURRENT_OSSYS-$CURRENT_OSREV-$CURRENT_ARCH"
+
+INFOFILES="doc/lsh.info src/nettle/nettle.info src/nettle/nettle.info-1 src/nettle/nettle.info-2";
+
+STARTUP=yes
+POSTINST=yes
+CHECKINST=yes
+COPYRIGHT=yes
+
+while [ $# != 0 ]; do
+  case "$1" in
+  help | -h | --help)
+    echo "Available options: nostartup nopostinst nocheckinst"
+    exit 0
+    ;;
+  nostartup)
+    STARTUP=no
+    ;;
+  nopostinst)
+    POSTINST=no
+    ;;
+  nocheckinst)
+    CHECKINST=no
+    ;;
+  nocopyright)
+    COPYRIGHT=no
+    ;;
+  *)
+    echo "Invalid option."
+    exit 1
+    ;;
+  esac
+  shift
+done
+
+
+cat - >pkginfo <<EOF
+PKG="@PACKAGE_NAME@" 
+NAME="GNU @PACKAGE_NAME@ - client, server and utilites." 
+VERSION="@PACKAGE_VERSION@" 
+ARCH="$CURRENT_ARCH" 
+VENDOR="GNU" 
+EMAIL="@PACKAGE_BUGREPORT@" 
+CATEGORY="system,utility" 
+CLASSES="none" 
+ISTATES="S s 1 2 3" 
+RSTATES="S s 1 2 3" 
+BASEDIR="/"
+MAXINST="1"
+EOF
+echo "i pkginfo" > proto
+
+
+if [ "x$POSTINST" = xyes ]; then
+  cat - >postinstall <<EOF
+echo Creating random seed
+#!/bin/sh
+@bindir@/lsh-make-seed --server 
+if [ -f /var/spool/lsh/yarrow-seed-file -a \! -f /etc/lsh_host_key ] ; then
+  echo Creating host key
+  @bindir@/lsh-keygen --server | @bindir@/lsh-writekey --server 
+else
+  if [ -f /etc/lsh_host_key ] ; then 
+    echo No need to create random seed or keys.
+  else
+    echo Sorry, your system state didn\\'t provide enough randomness
+    echo keygeneration, you must manually perform the following steps:
+    echo
+    echo @bindir@/lsh-make-seed --server
+    echo @bindir@/lsh-keygen --server \| @bindir@/lsh-writekey --server
+  fi
+fi
+if install-info --version; then
+  for p in $INFOFILES; do
+    install-info --info-dir="@infodir@" "@infodir@/"\`basename \$p\`
+  done 
+fi
+EOF
+  echo "i postinstall" >> proto
+
+  if [ "x$STARTUP" = xyes ]; then
+    echo echo Launching lsh server. >> postinstall
+    echo /etc/init.d/lsh-server start >> postinstall
+  fi
+  echo exit 0 >> postinstall
+
+fi
+
+if [ "x$CHECKINST" = xyes ]; then
+  cat - >checkinstall <<EOF
+#!/bin/sh
+
+r=\`uname -r\`
+p=\`uname -p\`
+
+if [ "\$p" != "$CURRENT_ARCH" -o "\$r" != "$CURRENT_OSREV" ]; then
+  echo Wrong platform or OS release, aborting installation.
+  exit 1
+fi
+  
+exit 0
+EOF
+  echo "i checkinstall" >> proto
+fi
+
+if [ "x$COPYRIGHT" = xyes ]; then
+  cat - >copyright <<EOF
+LSH - a GNU implementation of the Secure Shell protocols
+written by Niels Möller. Solaris packaging by Pontus Sköld.
+
+COPYRIGHT
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation. See the file COPYING for details.
+
+Bugs in lsh can be reported to @PACKAGE_BUGREPORT@.
+EOF
+  echo "i copyright" >> proto
+fi
+
+echo "d none @bindir@ 0755 root root" >> proto
+echo "d none @sbindir@ 0755 root root" >> proto
+echo "d none @infodir@ 0755 root root" >> proto
+echo "d none @includedir@ 0755 root root" >> proto
+echo "d none @includedir@/nettle 0755 root root" >> proto
+echo "d none @libdir@ 0755 root root" >> proto
+echo "d none @sysconfdir@ 0755 root root" >> proto
+echo "d none @localstatedir@/run 0755 root root" >> proto
+
+if [ "x$STARTUP" = xyes ]; then
+  cat - >lsh-server <<EOF
+#!/sbin/sh
+#
+PIDFILE=@localstatedir@/run/lshd.pid
+
+case "\$1" in
+  start)
+    if [ -x "@sbindir@/lshd" -a -f /etc/lsh_host_key ]; then
+      echo "Starting lsh daemon"
+      if [ -x "@sbindir@/sftp-server" ]; then
+	SFTP_OPT='--subsystems=sftp=@sbindir@/sftp-server'
+      fi
+      if [ -d /tmp/.X11-unix ]; then 
+	:
+      else
+	mkdir /tmp/.X11-unix
+	chmod a+wt /tmp/.X11-unix
+      fi
+      if [ -f \$PIDFILE ] && kill -0 \`/usr/bin/cat \$PIDFILE\`; then
+        echo "lsh server seems to be running already."
+	exit 0
+      else
+        rm -rf @localstatedir@/run/lshd.pid
+        @sbindir@/lshd --daemonic --x11-forward \$SFTP_OPT --pid-file=\$PIDFILE --password-helper=@sbindir@/lsh-pam-checkpw
+      fi
+    fi
+    ;;
+  stop)
+    if [ -f \$PIDFILE ]; then
+      LSHD_PID=\`/usr/bin/cat \$PIDFILE\`
+      if [ "x\$LSHD_PID" != "x" ]; then
+        echo "Stopping lsh daemon (without killing existing"
+	echo "connections, do kill \$LSHD_PID to really kill them)."
+        kill \$LSHD_PID
+      fi
+    fi
+    ;;
+  restart)
+    "\$0" stop
+    sleep 3
+    "\$0" start
+    ;;
+  *)
+    echo "Usage: \$0 {start|stop}"
+    exit 1
+    ;;
+esac
+EOF
+  echo "f none /etc/init.d/lsh-server=lsh-server 0755 root root" >> proto
+  echo "f none /etc/rc2.d/S70lsh-server=lsh-server 0755 root root" >> proto
+  echo "f none /etc/rc2.d/K70lsh-server=lsh-server 0755 root root" >> proto
+  echo "f none /etc/rc1.d/K70lsh-server=lsh-server 0755 root root" >> proto
+  echo "f none /etc/rc0.d/K70lsh-server=lsh-server 0755 root root" >> proto
+  echo "f none /etc/rcS.d/K70lsh-server=lsh-server 0755 root root" >> proto
+fi
+
+
+
+
+for p in $INFOFILES; do
+  echo "f none @infodir@/"`basename $p`"=$p 0644 root root" >> proto
+done
+
+for p in aes.h base64.h cast128.h des.h knuth-lfib.h md5.h realloc.h \
+         sexp.h yarrow.h arcfour.h blowfish.h cbc.h dsa.h macros.h \
+         nettle-meta.h rsa.h sha.h base16.h buffer.h des-compat.h \
+         hmac.h md5-compat.h pgp.h serpent.h twofish.h ; do 
+  echo "f none @includedir@/nettle/$p=src/nettle/$p 0644 root root" >> proto 
+done
+
+for p in src/nettle/libnettle.a; do
+  echo "f none @libdir@/"`basename $p`"=$p 0644 root root" >> proto
+done
+
+for p in sftp/lsftp lsh-authorize lsh-decrypt-key lsh-keygen lsh-upgrade \
+         lshg srp-gen lsh lsh-decode-key lsh-export-key lsh-make-seed \
+         lsh-writekey nettle/tools/sexp-conv ssh-conv; do
+  if [ -f "src/$p" ]; then
+    echo "f none @bindir@/"`basename $p`"=src/$p 0755 root root" >> proto
+  fi
+done
+
+for p in lsh-execuv lsh-krb-checkpw lsh-pam-checkpw lshd sftp/sftp-server; do
+  if [ -f "src/$p" ]; then
+    echo "f none @sbindir@/"`basename $p`"=src/$p 0755 root root" >> proto
+  fi
+done
+
+mkdir $pkgname || /bin/true
+pkgmk -o -d $pkgname -f proto && pkgtrans -s $pkgname \
+ ../"@PACKAGE_NAME@-@PACKAGE_VERSION@-$CURRENT_OSSYS-$CURRENT_OSREV-$CURRENT_ARCH.pkg" @PACKAGE_NAME@
+
+echo Created "@PACKAGE_NAME@-@PACKAGE_VERSION@-$CURRENT_OSSYS-$CURRENT_OSREV-$CURRENT_ARCH.pkg"

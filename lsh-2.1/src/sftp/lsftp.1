@@ -1,0 +1,235 @@
+.\" COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" Copyright (C) 1999 J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are 
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a 
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this manual
+.\" into another language, under the above conditions for modified versions,
+.\" except that this permission notice may be stated in a translation approved
+.\" by the Free Software Foundation, Inc. <URL:http://www.fsf.org>
+.\"
+.\" END COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" If you make modified versions of this manual, please notify the current 
+.\" maintainers of the package you received this manual from and make your
+.\" modified versions available to them.
+.\"
+.TH LSFTP 1 "NOVEMBER 2004" LSFTP "Lsh Manuals"
+.SH NAME
+lsftp - Client for the sftp subsystem 
+.SH SYNOPSIS
+.B lsftp [OPTION]... [-- [COMMAND]...]
+
+.SH DESCRIPTION
+\fBlsftp\fP is a program that connects to a remote sftp server, and
+can be used to upload download files \['a] la FTP. When invoked with no
+command arguments, lsftp enters interactive mode, much like \fBftp
+(1)\fP (although with a more feature rich interface, providing tab
+completion, recursive up and downloads and more). However, when the
+\fI--\fP argument and subsequent commands are passed to lsftp, lsftp
+simply executes those commands and exits.
+
+.SH OPTIONS
+Anything 
+(except the special options
+--,
+.B --help
+and
+.B --version
+) before the last (if any) -- is handled as options, meaning lsftp
+passes them directly to the transport program. If you want to pass --
+to the transport program, you must give an extra -- to make sure it's
+not handled as end of options, e.g.
+
+lsftp OPTIONS -- MORE OPTIONS --
+
+to enter interactive mode or
+
+lsftp -l OTPIONS -- MORE OPTIONS -- ls
+
+to perform the
+.B ls
+command.
+
+.TP
+Available options:
+
+.TP
+.B \-\-help
+Show summary of options.
+.TP
+.B \-\-version
+Show version of program.
+.TP
+.B \-\-
+End of options (if the last occurence).
+
+
+.SH COMMANDS
+.TP
+.B cd \fIdirectory\fP
+Change the current directory on the remote server to \fIdirectory\fP.
+.TP
+.B rm \fIfilespec\fP
+Removes files or directories. To delete directories, the \-r option needs to be
+specified. The rm command doesn't accept wildcards by default, to enable these
+you must specify the \-g option.
+.TP
+.B delete
+Alias for \fBrm\fP.
+.TP
+.B mkdir \fIdir\fP
+Make directory \fIdir\fP.
+.TP
+.B about
+Display information about lsftp.
+.TP
+.B help
+Displays a list of commands.
+.TP
+.B ?
+Alias for \fBhelp\fP.
+.TP
+.B longhelp
+Displays the list of commands with detailed information about each command.
+.TP
+.B ls \fIfilespec\fP
+List remote files and folders.
+.TP
+.B list
+Alias for \fBls\fP.
+.TP
+.B dir
+(Another) Alias for \fBls\fP.
+.TP
+.B pwd
+Print the current working directory.
+.TP
+.B quit
+Quit lsftp.
+.TP
+.B exit
+Quit lsftp.
+.TP
+.B set [\fIvar=value\fP]
+Sets or shows variables. Without an argument, \fIset\fP displays the current variable state. With
+a \fIvar=value\fP argument, \fBset\fP sets the appropriate variable in the environment.
+.TP
+.B mail
+Runs the \fBmail (1)\fP command.
+.TP
+.B umask [\fIvalue\fP]
+Sets or displays the remote umask.
+.TP
+.B jobs
+Prints information about currently running jobs.
+.TP
+.B open \fIsite\fP
+Open a sftp connection to \fIsite\fP.
+.TP
+.B close
+Close the current connection.
+.TP
+.B mv \fIold\-filename\fP \fInew\-filename\fP
+Rename file \fIold\-filename\fP to \fInew\-filename\fP.
+.TP
+.B rename
+Alias for \fBmv\fP.
+.TP
+.B ln \fIfile\fP \fIlink\fP
+Make \fIlink\fP a symlink to \fIfile\fP.
+.TP
+.B get \fIremote\-file\fP
+Retrieve \fIremote\-file\fP on the remote system to the local system.
+.TP
+.B put \fIlocal\-file\fP
+Send \fIlocal\-file\fP on the local system to the remote system.
+.TP
+.B chown \fIuid\fP \fIfile\fP
+Change the ownership of \fIfile\fP to be owned by the user represented by
+\fIuid\fP.
+.TP
+.B chgrp \fIgid\fP \fIfile\fP
+Change the group ownership of \fIfile\fP to be owned by the group represented by
+\fIgid\fP.
+.TP
+.B lcd \fIdir\fP
+Change the current local directory to \fIdir\fP.
+.TP
+.B lrm \fIfile\fP
+Remove \fIfile\fP from the \fBlocal\fP system.
+.TP
+.B ldelete
+Alias for \fBlrm\fP.
+.TP
+.B lls
+List files on the local system.
+.TP
+.B llist
+Alias for \fBlls\fP.
+.TP
+.B lpwd
+Print the current local working directory.
+.TP
+.B ! \fIcommand\fP
+Executes \fIcommand\fP in a shell on the local system.
+
+
+
+
+.SH ENVIRONMENT
+.TP
+.B LSFTP_RSH
+The program to use for the SSH tunnel. If the variable is not set, lsftp
+defaults to using lshg.
+.TP
+.B LSFTP_BEFORE_ARGS
+.TP
+.B LSFTP_AFTER_ARGS
+
+may be used to specify default options to be parsed before and after
+the command line options, making it possible to provide default
+transport options as well as commands if desired.
+
+.SH "REPORTING BUGS"
+Report bugs to <bug-lsh@gnu.org>.
+
+
+.SH COPYING
+The lsh suite of programs is distributed under the GNU General Public
+License; see the COPYING and AUTHORS files in the source distribution for
+details.
+.SH AUTHOR
+The lsh program suite is written mainly by Niels M\[:o]ller <nisse@lysator.liu.se>. The lsftp client
+was written mainly by Pontus Freyhult.
+
+This man-page was written for lsh 2.0 by Pontus Freyhult
+<pont_lsh@soua.net>, it is based on a template written by
+J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>. Most of the text was taken from the 
+man page provided for the Debian GNU/Linux system by Timshel Knoll <timshel@debian.org>.
+
+.SH "SEE ALSO"
+.BR lsftp (1),
+.BR lshd (8),
+.BR sftp (1),
+.BR sftp-server (8)
+
+The full documentation for
+.B lsh
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B lsh
+programs are properly installed at your site, the command
+.IP
+.B info lsh
+.PP
+should give you access to the complete manual.

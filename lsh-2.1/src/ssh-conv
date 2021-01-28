@@ -1,0 +1,42 @@
+#! /bin/sh
+
+SSH_CONV="lsh-decode-key"
+
+while [ $# -ge 1 ]; do
+    case "$1" in
+	--usage|--help)
+	    echo "Usage: ssh-conv [OPTION]"
+	    echo "Converts an OpenSSH style public key to spki format."
+	    echo
+	    echo "  --decode-with PROGRAM-NAME    The program to use for the"
+	    echo "                                actual decoding."
+	    echo
+	    echo "Report bugs to <bug-lsh@gnu.org>."
+	    exit 0
+	    ;;
+	--decode-with)
+	    shift
+	    SSH_CONV=$1
+	    ;;
+	*)
+	    echo "ssh-conv: unrecognized option \`$1'"
+	    echo "Try \`ssh-conv --help' or \`ssh-conv --usage' for more information."
+	    exit 1
+	    ;;
+    esac
+    shift
+done
+
+if type "$SSH_CONV" >/dev/null 2>&1; then : ; else
+    echo "ssh-conv: Can't find the program \`$SSH_CONV'."
+    exit 1
+fi
+
+awk 'BEGIN { state = 0; }
+     state == 0 && /^---- BEGIN SSH2 PUBLIC KEY/ { state = 1; next; }
+     state == 1 && $0 ~ /^---- END SSH2 PUBLIC KEY/ { state = 2 }
+     state == 1 && $0 !~ /:/ { print }
+     state == 2 { next } 
+     state == 0 && /^ssh-dss/ { print $2; }
+     state == 0 && /^ssh-rsa/ { print $2; }' \
+  | $SSH_CONV -b

@@ -1,0 +1,358 @@
+This file contains notes that don't fit in the TODO or TASKLIST files.
+
+
+NO PAM SUPPORT
+
+I spent a day reading the PAM documentation. My conclusion was that
+PAM is not at all suited for handling ssh user authentication. There
+are three main problems, the first two of which would be show-stoppers
+for any SSH server, while the last is a problem that affects servers
+like lshd which doesn't fork() for each connection.
+
+(i) The design of PAM is to hide all details about the actual
+authentication methods used, and that the application should never
+know anything about that. However, ssh user authentication is about
+particular authentication methods. When the client asks which
+authentication methods can be used, the server should be able to tell
+it, for example, whether or not password authentication is acceptable.
+When the client tries the password authentication method, no other
+method should be invoked. But PAM won't let the server know or control
+such details. This problem excludes using PAM for anything but simple
+password authentication.
+
+(ii) PAM wants to talk directly to the user, to ask for passwords,
+request password changes, etc. These messages are not abstracted *at*
+*all*, PAM gives the application a string and some display hints, and
+expects a string back as the users response. This mode of operation
+doesn't fit with the ssh user-authentication protocol. 
+
+If PAM would tell the ssh server that it wanted the user to chose a
+new password, for instance, the server could the appropriate message,
+SSH_SSH_MSG_USERAUTH_PASSWD_CHANGEREQ, to the client, and pass any
+response back to PAM. But PAM refuses to tell the application what it
+really wants the user to do, and therefore there's no way the server
+can map PAM's messages to the appropriate SSH packets. This problem
+excludes using PAM for password authentication.
+
+(iii) The PAM conversation function expects the server to ask the user
+some question, block until a response is received, and then return the
+result to PAM. That is very unfriendly to a server using a select()
+loop to manage many simultaneous tasks. This problem by itself does
+not exclude using PAM for a traditional accept(); fork()-style server,
+but it is completely unacceptable for lshd.
+
+
+DSS KEY GENERATION
+
+I have implemented DSS key generation, using the method recommended by
+NIST (algorithm 4.56 of Handbook of Applied Cryptography) to generate
+the public primes. According to Werner Koch, the method used in GNU
+Privacy Guard, suggested by Lim-Lee at Crypto '97, may be a lot
+faster:
+
+> I generate a a pool of small primes (160 bits for a prime up to 1024
+> bits), multiply a couple of them, then double the result, add 1 and
+> check wether this is a prime (5 times Rabin-Miller) and continue
+> with a new permutation until I found a prime. (p = 2*q*p1*p2 ... *
+> pn + 1).
+
+
+EOF ON CHANNELS
+
+A typical channel (i.e. all channels created in the current
+implementation) are, at each end, connected to one or more fd:s for
+reading and writing. When the source fd(:s), i.e. the fd:s that we are
+reading, have no more data available, a CHANNEL_EOF message should be
+sent. As there may be several such fd:s, we use a counter SOURCES in
+the channel struct to keep track of the number of active source fd:s.
+When an fd is closed, the counter is decremented, and when it reaches
+zero, the CHANNEL_EOF message is sent.
+
+The decrementing of the counter is done by the close-callback for the
+fd, not by the read handler, as this is the easiest way to
+ensure that it is called exactly once whenever a fd dies. However, the
+sending of the CHANNEL_EOF message is done by the read handlers
+do_channel_write() and do_channel_write_extended(). This is because
+otherwise, eof on bidirectional fd:s migth be delayed until it is
+closed also for writing. There are more unsolved issues with
+bidirectional fd:s though, in particular tcp connections where one
+direction is closed (with shutdown()) long before the other.
+
+
+CLOSING CHANNELS
+
+The right conditions for closing a channel, and in particular a
+session, are even more subtle. The basic rules are:
+
+1. When SSH_MSG_CHANNEL_CLOSE is both sent and received, the channel
+   is killed. This is unconditionally required by the spec.
+
+2. When SSH_MSG_CHANNEL_EOF is both sent and received,
+   SSH_MSG_CHANNEL_CLOSE is sent. This is a rule with a few
+   exceptions, controlled by the CHANNEL_CLOSE_AT_EOF flag, see below.
+
+These two rules are sufficient for most channel types.
+
+When looking at the channel close logic for session channels, one has
+to consider these three events that may occur in arbitrary order:
+
+ * The client sends SSH_MSG_CHANNEL_EOF on the channel.
+
+ * The server sends SSH_MSG_CHANNEL_EOF on the channel (this happens
+   when there are no more processes which have the files the server
+   has opened for stdout or stderr open).
+
+ * The child process created by the server dies. An exit-status or
+   exit-signal message is sent to the client.
+
+Previous versions of lshd handled these conditions as follows: It
+closed the channel according to rule (2) above, no exceptions. This
+causes other clients to hang, because they never send any
+SSH_MSG_CHANNEL_EOF. Using lsh did work right, only because it
+responded to the exit-status message with a SSH_MSG_CHANNEL_EOF.
+
+But the server can't rely on clients sending SSH_MSG_CHANNEL_EOF.
+Instead, it must treat process death in much the same way as reception
+of SSH_MSG_CHANNEL_EOF. The channel is closed once the server has both
+encountered EOF on the process' stdout and stderr (resulting in a
+SSH_MSG_CHANNEL_EOF), and sent an exit-status or exit-signal message.
+
+As a further complication, rule (2) must be relaxed, because otherwise
+the channel may get closed before the exit-status message is sent.
+
+
+PARSING USING STRUCT SIMPLE_BUFFER
+
+I view the simple_buffer objects as bookkeeping objects only. They
+don't own any storage. They are *always* allocated on the stack, and
+are therefore short-lived and not garbage collected.
+
+The idea is that you initialize a simple_buffer to parse some data, and do
+all the parsing more or less immediately. When parsing is done, forget
+the buffer object, and free the underlying data if appropriate.
+
+In most cases, parsing looks like
+
+  simple_buffer_init(&buffer, packet->length, packet->data);
+  if (parse_*(&buffer, ...) && parse_*(&buffer, ...))
+  {
+    lsh_string_free(packet);
+
+    /* No more uses of buffer, and no more calls to parse_* */
+
+    return...
+  }
+  lsh_string_free(packet);
+  return LSH_FAIL;
+
+This usage pattern should be safe.
+
+The do_channel_request() function is an exception, in that it
+delegates some of the parsing to another method. It must therefore
+keep the packet data around until that method has returned.
+Conversely, the called method, CHANNEL_REQUEST, must assume that the
+data associated with its buffer argument will disappear as soon as the
+method returns; any data that is needed later must be copied.
+
+The do_alloc_pty function in server.c observes this; it doesn't use a
+copying method when extracting the mode string, *but* the string is
+used only in the call to tty_decode_term_mode. If the method needed to
+remember the string for later use, it would have to use
+parse_string_copy instead.
+
+In some cases some data from the buffer is needed later, and in those
+cases, it should be copied out of the buffer using parse_string_copy.
+But most parsing extracts integers from the buffer, in various ways,
+and do not need to do any extra copying.
+
+
+CLIENT SIDE OF USER AUTHENTICATION
+
+About publickey authentication, one way to organize this as follows:
+
+First, lsh.c parses its options and collects all -i keyfile options
+into a list. By default, the list contains ~/.lsh/identity. There
+should also be some way to specify an empty list, i.e. to disable
+public key authentication.
+
+Later on, we iterate through this list, and collect any private keys
+we find into a list of keypairs. A file can contain zero or more keys,
+and i/o and parse errors are not fatal errors. dss keys may split into
+two keypair structures; one for "ssh-dss" and another for "spki" (this
+splitting could be moved to later on, but I think that will require
+some more information than the keypair struct to be kept around). The
+list is passed on to the userauth mechanism, perhaps using something
+like
+
+  (publickey-login (map-append read-private-key-file file-list)
+                   (userauth_service (handshake (connect port))))
+
+When we have an agent, we will also ask the agent for additional keys
+(a keypair from an agent will contain a public key and a "proxy
+signer" object, which will create signatures by communicating with the
+agent).
+
+When getting into the userauth proper, we try all available keys, by
+sending USERAUTH_REQUEST messages for all of the public key, and
+whatching for USERAUTH_PK_OK replies. When we get one, we create a new
+signature and send a new USERAUTH request. If all keys fail, we fall
+back to password authentication.
+
+At first, we'll support only one keyfile at a time, but we can still
+have several keys.
+
+Also the lshd server currently can't deal with multiple userauth
+requests in parallell.
+
+On a higher level, we may have several userauth methods that we want
+to try, say first public key, then agent public keys, and last
+password authentication.
+
+I think the best way to keep track of this is to let the userauth
+mechanism get a list of methods. It tries the first method; when it
+failes, we should continue with the next useful method. To do this, we
+advance one element on the methods list, and we also look at the list
+of useful methods according to the latest USERAUTH_FAILURE message
+from the server. Then we try the next useful method.
+
+Perhaps each userauth method could be represented as a command? I
+think it is better to handle the SETUP and CLEANUP done internally by
+the method. Each userauth method should probably request the same
+username and service.
+
+
+SPKI SUPPORT
+
+The current interface for SPKI operations consists of two classes.
+spki_context and spki_subject.
+
+An spki_subject holds at least one of the following items:
+
+ * A public key
+ * Hashes of the key
+ * A verifier object, that can verify signatures created with a key.
+
+Subjects are not necessarily trusted, but each subject must always be
+internally consistent.
+
+An spki_context contains a list of subjects and a list of 5-tuples. It
+has two methods, lookup and authorize.
+
+The LOOKUP method takes an s-expression which is a public key or a
+hash (names should be added later). It tries to find a matching
+subject in the list, or adds a new one if needed. LOOKUP returns a
+subject, or NULL if the input s-expression was invalid.
+
+The idea is that subjects in the same context (i.e. returned by the
+LOOKUP method in the same spki_context object) can be compared by
+simple pointer comparison. If LOOKUP is first called with a hash, a
+subject will all attributes but the appropriate hash value left NULL is
+returned. If LOOKUP is called later with a public key matching the
+hash, the same subject is returned, but with the public-key and
+possibly verifier attributes modified with the new information.
+
+This should work in most cases. But consider this scenario: Assume
+that we call LOOKUP three times with (i) md5 hash, (ii) sha1 hash, and
+finally (iii) the matching public-key expression. The first two calls
+will result in two distinct subjects. With the third call, we provide
+new information, which is merged into one of the subjects. But the
+other will stay around, with a NULL verifier attribute.
+
+The AUTHORIZE method takes a subject and an "access description",
+where the latter correspond to the bodies of SPKI (tag ...)
+expressions. AUTHORIZE tries to find an ACL and certificate chain that
+grants acces for the subject. Currently, only ACL:s are supported; no
+certificates. AUTHORIZE returns 1 if access is granted and 0 if access
+is denied.
+
+For ssh hostkeys, the access description for the host
+"foo.lysator.liu.se" is the s-expression (ssh-hostkey
+"se.liu.lysator.foo"). Note that the components are in reversed order;
+this makes it easier to create certificates for a subtree in the dns,
+with a tag containing (* prefix "se.liu.lysator.").
+
+There's one function to convert an ACL to a list 5-tuple:
+
+  struct object_list *
+  spki_read_acls(struct spki_context *ctx,
+  		 struct sexp *e)
+
+Perhaps this should be turned into a method, and we also need some
+similar method for certificates. When adding a certificate, the
+certificate signature must be verified, and this will fail unless the
+issuer is already in the spki_subject-list, and with a non-NULL
+verifier attribute.
+
+Sharing spki_contexts requires consideration. Consider the server side
+of user authentication, where each user may have a file of acls and
+certificates to grant login access to his or her account. It's
+tempting to use one single spki_context to keep track of all subjects.
+
+And I think that it may be reasonable to do this for subjects and
+certificates. They are (i) more or less public, and (ii) not empowered
+unless there is an acl->certificate chain that grants power to the
+key. ACL:s are an entirely different matter, though.
+
+I could make sense to have a base context that contains names, acl:s
+and certificates that the server (or its admin) trusts. For each user
+authentication operation, first copy the base context, then add the
+user's acl:s to it, and finally add the certificates supplied by the
+remote peer. This extended context can be used for access decision,
+without the base context being modified at all. On the other hand, it
+might be a good idea to at least share the subject database.
+
+I have to think some more about this.
+
+
+PTY REFERENCES (from Keresztg)
+
+the code of tnlited
+http://viks.mvrop.org/networking/sock_advanced_tut.html
+Text-Terminal-HOWTO
+http://www.developer.ibm.com/library/ref/about4.1/df4commo.html
+
+Jon Ribbens <jon@oaktree.co.uk>:
+
+The other functions can be found at
+  ftp://ftp.openbsd.org/pub/OpenBSD/src/lib/libutil/pty.c
+
+
+
+3605942 idag 07:59 /32 rader/ assar
+Kommentar till text 3578895 av Niels Möller ()
+Mottagare: C - (den) portabla(?) assemblern <7482>
+Ärende: const
+------------------------------------------------------------
+tyvärr räcker inte det där eftersom det finns kompilatorer som är
+(eller har varit i ett tidigare liv) gcc men inte förstår
+__attribute__ för det.
+
+så dår får man göra:
+
+dnl
+dnl Test for __attribute__
+dnl
+
+AC_DEFUN(AC_C___ATTRIBUTE__, [
+AC_MSG_CHECKING(for __attribute__)
+AC_CACHE_VAL(ac_cv___attribute__, [
+AC_TRY_COMPILE([
+#include <stdlib.h>
+],
+[
+static void foo(void) __attribute__ ((noreturn));
+
+static void __attribute__ ((noreturn))
+foo(void)
+{
+  exit(1);
+}
+],
+ac_cv___attribute__=yes,
+ac_cv___attribute__=no)])
+if test "$ac_cv___attribute__" = "yes"; then
+  AC_DEFINE(HAVE___ATTRIBUTE__)
+fi
+AC_MSG_RESULT($ac_cv___attribute__)
+])
+(3605942) ------------------------------------------

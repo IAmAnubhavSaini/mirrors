@@ -1,0 +1,41 @@
+#! /bin/sh
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+PORT=5556
+
+./mini-inetd -- $PORT /bin/sh /bin/sh -c 'cat current' & 
+pid=$!
+
+at_exit "kill $pid; rm -f current" 0
+
+werror "Testing lsh"
+
+for f in $srcdir/rapid7-ssh-pdu/*.pdu ; do
+    echo 1>&2 "Testing $f"
+    rm -f current    || die "Deleting symlink current failed"
+    ln -s $f current || die "Creating symlink current -> $f failed"
+
+    set +e
+    HOME="$TEST_HOME" ../lsh -q --sloppy --capture-to=/dev/null -p $PORT localhost exit 0
+    status="$?"
+    set -e
+    # Should be either 1 or 17 (not sure exactly when
+    # which of these are returned)
+    case "$status" in
+	1|17)
+	    :
+	;;
+	*)
+	    die "Strange exit code $status from client"
+	;;
+    esac
+done
+
+werror "Test done"
+
+test_success

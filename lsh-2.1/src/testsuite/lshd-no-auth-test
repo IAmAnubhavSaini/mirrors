@@ -1,0 +1,26 @@
+#! /bin/sh
+
+echo lshd, no-auth-test
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+set +e
+
+LSHD_FLAGS="$LSHD_FLAGS --no-password --no-publickey --no-srp"
+
+HOME="$TEST_HOME" ../lshd -h $HOSTKEY \
+    -p $PORT --interface=$INTERFACE $LSHD_FLAGS \
+    --pid-file $PIDFILE --daemon --no-syslog "$@"
+excode=$?
+
+# Failed, but without a signal?
+
+if [ "$excode" -ne 0 -a "$excode" -lt 128 ]; then
+  test_success
+fi
+
+test_done

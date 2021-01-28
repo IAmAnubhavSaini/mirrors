@@ -1,0 +1,1 @@
+(3:acl(5:entry(7:subject(10:public-key2:k4))(3:tag(3:foo3:bla))(5:valid(10:not-before19:2000-05-07_21:00:57)(9:not-after19:2000-05-07_21:00:57)))(5:entry(7:subject(10:public-key2:k4))(9:propagate)(3:tag(3:foo3:bla))(5:valid(10:not-before19:2000-05-07_21:00:57)(9:not-after19:2000-05-07_21:00:57))))

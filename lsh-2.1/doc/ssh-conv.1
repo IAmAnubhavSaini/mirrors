@@ -1,0 +1,111 @@
+.\" COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" Copyright (C) 1999 J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are 
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a 
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this manual
+.\" into another language, under the above conditions for modified versions,
+.\" except that this permission notice may be stated in a translation approved
+.\" by the Free Software Foundation, Inc. <URL:http://www.fsf.org>
+.\"
+.\" END COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" If you make modified versions of this manual, please notify the current 
+.\" maintainers of the package you received this manual from and make your
+.\" modified versions available to them.
+.\"
+.TH SSH-CONV 1 "NOVEMBER 2004" SSH-CONV "Lsh Manuals"
+.SH NAME
+ssh-conv \- script to convert OpenSSH/SSH2 keys to lsh format
+.SH SYNOPSIS
+.B ssh-conv 
+[\fIOPTION\fR...]
+
+.SH DESCRIPTION
+.B CAUTION! The information in this manpage may be invalid or outdated. For authorative
+.B information on lsh, please see it's Texinfo manual (see the
+.I SEE\ ALSO
+.B section).
+
+Converts an OpenSSH style public key to spki format used by lsh. Reads the key from 
+stdin and outputs the converted key on stdout.
+
+Example usage:
+
+.PD 0
+$ ssh-conv < /home/pont/.ssh/id_dsa.pub
+.PP
+lsh-decode-key: lsh-decode-key: Reading key of type ssh-dss...
+.PP
+{KDEwOnB1YmxpYy1rZXkoMzpkc2EoMTpwMTI5OgD1qRFBMowgnnOzjOp3HptHWf9836wy/3
+ F59d8DfWWehKgy8DNISgmzCnRNXReL/5PvTZwFID2KvEYfyxAYy4uTSJbtkzDfsicGWi7n
+ YbXu2VpWHpNdhsaKrEu9iXmQb4JoN1grC0QsaCZrngACZRKEAklPH9ubwCMBK55yRP27gy
+ koMTpxMjE6AIoOrpe064y7L2oYQqBE3sNskW19KSgxOmcxMjg6Olyu4xMIWsUBeVnbg2oU
+ BvvbcsnHHhHyDVHmMZ1ERhDCLl6gjIsbWjBIBIXZUaFJ6AO236CfgdM5Rop5XYmcIIA9G7
+ QD2GWTe48MGdjFQVyr2SKoDiNFKSJXqHVYzZJeosvz6FyTDt7aGNGqcL0tG7GXl9savALt
+ RSQRfO9JlOcpKDE6eTEyOToAwyzp6sIt6KsLhFoeM9ADA7opHq4lFT6bS8su9g3KBGqGG4
+ JNsEN9CI5SnLpqsfVm5SxmqPMPJvdGVOqAjjfzsv7SvfhSBUHXYeYpgci49pfc5bZCh/EY
+ zX7bVnOVV3gQgNGeT0FN1gf9vTUMKh1VGPRfm7unXNqjBLEMYmlRwqcpKSk=}
+.PP
+$
+.PP
+.PD
+
+
+.SH OPTIONS
+
+.TP
+\fB\-\-decode\-with\fR PROGRAM-NAME
+The program to use for the
+actual decoding.
+
+.SH "REPORTING BUGS"
+Report bugs to <bug-lsh@gnu.org>.
+
+
+.SH COPYING
+The lsh suite of programs is distributed under the GNU General Public
+License; see the COPYING and AUTHORS files in the source distribution for
+details.
+.SH AUTHOR
+The lsh program suite is written mainly by Niels M\[:o]ller <nisse@lysator.liu.se>.
+
+This man-page was written for lsh 2.0 by Pontus Freyhult
+<pont_lsh@soua.net>, it is based on a template written by
+J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>.
+
+
+.SH "SEE ALSO"
+.BR lsftp (1),
+.BR lshg (1),
+.BR lsh-authorize (1),
+.BR lsh-decode-key (1),
+.BR lsh-decrypt-key (1),
+.BR lsh-export-key (1),
+.BR lsh-keygen (1),
+.BR lsh-make-seed (1),
+.BR lsh-upgrade (1),
+.BR lsh-upgrade-key (1),
+.BR lsh-writekey (1),
+.BR lshd (8)
+
+
+The full documentation for
+.B lsh
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B lsh
+programs are properly installed at your site, the command
+.IP
+.B info lsh
+.PP
+should give you access to the complete manual.

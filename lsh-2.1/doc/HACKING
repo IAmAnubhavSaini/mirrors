@@ -1,0 +1,458 @@
+A Hacker's Guide to LSH
+
+This document contains some notes, which I hope will make it easier
+for you to understand and hack lsh. It is divided into five main
+sections: Abstraction, Object system, Memory allocation, a Source road
+map, and at last some comments about the naming conventions used.
+
+
+ABSTRACTION
+
+All sent and received data are represented as a struct lsh_string.
+This is a simple string type, with a length field and a sequence of
+unsigned octets. The NUL character does *not* have any special status.
+
+Most of the functions in lsh are organized in terms of objects. An
+object type has a public interface: a struct containing attributes
+that all instances of all implementations of the type must have, and
+one or more method pointers. A method implementation is a C function
+which takes an instance of a corresponding instance as its first
+argument (or in some cases, a pointer to a pointer to an instance).
+For many types, there is only one public attribute, which is a method
+pointer. In this case, the object is called a "closure".
+
+Specific types of objects and closures often include more data; they
+are structures where the first element is an interface structure.
+Extra data can be considered private, in OO-speak.
+
+Explicit casts are avoided as much as possible; instances that are
+passed around are typed as pointers to the corresponding interface
+struct, not as void *. Macros are used to make application of methods
+and closures more convenient. To cast a pointer to the right subclass
+or superclass, the macro CAST is used, which provides optional runtime
+type-checking. Catching pointer errors as early as possible makes
+debugging easier.
+
+An example might make this clearer. The definition of a write handler,
+taken from abstract_io.h:
+
+   /* GABA:
+      (class
+ 	(name abstract_write)
+ 	(vars
+ 	  (write method int "struct lsh_string *packet")))
+   */
+   
+   #define A_WRITE(f, packet) ((f)->write((f), (packet)))
+   
+   /* A handler that passes packets on to another handler */
+   /* GABA:
+      (class
+ 	(name abstract_write_pipe)
+ 	(super abstract_write)
+ 	(vars
+ 	  (next object abstract_write)))
+   */
+   
+As you see, the definitions are not written directly in C, but in a
+specialized "class language" (described in the next section). Both
+structure definitions and the functions needed for gc are generated
+automatically and can be found in the corresponding .x file,
+abstract_io.h.x.
+
+abstract_write is the interface structure common to all write
+handlers, and abstract_write_pipe is a generic subclass used for
+piping write handlers together. One specific kind of write handler is
+the unpad handler, which removes padding from received packets, and
+sends them on. This object is implemented in unpad.c, and it does not
+have any private data beyond the abstract_write_pipe structure above.
+The write method implementation of this type looks as follows:
+
+   static int do_unpad(struct abstract_write *w,
+   		       struct lsh_string *packet)
+   {
+     CAST(abstract_write_pipe, closure, w);
+     
+     UINT8 padding_length;
+     UINT32 payload_length;
+     struct lsh_string *new;
+     
+     if (packet->length < 1)
+       {
+   	 lsh_string_free(packet);
+   	 return LSH_FAIL | LSH_DIE;
+       }
+     
+     padding_length = packet->data[0];
+   
+     if ( (padding_length < 4)
+   	  || (padding_length >= packet->length) )
+       {
+   	 lsh_string_free(packet);
+   	 return LSH_FAIL | LSH_DIE;
+       }
+   
+     payload_length = packet->length - 1 - padding_length;
+     
+     new = ssh_format("%ls", payload_length, packet->data + 1);
+   
+     /* Keep sequence number */
+     new->sequence_number = packet->sequence_number;
+   
+     lsh_string_free(packet);
+   
+     return A_WRITE(closure->next, new);
+   }
+	
+Note the last line; the function passes a newly created packet on to
+the next handler in the pipe.
+
+There's no central place where all important state is stored; I have
+tried to delegate details to the relevant places. However, some things
+that didn't fit anywhere else, and information that is needed by many
+modules, is kept in the ssh_connection structure (in connection.[hc]).
+
+Connection objects are also the point where packets are dispatched to
+various packet handlers (key exchange, channels, debug, etc). packet
+handlers are similar to the abstract write handlers described above,
+but they get one extra argument: a pointer to the connection object.
+
+
+OBJECT SYSTEM
+
+The language used for defining classes is not a full-featured
+OO-language. In fact, it's primary purpose is not to help with object
+orientation (I could do that fairly well with plain C before
+introducing the class language), but to provide the information needed
+for garbage collection. The syntax is scheme s-expressions, and the
+files are preprocessed by make_class, a scheme shell script a few
+hundred lines long.
+
+Classes are written inside C comments. For each definition the source
+file contains a line
+
+   /* GABA:
+
+followed by an s-expression. There are a few different kinds of
+definitions. The most important is the class-expression, which looks
+like
+
+   (class
+     (name NAME-OF-THE-CLASS)
+     (super THE-SUPERCLASS)     ; Optional
+     (vars
+        INSTANCE-VARIABLES)
+     (methods
+        NONVIRTUAL-METHODS))
+
+The last clause, (methods ...) is related to the meta-expression and
+is currently used only by alist objects. It should be considered even
+more experimental than the rest of the class language.
+
+The most interesting part are the vars-clauses. Each instance variable
+or method is described as a list, (name type ...). (If you are
+familiar with lisp expressions, types are represented as lists, and
+the syntax is actually (name . type) ). A type is a list of a keyword
+and optional arguments. For convenience, a type that is not a list is
+expanded to a simple type, i.e. int is equivalent to (simple int).
+
+Some examples of variable definitions and corresponding C declarations
+are:
+
+   (foo simple int)
+   (foo . int)
+			int foo;
+
+The type keyword "simple" means that the variable will be ignored by
+the garbage collector.
+
+   (foo pointer (simple int))
+   (foo pointer int)
+   (foo simple "int *")
+			int *foo;
+
+Pointer is a modifier that is usually overkill for simple types. The
+syntax is (pointer type) or (pointer type length-field) where the
+latter construction implies that the pointer points to an array, the
+length of which is kept in an instance variable LENGTH-FIELD.
+
+   (foo string)
+			struct lsh_string *foo;
+   (foo bignum)
+			mpz_t foo;
+
+The string (or bignum) will be deallocated automatically when the
+object is garbage collected.
+
+   (foo object abstract_write)
+			struct abstract_write *foo;
+
+The keyword object means a pointer to an object, and the gc will make
+sure that it is deallocated when *all* pointers to it are gone.
+
+   (foo method void "int arg")
+   (foo pointer (function void "struct THIS_TYPE *self" "int arg"))
+
+			void (*foo)(struct THIS_TYPE *self, int arg);
+
+The method keyword defines a method, implemented as an instance
+variable holding a function pointer. Keeping the pointer in an
+instance variable rather than in the class is flexible; it's easy to
+override it in a subclass or even in a single object. So these methods
+are as virtual as one can get.
+
+It is possible to use the meta-feature to place method pointers in the
+class struct rather than in every instance, and would be preferable
+for some classes. But currently, the alist classes are the only ones
+which are not keeping method pointers in each object.
+
+Usually, there's an invocation macro for each method. For the above
+method, one would use a macro such as
+
+   #define FOO(o, i) (((o)->foo)((o), (i)))
+
+These macros are not generated automatically.
+
+   (foo struct dss_public)
+			struct dss_public foo;
+
+The struct keyword incorporates some other struct in the instance (note
+that it is *not* a pointer). The difference from including a C structure
+as a simple type, like (foo simple "struct dss_public"), is the gc
+properties. structures used with the struct keyword should be defined
+by a struct-expression, and that definition determines not only the
+contents of the structure, but also its gc properties.
+
+   (foo array (object abstract_write) LENGTH)
+
+			struct abstract_write *foo[LENGTH];
+
+The array keyword defines an array of fix size. If the content type
+((object abstract_write) in the example above) needs any gc
+processing, that processing will be applied to each element. In
+principle, one could nest array and pointer constructions arbitrarily,
+but the current implementation can't handle construction requiring
+nested loops to process the elements.
+
+As a last resort, one can use the keyword special,
+
+   (foo special "struct strange *"
+                do_mark_strange do_free_strange))
+
+			struct strange *foo;
+
+where the last two arguments are names of functions that should be
+called by the garbage collector.
+
+
+As noted above, structures for use with the struct keyword should be
+defined by a struct-expression:
+
+   (struct
+     (name NAME-OF-STRUCT)
+     (vars
+       VARIABLES))
+
+This defines a structure that can be included in other objects. The
+structure is not an object in itself (i.e. they have no object
+headers, pointers to them can not be handled by the gc, and (object
+SOME-STRUCT) is not a valid type). The vars-clause is just like the
+corresponding clause in a class-expression.
+
+
+CAVEATS
+
+The method-like macros (COMMAND_CALL, A_WRITE, SIGN, etc) all evaluate
+their first argument twice.
+
+A good command for finding potential problems is
+
+  grep -n -e '[A-Z]([^),]*(' *.c
+
+
+MEMORY ALLOCATION
+
+As always when writing C programs, memory allocation is the most
+complicated and error-prone part of it. The objects in lsh can be
+classified by allocation strategy into three classes:
+
+× Strings. These use a producer-consumer abstraction. Strings are
+allocated in various places, usually by reading a packet from some
+socket, or by calling ssh_format(). They are passed on to some
+consumer function, which has to deallocate the string when it is
+finished processing it usually by throwing it away, transforming it
+into a new string, or writing it to some socket. If you want to *both*
+pass a string to a consumer, and keep it for later reference, you have
+to copy it.
+
+Sometimes, a consumer modifies a string destructively and sends it on,
+rather than freeing it and allocating a new one. This is allowed; the
+function that produced the string can not assume that it is alive or
+intact after that it has been passed to a consumer.
+
+× Local objects, used in only one module, and with references from
+only one place. Examples are the queue nodes that write_buffer.c uses
+to link packets together. These are freed explicitly when they
+are no longer needed.
+
+× Other objects and closures, which references each other in some
+complex fashion. Except places where it is *obvious* that an object
+can be freed, these objects are not freed explicitly, but are handled
+by the garbage collector. The gc overhead should be fairly small;
+almost all allocated memory are strings, which *are* freed explicitly
+when they are no longer used. The objects handled by the gc things
+like pipes of write handlers, keyexchange state objects, etc, which
+are relatively few.
+
+Objects are allocated using the NEW() macro. Objects that won't be
+needed anymore can be deleted explicitly by using the KILL() macro.
+
+For the gc to work properly, it is important that there be no bogus or
+uninitialized pointers. Pointers should either be NULL, or point at
+some valid data, and all bignums should be initialized. Note that this
+rule applies to all objects, including those KILL()ed explicitly.
+
+Currently, all memory is zeroed on allocation, which is overkill (and
+also doesn't take care of initializing bignums). I'm considering
+extending the object system to initialize objects more intelligently.
+
+For some notes about memory allocation conventions when using struct
+simple_buffer and the parse_* functions, se the NOTES file.
+
+
+ROAD MAP
+
+Some of the central source files are:
+
+abstract_io.h		Definitions of read and write handlers.
+
+abstract_crypto.h	Common interfaces for all cryptographic
+			algorithms.
+
+atoms.in		Textual names of the algorithms and services
+			recognized by lsh. From this file, several
+			source and header files are generated, by the
+			process_atoms bash script and the GNU gperf
+			program.
+
+channel.[hc]		Manages the channels of the ssh connection
+			protocol. 
+
+connection.[hc]		Packet dispatch. Also manages global
+			information about the connection, such as
+			encryption and decryption state.
+
+io.[hc]			The io module. I believe that it is a good
+			thing to separate io from other processing.
+			This module is the only one performing actual
+			io calls (read, write, accept, poll, etc).
+			File descriptors are associated with various
+			types of handlers which are called when
+			something happens on the fd.
+
+read_{line|packet|data}.[hc]
+			These are read handlers. They are hooked into
+			the io-system, and called when there is input
+			available on a socket. Complete packets (or
+			lines) are passed on to some other handler for
+			processing.
+
+parse.[hc]		Functions to parse ssh packets.
+
+format.[hc]		The function ssh_format is a varargs function
+			accepting a format string and an arbitrary
+			number of other arguments. The supported
+			format specifiers are very different from the
+			stdio format functions, and works with
+			lsh datatypes. It allocates and returns a
+			string of the right size.
+
+gc.c			Simple mark&sweep garbage collector.
+
+client.c		Client specific processing.
+
+server.c		Server specific processing, including forking
+			of subprocesses.
+
+nettle/			Free implementations of hash functions and
+			symmetric cryptographic algorithms. See the
+			file AUTHORS for credits.
+
+crypto.[hc]		lsh's interface to those algorithms.
+
+publickey_crypto.[hc]	Public key cryptography objects.
+
+keyexchange.[hc]	Key exchange protocol. This file implements the
+			algorithm-independent parts of the ssh key
+			exchange protocol.
+
+lsh.c			Client main program.
+
+lshd.c			Server main program.
+
+
+NAMING CONVENTIONS
+
+Choosing good names for types, variables and functions is difficult.
+The naming in lsh is not as consistent as I would like it to. Below, I
+assemble some rules that I try to follow.
+
+The name of a type, usually defined in a /* GABA: (class ...) */,
+should be fairly short and say something about the function of the
+type. It is more important to keep time names short and clean than
+names of functions or variables. Some examples are
+
+  compress_instance, compress_algorithm
+
+These names have a suffix to distinguish between an algorithm object
+and the state in one instance of the algorithm.
+
+  signer, read_handler, abstract_write
+
+These are short names of fairly abstract types.
+
+  global_request, channel_open
+
+These are names of packet handlers. There's no common suffix for
+packet handler types; perhaps there should be.
+
+Types that inherit command or command_continuation should have a
+_command or _continuation suffix. Types that inherit exception_handler
+should ahve an exc_ prefix.
+
+Below, TYPE stands for a type name,
+and METHOD for the name one of its methods.
+
+The constructor function for a TYPE should be make_TYPE().
+Some objects also have a separate initialization function, for use by
+subclasses. That should be named init_TYPE().
+
+Functions implementing its methods should be do_TYPE_METHOD. Except
+for closure-like objects, i.e. objects with essentially only one
+method, where the method implementation is do_TYPE. The do_* functions
+are not intended to be called directly; they are only installed in
+objects' method pointers. Most of them, but not all, are declared
+static.
+ 
+Functions related to the collect_info-mechanism have a collect_
+prefix. They take and return arguments of type struct lsh_object *,
+and do typechecking at run time.
+
+At last we have the functions generated by /* GABA: (expr ...) */
+constructions. The naming of these is currently very inconsistent.
+Perhaps it would make sense to use a expr_ prefix on all these
+functions.
+
+
+INCLUDE FILES
+
+I try to follow the following rules for how to include files, and in
+which order. lsh header files should include all files they depend on.
+First ANSI C and system files, then other lsh files, and finally any
+.h.x file. Header files never include config.h
+
+.c files should first include config.h (guarded by an #if
+HAVE_CONFIG_H). Next, they should include ANSI C files, system files,
+nettle files, spki files, lsh file defining the interface
+corresponding to the code, other lsh files, and finally any generated
+.h.x and .c.x.

@@ -1,0 +1,55 @@
+#! /bin/sh
+
+# Build all automatically generated files that are not present in the
+# repository.
+
+# This script is for use in the source directory, before you run
+# configure. To get started from a fresh checkout, you also need
+# to run configure and make bootstrap from your build directory.
+
+set -e
+
+relative_symlink() {
+    (
+	target="$1"
+	shift
+	while [ $# -ge 1 ] ; do
+	    dir="$1"
+	    if [ "$dir" = "." ] ; then
+		ln -s "$target" "$dir"
+	    else
+		dotdots="`echo "$dir" | sed 's%[^/][^/]*%..%g'`"
+		(cd "$dir" && ln -s "$dotdots/$target" . || true)
+	    fi
+	    shift
+	done
+    )
+}
+
+relative_symlink misc/run-tests \
+    src/testsuite src/argp/testsuite  \
+    src/sftp/testsuite src/spki/testsuite
+
+relative_symlink acinclude.m4 \
+    src/argp src/spki src/sftp
+
+relative_symlink misc/vsnprintf.c \
+    src/argp src/sftp
+
+relative_symlink misc/getopt.c src/spki/tools
+relative_symlink misc/getopt1.c src/spki/tools
+relative_symlink misc/getopt.h src/spki/tools
+    
+relative_symlink config.guess src/spki
+relative_symlink config.sub src/spki
+
+if [ "$1" = "links" ] ; then
+    # Skip the time consuming autoconf and automake stuff
+    exit 0;
+fi
+
+for subdir in src/argp src/sftp src/spki ; do
+    (cd $subdir && ./.bootstrap)
+done
+
+aclocal && autoconf && autoheader && automake -a

@@ -1,0 +1,16 @@
+#! /bin/sh
+
+echo lsh, test 9, check that LSHFLAGS works.
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+LSHFLAGS="-nt -p $PORT --sloppy-host-authentication --capture-to /dev/null  $LSH_FLAGS"
+export LSHFLAGS
+
+spawn_lshd && HOME=$TEST_HOME  ../lsh localhost true && test_success
+
+test_done

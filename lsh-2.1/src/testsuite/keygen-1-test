@@ -1,0 +1,17 @@
+#! /bin/sh
+
+# Tests the key generation programs
+
+echo Testing lsh-keygen DSA key generation 
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+rm -f foo foo.pub
+../lsh-keygen -a dsa -l2 | ../lsh-writekey -c none -o foo \
+  && "$SEXP_CONV" < foo && [ -s foo -a -s foo.pub ] && test_success
+
+test_done

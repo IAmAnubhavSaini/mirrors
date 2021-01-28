@@ -1,0 +1,1726 @@
+<html lang="en">
+<head>
+<title>lsh</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="description" content="lsh">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">lsh</h1>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Introduction" href="#Introduction">1 Introduction</a>
+<ul>
+<li><a href="#Threats">1.1 Threats</a>
+<li><a href="#Features">1.2 Features</a>
+<li><a href="#Related-techniques">1.3 Related programs and techniques</a>
+<ul>
+<li><a href="#ssh1">1.3.1 <code>ssh-1.x</code></a>
+<li><a href="#ssh2">1.3.2 <code>ssh-2.x</code></a>
+<li><a href="#Kerberos">1.3.3 Kerberos</a>
+<li><a href="#ipsec">1.3.4 <acronym>IPSEC</acronym></a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Installation" href="#Installation">2 Installation</a>
+<li><a name="toc_Getting-started" href="#Getting-started">3 Getting started</a>
+<ul>
+<li><a href="#lsh_002dmake_002dseed">3.1 Initializing the randomness generator</a>
+<li><a href="#lsh-basics">3.2 <samp><span class="command">lsh</span></samp> basics</a>
+<li><a href="#tcpip-forwarding">3.3 Port forwarding</a>
+<li><a href="#lshd-basics">3.4 <samp><span class="command">lshd</span></samp> basics</a>
+<li><a href="#public_002dkey">3.5 Using public-key user authentication</a>
+<li><a href="#srp">3.6 Using <acronym>SRP</acronym> authentication</a>
+<li><a href="#sexp">3.7 Examining keys and other sexp files</a>
+<li><a href="#Converting-keys">3.8 Converting keys from <samp><span class="command">ssh2</span></samp> and OpenSSH</a>
+</li></ul>
+<li><a name="toc_Invoking-lsh" href="#Invoking-lsh">4 Invoking <samp><span class="command">lsh</span></samp></a>
+<ul>
+<li><a href="#Algorithm-options">4.1 Algorithm options</a>
+<li><a href="#Hostauth-options">4.2 Host authentication options</a>
+<li><a href="#Userauth-options">4.3 User authentication options</a>
+<li><a href="#Action-options">4.4 Action options</a>
+<li><a href="#Verbosity-options">4.5 Verbosity options</a>
+</li></ul>
+<li><a name="toc_Invoking-lshg" href="#Invoking-lshg">5 Invoking <samp><span class="command">lshg</span></samp></a>
+<li><a name="toc_Invoking-lshd" href="#Invoking-lshd">6 Invoking <samp><span class="command">lshd</span></samp></a>
+<li><a name="toc_Files-and-environment-variables" href="#Files-and-environment-variables">7 Files and environment variables</a>
+<li><a name="toc_Terminology" href="#Terminology">8 Terminology</a>
+<li><a name="toc_Concept-Index" href="#Concept-Index">Concept Index</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<a name="Top"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Introduction">Introduction</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+   <p>This document describes <samp><span class="command">lsh</span></samp> and related programs. The
+<samp><span class="command">lsh</span></samp> suite of programs is intended as a free replacement for
+the <samp><span class="command">ssh</span></samp> suite of programs. In turn, <samp><span class="command">ssh</span></samp> was intended
+as a secure replacement for the <samp><span class="command">rsh</span></samp> and <samp><span class="command">rlogin</span></samp>
+programs for remote login over the Internet.
+
+   <p><samp><span class="command">lsh</span></samp> is a component of the <acronym>GNU</acronym> system.
+
+   <p>This manual explains how to use and hack <samp><span class="command">lsh</span></samp>; it corresponds to
+<samp><span class="command">lsh</span></samp> version 2.0.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Introduction">Introduction</a>
+<li><a accesskey="2" href="#Installation">Installation</a>
+<li><a accesskey="3" href="#Getting-started">Getting started</a>
+<li><a accesskey="4" href="#Invoking-lsh">Invoking lsh</a>
+<li><a accesskey="5" href="#Invoking-lshg">Invoking lshg</a>
+<li><a accesskey="6" href="#Invoking-lshd">Invoking lshd</a>
+<li><a accesskey="7" href="#Files-and-environment-variables">Files and environment variables</a>
+<li><a accesskey="8" href="#Terminology">Terminology</a>
+<li><a accesskey="9" href="#Concept-Index">Concept Index</a>
+
+</li></ul>
+<p>--- The Detailed Node Listing ---
+
+<p>Introduction
+
+</p>
+<ul class="menu">
+<li><a href="#Threats">Threats</a>
+<li><a href="#Features">Features</a>
+<li><a href="#Related-techniques">Related techniques</a>
+
+</li></ul>
+<p>Related programs and techniques
+
+</p>
+<ul class="menu">
+<li><a href="#ssh1">ssh1</a>:                         SSH version 1
+<li><a href="#ssh2">ssh2</a>:                         SSH version 2
+<li><a href="#Kerberos">Kerberos</a>:                     Kerberos
+<li><a href="#ipsec">ipsec</a>:                        IP Sec
+
+</li></ul>
+<p>Getting started
+
+</p>
+<ul class="menu">
+<li><a href="#lsh_002dmake_002dseed">lsh-make-seed</a>:                Initializing the randomness generator
+<li><a href="#lsh-basics">lsh basics</a>:                   Connection with lsh
+<li><a href="#tcpip-forwarding">tcpip forwarding</a>:             Forwarding <acronym>TCP/IP</acronym> ports
+<li><a href="#lshd-basics">lshd basics</a>:                  Starting the lshd deamon
+<li><a href="#public_002dkey">public-key</a>:                   Using public-keys
+<li><a href="#srp">srp</a>:                          Using SRP authentication
+<li><a href="#sexp">sexp</a>:                         Examining keys and other S-exp files
+<li><a href="#Converting-keys">Converting keys</a>
+
+</li></ul>
+<p>Invoking <samp><span class="command">lsh</span></samp>
+
+</p>
+<ul class="menu">
+<li><a href="#Algorithm-options">Algorithms</a>:   Selecting algorithms. 
+<li><a href="#Hostauth-options">Hostauth options</a>
+<li><a href="#Userauth-options">Userauth options</a>
+<li><a href="#Action-options">Actions</a>:       What to do after login. 
+<li><a href="#Verbosity-options">Messages</a>:   Tuning the amount of messages.
+
+   </ul>
+
+<div class="node">
+<a name="Introduction"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Installation">Installation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">1 Introduction</h2>
+
+<p>What is this thing called computer security anyway? Why would you want
+to use a program like <samp><span class="command">lsh</span></samp>?
+
+   <p>This chapter explains the threats <samp><span class="command">lsh</span></samp> tries to protect you from,
+and some of the threats that remain. It also describes some of the
+technologies used in <samp><span class="command">lsh</span></samp>.
+
+   <p>From time to time in this manual, I will speak about the <dfn>enemy</dfn>. 
+This means anybody who is trying to eavesdrop or disturb your private
+communication. This usage is technical, and it does not imply that the
+enemy is somehow morally inferior to you: The enemy may be some awful
+criminals trying to eavesdrop on you, or it may be the police trying to
+eavesdrop on the same criminals.
+
+   <p>The enemy can be a criminal, or a competitor, or your boss who's trying
+to find out how much you tell collegues at competing firms. It may be
+your own or somebody else's national security officials. Or your
+ex-boyfriend who happens to be too curious.
+
+   <p>So what can the enemy do to your communications and your privacy? 
+Remember that just because you're paranoid that doesn't mean that nobody
+is trying to get you<small class="dots">...</small>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Threats">Threats</a>
+<li><a accesskey="2" href="#Features">Features</a>
+<li><a accesskey="3" href="#Related-techniques">Related techniques</a>
+</ul>
+
+<div class="node">
+<a name="Threats"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Features">Features</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Introduction">Introduction</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">1.1 Threats</h3>
+
+<p>When logging in to some other machine via the Internet, either in the
+same building or a few continents away, there are several things that
+may be under enemy attack.
+
+     <dl>
+<dt><dfn>Local attacks</dfn><dd>The enemy controls your local environment. He or she may be looking over
+your shoulder. Your local machine might be cracked. Or there may be some
+device planted inside your keyboard transmitting everything you type to
+the attacker. About the same problems occur if the attacker has taken
+control over your target machine, i.e. the remote machine you have
+logged in to.
+
+     <br><dt><dfn>Denial-of-service attacks</dfn><dd>The enemy has cut your network cable, effectively stopping your
+communication. Even without doing physical damage, the enemy may be able
+to flood and overload computers or network equipment. Or disrupt network
+traffic by sending fake packets to hangup your <acronym>TCP/IP</acronym>
+connections.
+
+     <br><dt><dfn>Passive eavesdropping</dfn><dd>The enemy may be able to listen to your communication somewhere along
+its path. With the global Internet, it's difficult to predict who might
+be able to listen. Internet traffic between buildings just a few hundred
+meters apart have been observed temporarily being routed through half a
+dozen countries, perhaps a few thousand kilometers.
+
+     <p>And even without routing anomalies, it is possible that the enemy has
+been able to take control of some nearby machine, and can listen in from
+there. Of course, passive eavesdropping is most dangerous if you
+transmit cleartext passwords. This is the main reason not to use vanilla
+telnet to login to remote systems. Use a telnet with support for
+<acronym>SSL</acronym> or Kerberos, or use a program like <samp><span class="command">lsh</span></samp> or
+<samp><span class="command">ssh</span></samp>.
+
+     <p>A passive eavesdropper is assumed not to do anything nasty with your
+packets beyond listening to them.
+
+     <br><dt><dfn>Name resolution attacks</dfn><dd>The translation from symbolic <acronym>DNS</acronym> names to numeric
+ip-addresses may be controlled by the attacker. In this case, you may
+think that you are connecting to a friendly machine, when in fact you
+are connecting somewhere else.
+
+     <br><dt><dfn>Fake packets</dfn><dd>It is fairly easy to fake the source address of an <acronym>IP</acronym>-packet,
+although it is more difficult to get hold on the replies to the faked
+packets. But even without any replies, this can cause serious
+problems.
+
+     <br><dt><dfn>Man-in-the-middle attack</dfn><dd>In this attack, the enemy sits between you and the target. When
+communicating with you, he pretends to be the target. When communicating
+with the target, he pretends to be you. He also passes all information
+on more or less unmodified, so that he is invisible to you and the
+target. To mount this attack, the enemy either needs physical access to
+some network equipment on the path between you and the target, or he has
+been able to fool you to connect to him rather than to the target, for
+example by manipulating the <acronym>DNS</acronym>-system.
+
+   </dl>
+
+   <p><samp><span class="command">lsh</span></samp> makes no attempt to protect you from local attacks. You have
+to trust the endpoint machines. It seems really difficult to uphold any
+security if the local machine is compromised. This is important to keep
+in mind in the &ldquo;visitor&rdquo;-scenario, where you visit a friend or perhaps an
+Internet café and want to connect to some of the machines at home or at
+work. If the enemy has been able to compromize your friend's or the
+café's equipment, you may well be in trouble.
+
+   <p>Protection from denial-of-service attacks is also a very difficult
+problem, and <samp><span class="command">lsh</span></samp> makes no attempt to protect you from that.
+
+   <p>Instead, the aim of <samp><span class="command">lsh</span></samp>, and most serious tools for cryptographic
+protection of communications across the net, is to isolate the
+vulnerabilities to the communication endpoints. If you know that the
+endpoints are safe, the enemy should not be able to compromize your
+privacy or communications. Except for denial-of-service attacks (which
+at least can't be performed without you noticing it).
+
+   <p>First of all, <samp><span class="command">lsh</span></samp> provides protection against passive
+eavesdropping. In addition, if you take the appropriate steps to make
+sure that hostkeys are properly authenticated, <samp><span class="command">lsh</span></samp> also protects
+against man-in-the-middle attacks and in particular against attacks on
+the name resolution. In short, you need only trust the security at the
+end points: Even if the enemy controls all other network equipment, name
+resolution and routing infrastructure, etc, he can't do anything beyond
+the denial-of-service attack.
+
+   <p>And at last, remember that there is no such thing as absolute security. 
+You have to estimate the value of that which you are protecting, and
+adjust the security measures so that your enemies will not find it worth
+the effort to break them.
+
+<div class="node">
+<a name="Features"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Related-techniques">Related techniques</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Threats">Threats</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Introduction">Introduction</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">1.2 Features</h3>
+
+<p><samp><span class="command">lsh</span></samp> does not only provide more secure replacements for
+<samp><span class="command">telnet</span></samp>, <samp><span class="command">rsh</span></samp> and <samp><span class="command">rlogin</span></samp>, it also provides
+some other features to make it convenient to communicate securely. This
+section is expected to grow with time, as more features from the
+wish-list are added to lsh. One goal for <samp><span class="command">lsh</span></samp> is to make it
+reasonable easy to extend it, without messing with the core security
+functionality.
+
+   <p><samp><span class="command">lsh</span></samp> can also be used in something called gateway mode, in
+which you can authenticate once and set up a connection that can
+later be used for quickly setting up new sessions with <samp><span class="command">lshg</span></samp>
+(see <a href="#Invoking-lshg">Invoking lshg</a>).
+
+   <p><samp><span class="command">lsh</span></samp> can be configured to allow login based on a personal
+key-pair consisting of a private and a public key, so that you can
+execute remote commands without typing your password every time. There
+is also experimental support for Thomas Wu's Secure Remote Password
+Protocol (<acronym>SRP</acronym>). Kerberos support is on the wish list but not
+yet supported (see <a href="#Kerberos">Kerberos</a>).
+
+   <p>The public-key authentication methods should also be extended to support
+Simple Public Key Infrastructure (<acronym>SPKI</acronym>) certificates,
+including some mechanism to delegate restricted logins.
+
+   <p>Forwarding of arbitrary <acronym>TCP/IP</acronym> connections is provided. This
+is useful for tunneling otherwise insecure protocols, like telnet and
+pop, through an encrypted <samp><span class="command">lsh</span></samp> connection.
+
+   <p><samp><span class="command">lsh</span></samp> also features a <acronym>SOCKS</acronym>-proxy which also
+provides tunneling of <acronym>TCP/IP</acronym> connections, but can be easily
+used, e.g.  from within popular web browsers like Mozilla and Firefox
+for tunneling web traffic. There are also programs like
+<samp><span class="command">tsocks</span></samp> that performs transparent redirection of network
+access through a <acronym>SOCKS</acronym> proxy.
+
+   <p>Convenient tunneling of <acronym>X</acronym> was one of the most impressive
+features of the original <samp><span class="command">ssh</span></samp> programs. Both <samp><span class="command">lsh</span></samp> and
+<samp><span class="command">lshd</span></samp> support <acronym>X</acronym>-forwarding, although <samp><span class="command">lshg</span></samp>
+does not.
+
+   <p>Whan <acronym>X</acronym> forwarding is in effect, the remote process is started
+in an environment where the <samp><span class="env">DISPLAY</span></samp> variable in the environment
+points to a fake <acronym>X</acronym> server, connections to which are forwarded
+to the <acronym>X</acronym> server in your local environment. <samp><span class="command">lsh</span></samp> also
+creates a new &ldquo;fake&rdquo; &lsquo;<samp><span class="samp">MIT-MAGIC-COOKIE-1</span></samp>&rsquo; for controlling access
+control. Your real <acronym>X</acronym> authentication data is never sent to the
+remote machine.
+
+   <p>Other kinds of tunneling that may turn out to be useful include
+authentication (i.e. <samp><span class="command">ssh-agent</span></samp>), general forwarding of
+<acronym>UDP</acronym>, and why not also general <acronym>IP</acronym>-tunneling.
+
+<div class="node">
+<a name="Related-techniques"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Features">Features</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Introduction">Introduction</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">1.3 Related programs and techniques</h3>
+
+<p>This sections describes some other programs and techniques related to
+<samp><span class="command">lsh</span></samp>. The ssh family of programs use mostly the same kind of
+security as <samp><span class="command">lsh</span></samp>. Kerberos and <acronym>IPSEC</acronym> operate quite
+differently, in particular when it comes to protection against
+man-in-the-middle attacks.
+
+<ul class="menu">
+<li><a accesskey="1" href="#ssh1">ssh1</a>:                         SSH version 1
+<li><a accesskey="2" href="#ssh2">ssh2</a>:                         SSH version 2
+<li><a accesskey="3" href="#Kerberos">Kerberos</a>:                     Kerberos
+<li><a accesskey="4" href="#ipsec">ipsec</a>:                        IP Sec
+</ul>
+
+<div class="node">
+<a name="ssh1"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ssh2">ssh2</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Related-techniques">Related techniques</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Related-techniques">Related techniques</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h4 class="subsection">1.3.1 <code>ssh-1.x</code></h4>
+
+<p>The first of the Secure shell programs was Tatu Ylönen's <samp><span class="command">ssh</span></samp>. 
+The latest of the version 1 series is <code>ssh-1.33</code> which speaks
+version 1.5 of the protocol. The &ldquo;free&rdquo; version of <code>ssh-1.33</code>
+does not allow commercial use without additional licensing, which makes
+<code>ssh-1.33</code> non-free software according to Debian's Free Software
+Guidelines and the Open Source Definition.
+
+   <p>The version 1 protocol has some subtle weaknesses, in particular, all
+support for using stream ciphers was disabled by default a few versions
+back, for security reasons.
+
+   <p>There also exists free implementations of <code>ssh-1</code>, for both Unix
+and Windows. <samp><span class="command">ossh</span></samp> and later OpenSSH are derived from earlier
+version av Tatu Ylönen's <samp><span class="command">ssh</span></samp>, and are free software.
+
+<div class="node">
+<a name="ssh2"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Kerberos">Kerberos</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ssh1">ssh1</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Related-techniques">Related techniques</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h4 class="subsection">1.3.2 <code>ssh-2.x</code></h4>
+
+<p><samp><span class="command">ssh2</span></samp> implements the next generation of the Secure Shell
+protocol, the development of which is supervised by the <acronym>IETF</acronym>
+secsh Working Group. Besides <samp><span class="command">lsh</span></samp>, some well known
+implementations of this protocol includes
+     <ul>
+<li>OpenSSH (which supports version 2 of the protocol since May 2000).
+
+     <li>The <samp><span class="command">ssh2</span></samp> series of proprietary programs sold by the SSH
+company. <samp><span class="command">lsh</span></samp> interoperates with current versions of these
+programs, but not with version 3.0 and earlier (the older versions get
+some details of the protocol wrong, probably because it predates the
+protocol specification). The license for the SSH company's
+<samp><span class="command">ssh2</span></samp> programs is similar to that for recent versions of
+<samp><span class="command">ssh1</span></samp>, but with a narrower definition of &ldquo;non-commercial
+use&rdquo;.
+
+     <li><samp><span class="command">putty</span></samp>, a free <samp><span class="command">ssh</span></samp> implementation for Microsoft
+Windows.
+
+   </ul>
+
+   <p>There a numerous other implementations, both free and proprietary. The
+above list is far from complete.
+
+<div class="node">
+<a name="Kerberos"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ipsec">ipsec</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ssh2">ssh2</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Related-techniques">Related techniques</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h4 class="subsection">1.3.3 Kerberos</h4>
+
+<p>Kerberos is a key distribution system originally developed in the late
+1980:s as a part of Project Athena at <acronym>MIT</acronym>. Recent development
+have been done at The Royal Institute of Technology, Stockholm
+(<acronym>KTH</acronym>).
+
+   <p>Kerberos uses a central trusted ticket-granting server, and requires
+less trust on the local machines in the system. It does not use
+public-key technology.
+
+   <p>Usually, Kerberos support is compiled into applications such as telnet,
+ftp and X-clients. The ssh family of programs, on the other hand, tries
+to do all needed magic, for instance to forward <acronym>X</acronym> securely,
+and then provides general <acronym>TCP/IP</acronym> forwarding as a kitchen sink.
+
+   <p>I believe Kerberos' and lsh's protection against passive eavesdropping
+are mostly equivalent. The difference is in the set of machines and
+assumptions you have to trust in order to be safe from a
+man-in-the-middle attack.
+
+   <p>I think the main advantage of <samp><span class="command">lsh</span></samp> over Kerberos is that it is
+easier to install and use for on ordinary mortal user. In order to set
+up key exchange between two different Kerberos systems (or <dfn>Kerberos
+realms</dfn>), the respective system operators need to exchange keys. In the
+case of two random users at two random sites, setting up <samp><span class="command">lsh</span></samp> or
+some other program in the ssh family is likely easier than to get the
+operators to spend time and attention. So <samp><span class="command">lsh</span></samp> should be easier to
+use in an anarchistic grass-roots environment.
+
+   <p>Another perspective is to combine ssh features like <acronym>X</acronym> and
+<acronym>TCP/IP</acronym> forwarding with authentication based on Kerberos. Such
+an arrangement may provide the best of two worlds for those who happen
+to have an account at a suitable ticket-granting server.
+
+<div class="node">
+<a name="ipsec"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Kerberos">Kerberos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Related-techniques">Related techniques</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h4 class="subsection">1.3.4 <acronym>IPSEC</acronym></h4>
+
+<p><acronym>IPSEC</acronym> is a set of protocols for protecting general
+<acronym>IP</acronym> traffic. It is developed by another <acronym>IETF</acronym> working
+group, and is also a required part of <acronym>IP</acronym> version 6.
+
+   <p>Again, the main difference between <acronym>IPSEC</acronym>, Kerberos and ssh
+is the set of machines that have to be secure and the keys that have to
+be exchanged in order to avoid man-in-the-middle attacks.
+
+   <p>Current protocols and implementations of <acronym>IPSEC</acronym> only provide
+authentication of machines; there's nothing analogous to the user
+authentication in ssh or Kerberos.
+
+   <p>On the other hand, <acronym>IPSEC</acronym> provides one distinct advantage over
+application level encryption. Because <acronym>IP</acronym> and <acronym>TCP</acronym>
+headers are authenticated, it provides protection against some
+denial-of-service attacks. In particular, it makes attacks that cause
+hangup of a <acronym>TCP</acronym> connection considerably more difficult.
+
+   <p>So it makes sense to use both <acronym>IPSEC</acronym> and some application
+level cryptographic protocol.
+
+   <p>Also note that it is possible to use the <dfn>Point-to-Point Protocol</dfn>
+(<acronym>PPP</acronym>) to tunnel arbitrary <acronym>IP</acronym> traffic accross an ssh
+connection. This arrangement provides some of the functionality of
+<acronym>IPSEC</acronym>, and is sometimes referred to as &ldquo;a poor man's Virtual
+Private Network&rdquo;.
+
+<div class="node">
+<a name="Installation"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Getting-started">Getting started</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">2 Installation</h2>
+
+<p>You install <samp><span class="command">lsh</span></samp> with the usual <code>./configure &amp;&amp; make &amp;&amp;
+make install</code>. For a full listing of the options you can give to
+<samp><span class="command">configure</span></samp>, use <code>./configure --help</code>. For example, use
+<samp><span class="option">--without-pty</span></samp> to disable pty-support.
+
+   <p>The most commonly used option is <samp><span class="option">--prefix</span></samp>, which tells
+configure where lsh should be installed. Default prefix is
+<samp><span class="file">/usr/local</span></samp>. The <samp><span class="command">lshd</span></samp> server is installed in
+<samp><span class="file">$prefix/sbin</span></samp>, all other programs and scripts are installed in
+<samp><span class="file">$prefix/bin</span></samp>.
+
+   <p>The configure script tries to figure out if the linker needs any special
+flags specifying where to find dynamically linked libraries at run time
+(one case where this matters is if you have a dynamic libz.so installed
+in a non-standard place). Usually, you can use
+
+<pre class="example">     ./configure --with-lib-path=/opt/lib:/other/place
+</pre>
+   <p class="noindent">to specify extra library directories, and the configure script should do
+the right thing. If this doesn't work, or you believe that you know your
+system better than <samp><span class="command">./configure</span></samp>, just set LDFLAGS and/or
+LD_LIBRARY_PATH to the right values instead.
+
+<div class="node">
+<a name="Getting-started"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-lsh">Invoking lsh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Installation">Installation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">3 Getting started</h2>
+
+<p>This section tells you how to perform some common tasks using the
+<samp><span class="command">lsh</span></samp> suite of programs, without covering all options and
+possibilities.
+
+<ul class="menu">
+<li><a accesskey="1" href="#lsh_002dmake_002dseed">lsh-make-seed</a>:                Initializing the randomness generator
+<li><a accesskey="2" href="#lsh-basics">lsh basics</a>:                   Connection with lsh
+<li><a accesskey="3" href="#tcpip-forwarding">tcpip forwarding</a>:             Forwarding <acronym>TCP/IP</acronym> ports
+<li><a accesskey="4" href="#lshd-basics">lshd basics</a>:                  Starting the lshd deamon
+<li><a accesskey="5" href="#public_002dkey">public-key</a>:                   Using public-keys
+<li><a accesskey="6" href="#srp">srp</a>:                          Using SRP authentication
+<li><a accesskey="7" href="#sexp">sexp</a>:                         Examining keys and other S-exp files
+<li><a accesskey="8" href="#Converting-keys">Converting keys</a>
+</ul>
+
+<div class="node">
+<a name="lsh-make-seed"></a>
+<a name="lsh_002dmake_002dseed"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#lsh-basics">lsh basics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Getting-started">Getting started</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.1 Initializing the randomness generator</h3>
+
+<p>Several of the lsh programs requires a good pseudorandomness generator
+for secure operation. The first thing you need to do is to create a
+seed file for the generator. To create a personal seed file, stored as
+<samp><span class="file">~/.lsh/yarrow-seed-file</span></samp>, run
+
+<pre class="example">     lsh-make-seed
+</pre>
+   <p>To create a seed file for use by <samp><span class="command">lshd</span></samp>, run
+
+<pre class="example">     lsh-make-seed --server
+</pre>
+   <p>as root. The seed file is stored as
+<samp><span class="file">/var/spool/lsh/yarrow-seed-file</span></samp>.
+
+<div class="node">
+<a name="lsh-basics"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#tcpip-forwarding">tcpip forwarding</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#lsh_002dmake_002dseed">lsh-make-seed</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.2 <samp><span class="command">lsh</span></samp> basics</h3>
+
+<p><samp><span class="command">lsh</span></samp> is the program you use for connection to a remote machine. A
+few examples are:
+
+<pre class="example">     lsh sara.lysator.liu.se
+</pre>
+   <p class="noindent">Connects to &lsquo;<samp><span class="samp">sara.lysator.liu.se</span></samp>&rsquo; and starts an interactive shell. 
+In this example, and in the rest of the examples in this section, lsh
+will ask for your password, unless you have public-key user
+authentication set up.
+
+   <p>The first time you try to connect to a new machine, <samp><span class="command">lsh</span></samp>
+typically complains about an &ldquo;unknown host key&rdquo;. This is because it
+has no reason to believe that it was the right machine that answered,
+and not a machine controlled by the enemy (see <a href="#Threats">Threats</a>). The default
+behaviour is to never ever accept a server that is not properly
+authenticated. A machine is considered authentic if it follows the
+protocol and has an acl-entry for its public hostkey listed in
+<samp><span class="file">~/.lsh/host-acls</span></samp>.
+
+   <p>To make lsh less paranoid, use
+
+<pre class="example">     lsh --sloppy-host-authentication sara.lysator.liu.se
+</pre>
+   <p class="noindent">Then <samp><span class="command">lsh</span></samp> will display a <dfn>fingerprint</dfn> of the host key of
+the remote machine, and ask you if it is correct. If so, the machine is
+considered authentic and a corresponding acl-entry is appended to the
+file <samp><span class="file">~/.lsh/captured_keys</span></samp>. You can copy acl-entries you have
+verified to <samp><span class="file">~/.lsh/host-acls</span></samp>.
+
+   <p>You can even use
+
+<pre class="example">     lsh --sloppy-host-authentication --capture-to ~/.lsh/host-acls
+</pre>
+   <p class="noindent">to get <samp><span class="command">lsh</span></samp> to behave more like the traditional <samp><span class="command">ssh</span></samp>
+program.
+
+<!-- You can create fingerprints for the hostkeys you need regularly, and -->
+<!-- keep with you (@pxref{sexp}). -->
+<pre class="example">     lsh -l omar sara.lysator.liu.se
+</pre>
+   <p class="noindent">Connects, like above, but tries to log in as the user &ldquo;omar&rdquo;.
+
+<pre class="example">     lsh sara.lysator.liu.se tar cf - some/dir | (cd /target/dir &amp;&amp; tar -xf -)
+</pre>
+   <p>Copies a directory from the remote machine, by executing one remote and
+one local <samp><span class="command">tar</span></samp> process and piping them together.
+
+<pre class="example">     CVS_RSH=lsh cvs -d cvs.lysator.liu.se:/cvsroot/lsh co lsh
+</pre>
+   <p class="noindent">Checks out the <samp><span class="command">lsh</span></samp> source code from the <acronym>CVS</acronym>
+repository.
+
+<pre class="example">     lsh -G -B sara.lysator.liu.se
+</pre>
+   <p>Opens an ssh connection, creates a &ldquo;gateway socket&rdquo;, and forks into
+the background.
+
+<pre class="example">     lshg sara.lysator.liu.se
+</pre>
+   <p>creates a new session using an existing gateway socket, without the
+overhead for a new key exchange and without asking for any passwords.
+
+<div class="node">
+<a name="tcpip-forwarding"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#lshd-basics">lshd basics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#lsh-basics">lsh basics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.3 Port forwarding</h3>
+
+<p>One useful feature of <samp><span class="command">lsh</span></samp> and other ssh-like programs is the
+ability to forward arbitrary connections inside the encrypted
+connection. There are two flavors: &ldquo;local&rdquo; and &ldquo;remote&rdquo; forwarding.
+
+   <p>An example of local forwarding is
+
+<pre class="example">     lsh -L 4000:kom.lysator.liu.se:4894 sara.lysator.liu.se
+</pre>
+   <p class="noindent">This makes <samp><span class="command">lsh</span></samp> listen on port 4000 on the <em>local</em>
+machine. When someone connects, <samp><span class="command">lsh</span></samp> asks the server to open a
+connection from the <em>remote</em> machine (i.e. &lsquo;<samp><span class="samp">sara</span></samp>&rsquo;) to port
+4894 on another machine (i.e. &lsquo;<samp><span class="samp">kom</span></samp>&rsquo;). The two connections are piped
+together using an encrypted channel.
+
+   <p>There are a few things that should be noted here:
+
+     <ul>
+<li>By default, <samp><span class="command">lsh</span></samp> only listens on the loopback interface, so only
+clients on the same machine can use the tunnel. To listen on all
+interfaces, use the <samp><span class="option">-g</span></samp> flag.
+
+     <li>A connection through the tunnel consists of three parts:
+
+          <ol type=1 start=1>
+<li>From a client socket to the local port (4000 in this example) that
+<samp><span class="command">lsh</span></samp> listens on.
+
+          <li>The tunnel itself, from the local machine to the tunnel endpoint,
+which is &lsquo;<samp><span class="samp">sara</span></samp>&rsquo; in this example.
+
+          <li>The connection from the tunnel endpoint to the ultimate target, in this
+example from &lsquo;<samp><span class="samp">sara</span></samp>&rsquo; to &lsquo;<samp><span class="samp">kom</span></samp>&rsquo;.
+
+          </ol>
+
+     <p>Only the middle part is protected by <samp><span class="command">lsh</span></samp>: all data flowing
+through the tunnel is sent across the first and last part <em>in the
+clear</em>. So forwarding doesn't offer much protection unless the tunnel
+endpoint and the ultimate target machine are close to each other. They
+should usually be either the same machine, or two machines connected by
+a local network that is trusted.
+
+     <li>Port forwarding is very useful for traversing firewalls. Of course, you
+don't need to use lsh-style forwarding just to get out, there are other
+tools like HTTPTunnel for that. But <samp><span class="command">lsh</span></samp> helps you get out
+through the firewall in a secure way.
+
+     <li>Port forwarding is done in addition to anything else <samp><span class="command">lsh</span></samp> is
+doing. In the example above, a tunnel is set up, but <samp><span class="command">lsh</span></samp> will
+also start an interactive shell for you. Just as if the <samp><span class="option">-L</span></samp>
+option was not present. If this is not what you want, the <samp><span class="option">-N</span></samp> or
+<samp><span class="option">-B</span></samp> option is for you (see <a href="#Invoking-lsh">Invoking lsh</a>)
+</ul>
+
+   <p>Remote forwarding is similar, but asks the <em>remote</em> machine to
+listen on a port. An example of remote forwarding is
+
+<pre class="example">     lsh -g -R 8080:localhost:80 sara.lysator.liu.se
+</pre>
+   <p class="noindent">This asks the remote machine to listen on port 8080 (note that you are
+probably not authorized to listen on port 80). Whenever someone
+connects, the connection is tunnelled to your local machine, and
+directed to port 80 on the same machine. Note the use of <samp><span class="option">-g</span></samp>;
+the effect is to allow anybody in the world to use the tunnel to connect
+to your local webserver.
+
+   <p>The same considerations that apply to forwarded local ports apply also to
+forwarded remote ports.
+
+   <p>At last, you can use any number of <samp><span class="option">-L</span></samp> and <samp><span class="option">-R</span></samp> options
+on the same command line.
+
+<div class="node">
+<a name="lshd-basics"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#public_002dkey">public-key</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#tcpip-forwarding">tcpip forwarding</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.4 <samp><span class="command">lshd</span></samp> basics</h3>
+
+<p>There are no global configuration files for <samp><span class="command">lshd</span></samp>; all
+configuration is done with command line options (see <a href="#Invoking-lshd">Invoking lshd</a>).
+
+   <p>To run <samp><span class="command">lshd</span></samp>, you must first create a hostkey, usually stored in
+<samp><span class="file">/etc/lsh_host_key</span></samp>. To do this, run
+
+<pre class="example">     lsh-keygen --server | lsh-writekey --server
+</pre>
+   <p class="noindent">This will also create a file <samp><span class="file">/etc/lsh_host_key.pub</span></samp>,
+containing the corresponding public key.
+
+   <p>A typical command line for starting lshd in daemon mode is simply
+
+<pre class="example">     lshd --daemonic
+</pre>
+   <p>You can find init script for <samp><span class="command">lshd</span></samp> tailored for Debian's and
+RedHat's GNU/Linux systems in the <samp><span class="file">contrib</span></samp> directory.
+
+   <p>It is also possible to let <samp><span class="command">init</span></samp> start <samp><span class="command">lshd</span></samp>, by
+adding it in <samp><span class="file">/etc/inittab</span></samp>.
+
+<div class="node">
+<a name="public-key"></a>
+<a name="public_002dkey"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#srp">srp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#lshd-basics">lshd basics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.5 Using public-key user authentication</h3>
+
+<p>Public-key user authentication is a way to authenticate for login,
+without having to type any passwords. There are two steps: Creating a
+key pair, and authorizing the public key to the systems where you want
+to log in.
+
+   <p>To create a keypair, run
+
+<pre class="example">     lsh-keygen | lsh-writekey
+</pre>
+   <p class="noindent">This can take some time, but in the end it creates two files
+<samp><span class="file">~/.lsh/identity</span></samp> and <samp><span class="file">~/.lsh/identity.pub</span></samp>.
+
+   <p>If you want to use the key to login to some other machine, say
+&lsquo;<samp><span class="samp">sara</span></samp>&rsquo;, you can do that by first copying the key,
+
+<pre class="example">     lsh sara.lysator.liu.se '&gt;my-key.pub' &lt; ~/.lsh/identity.pub
+</pre>
+   <p class="noindent">then authorizing it by executing, on &lsquo;<samp><span class="samp">sara</span></samp>&rsquo;,
+
+<pre class="example">     lsh-authorize my-key.pub
+</pre>
+   <p>By default, <samp><span class="command">lsh-writekey</span></samp> encrypts the private key using a
+passphrase. This gives you some protection if a backup tape gets into
+the wrong hands, or you use NFS to access the key file in your home
+directory. If you want an unencrypted key, pass the flag <samp><span class="option">-c
+none</span></samp> to <samp><span class="command">lsh-writekey</span></samp>.
+
+   <p>For security reasons, you should keep the private key
+<samp><span class="file">~/.lsh/identity</span></samp> secret. This is of course particularly important
+if the key is unencrypted; in that case, anybody who can read the file
+will be able to login in your name to any machine where the
+corresponding public key is registered as an authorized key.
+
+   <p>Naturally, you should also make sure not to authorize any keys but your
+own. For instance, it is inappropriate to use an insecure mechanism such
+as unauthenticated email, <code>ftp</code> or <code>http</code> to transfer your
+public key to the machines where you want to authorize it.
+
+   <p>If you have accounts on several systems, you usually create one keypair
+on each of the systems, and on each system you authorize some or all of
+your other public keys for login.
+
+<div class="node">
+<a name="srp"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#sexp">sexp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#public_002dkey">public-key</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.6 Using <acronym>SRP</acronym> authentication</h3>
+
+<p>The Secure Remote Password protocol is a fairly new protocol that
+provides mutual authentication based on a password. To use it, you must
+first choose a secret password. Next, you create a <dfn>password
+verifier</dfn> that is derived from the password. The verifier is stored on
+the target machine (i.e. the machine you want to log in to).
+
+   <p>To create a verifier, you run the <samp><span class="command">srp-gen</span></samp> program and type
+your new password. You have to do it on either the target machine,
+redirecting the output to ~/.lsh/srp-verifier, or you can generate it on
+some other machine and copy it to the target.
+
+   <p>The main advantage of using <acronym>SRP</acronym> is that you use the password
+not only to get access to the remote machine, but you also use it to
+authenticate the remote machine. I.e. you can use it to connect
+securely, <em>without</em> having to know any hostkeys or fingerprints
+beforehand!
+
+   <p>For instance, you could connect using <acronym>SRP</acronym> to fetch the hostkey
+fingerprint for the remote machine, as a kind of bootstrapping
+procedure, and then use traditional authentication methods for further
+connections.
+
+   <p>For this to work, the verifier <em>must</em> be kept <em>secret</em>. If the
+enemy gets your verifier, he can mount some attacks:
+
+     <ul>
+<li>He can mount a <dfn>dictionary attack</dfn> on your password, i.e. generate a
+large list of likely password and check if any of them matches yours.
+
+     <li>He can impersonate the server. That means that if you try to connect to
+the remote machine using <acronym>SRP</acronym>, and the attacker can intercept
+your connection (e.g. by attacking the name resolution or routing
+system) he can successfully pretend to be the real server. 
+</ul>
+
+   <p>If you use <acronym>SRP</acronym> to get the hostkey or fingerprint for the
+remote machine, as outlined above, the impersonation attack destroys
+security, you could just as well connect the hostkey presented by the
+remote server without verifying it at all.
+
+   <p>If you use <acronym>SRP</acronym> exclusively, the situation seems somewhat
+different. As far as I can see, an attacker knowing your verifier can
+not mount a traditional man-in-the-middle-attack: He can play the
+server's part when talking to you, but in order to play your part when
+talking to the real server, he needs to know your password as well.
+
+   <p><acronym>SRP</acronym> support is disabled by default, but can be enabled by the
+<samp><span class="option">--srp-keyexchange</span></samp> option to <samp><span class="command">lshd</span></samp> and <samp><span class="command">lsh</span></samp>
+(naturally, it won't be used unless enabled on both sides). At the time
+of this writing, <acronym>SRP</acronym> is too new to be trusted by conservative
+cryptographers (and remember that conservatism is a virtue when it comes
+to security).
+
+   <p>And even if <acronym>SRP</acronym> in itself is secure, the way <samp><span class="command">lsh</span></samp>
+integrates it into the <code>ssh</code> protocol has not had much peer review. 
+The bottom line of this disclaimer is that the <acronym>SRP</acronym> support in
+<samp><span class="command">lsh</span></samp> should be considered experimental.
+
+   <p>As far as I know, using <acronym>SRP</acronym> as a host authentication mechanism
+is not supported by any other <code>ssh</code> implementation. The protocol
+<samp><span class="command">lsh</span></samp> uses is described in the <samp><span class="file">doc/srp-spec.txt</span></samp>. 
+Implementations that use <acronym>SRP</acronym> only as a user authentication
+mechanism are not compatible with <samp><span class="command">lsh</span></samp>.
+
+<div class="node">
+<a name="sexp"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Converting-keys">Converting keys</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#srp">srp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.7 Examining keys and other sexp files</h3>
+
+<p>Keys and most other objects <samp><span class="command">lsh</span></samp> needs to store on disk are
+represented as so called S-expressions or <dfn>sexps</dfn> for short. 
+S-expressions have their roots in the Lisp world, and a variant of them
+in used in the Simple Public Key Infrastructure (<acronym>SPKI</acronym>). 
+Currently, <samp><span class="command">lsh</span></samp>'s support for <acronym>SPKI</acronym> is quite limited,
+but it uses <acronym>SPKI</acronym>'s formats for keys and Access Control Lists
+(<acronym>ACL</acronym>:s).
+
+   <p>There are several flavours of the sexp syntax:
+
+     <ul>
+<li>The canonical syntax is somewhere between a text and a binary format,
+and is extremely easy for programs to read and write.
+
+     <li>The transport syntax, which is suitable when embedding sexps in text
+files. It is essentially the canonical representation, encoded using
+base64.
+
+     <li>The advanced syntax, which is intended for humans to read and write, and
+bears some resemblance to Lisp expressions. 
+</ul>
+
+   <p>To see what your <samp><span class="file">~/.lsh/identity.pub</span></samp> file really contains, try
+
+<pre class="example">     sexp-conv &lt; ~/.lsh/identity.pub
+</pre>
+   <p>The <samp><span class="command">sexp-conv</span></samp> program can also be used to computes
+fingerprints. The fingerprint of a key (or any sexp, for that matter) is
+simply the hash of its canonical representation. For example,
+
+<pre class="example">     sexp-conv --hash &lt;/etc/lsh_host_key.pub
+</pre>
+   <p>This flavour of fingerprints is different from the ssh
+fingerprint convention, which is based on a hash of the key expressed in
+ssh wire format. To produce ssh standard fingerprints, use
+&lsquo;<samp><span class="samp">lsh-export-key --fingerprint</span></samp>&rsquo;.
+
+<div class="node">
+<a name="Converting-keys"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#sexp">sexp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Getting-started">Getting started</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">3.8 Converting keys from <samp><span class="command">ssh2</span></samp> and OpenSSH</h3>
+
+<p>If you are already using <samp><span class="command">ssh2</span></samp> or OpenSSH, and have created one
+or more personal keypairs, you need to convert the public keys to
+<samp><span class="command">lsh</span></samp>'s format before you can authorize them. Use the supplied
+<samp><span class="command">ssh-conv</span></samp> script,
+
+<pre class="example">     ssh-conv &lt;openssh-key.pub &gt;new-key.pub
+</pre>
+   <p>You can then use the usual <samp><span class="command">lsh-authorize</span></samp> on the converted
+keys. <samp><span class="command">ssh-conv</span></samp> supports both <acronym>DSA</acronym> and <samp><span class="command">RSA</span></samp> keys.
+
+   <p>Conversion of keys the other way is also possible, by using the
+<samp><span class="command">lsh-export-key</span></samp> program. It reads a public key in
+the  <acronym>SPKI</acronym> format used by <samp><span class="command">lsh</span></samp> on stdin, and writes the key in
+<samp><span class="command">ssh2</span></samp>/OpenSSH format on stdout.
+
+   <p>If you want to use your <samp><span class="command">lsh</span></samp> key to log in to another system
+running and OpenSSH server, you can do like this:
+
+<pre class="example">     lsh-export-key --openssh &lt; .lsh/identity.pub &gt;sshkey
+     
+</pre>
+   <p>And on the other machine, after having somehow copied the sshkey
+file, just add it to the end of your <samp><span class="file">authorized_keys</span></samp> file:
+
+<pre class="example">     cat sshkey &gt;&gt; ~/.ssh/authorized_keys
+</pre>
+   <p><samp><span class="command">lsh-export-key</span></samp> can also be used to check the fingerprint of
+keys (just like <samp><span class="command">ssh-keygen</span></samp>).
+
+<pre class="example">     lsh-export-key --fingerprint &lt; /etc/lsh_host_key.pub
+</pre>
+   <p>show the <acronym>MD5</acronym> and Bubble babble
+fingerprint of the server public key.
+
+   <p>There are currently no tools for converting private keys.
+
+<div class="node">
+<a name="Invoking-lsh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-lshg">Invoking lshg</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Getting-started">Getting started</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">4 Invoking <samp><span class="command">lsh</span></samp></h2>
+
+<p><a name="lsh_002dusage"></a>You use <samp><span class="command">lsh</span></samp> to login to a remote machine. Basic usage is
+
+   <p>&lsquo;<samp><span class="samp">lsh [-p </span><var>port number</var><span class="samp">] sara.lysator.liu.se</span></samp>&rsquo;
+
+   <p>which attempts to connect, login, and start an interactive shell on the
+remote machine. Default <var>port number</var> is whatever your system's
+<samp><span class="file">/etc/services</span></samp> lists for <samp><span class="command">ssh</span></samp>. Usually, that is port 22.
+
+   <p>There is a plethora of options to <samp><span class="command">lsh</span></samp>, to let you configure where
+and how to connect, how to authenticate, and what you want to do once
+properly logged in to the remote host. Many options have both long and
+short forms. This manual does not list all variants; for a full listing
+of supported options, use &lsquo;<samp><span class="samp">lsh --help</span></samp>&rsquo;.
+
+   <p>Note that for many of the options to <samp><span class="command">lsh</span></samp>, the ordering of the
+options on the command line is important.
+
+<!-- FIXME: Say something about the escape char mechanism here -->
+<ul class="menu">
+<li><a accesskey="1" href="#Algorithm-options">Algorithms</a>:   Selecting algorithms. 
+<li><a accesskey="2" href="#Hostauth-options">Hostauth options</a>
+<li><a accesskey="3" href="#Userauth-options">Userauth options</a>
+<li><a accesskey="4" href="#Action-options">Actions</a>:       What to do after login. 
+<li><a accesskey="5" href="#Verbosity-options">Messages</a>:   Tuning the amount of messages. 
+</ul>
+
+<div class="node">
+<a name="Algorithm-options"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Hostauth-options">Hostauth options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-lsh">Invoking lsh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Invoking-lsh">Invoking lsh</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">4.1 Algorithm options</h3>
+
+<p>Before a packet is sent, each packet can be compressed, authenticated,
+and encrypted, in that order. When the packet is received, it is first
+decrypted, next it is checked that it is authenticated properly, and
+finally it is decompressed. The algorithms used for this are negotiated
+with the peer at the other end of the connection, as a part of the
+initial handshake and key exchange.
+
+   <p>Each party provides a list of supported algorithms, and the first
+algorithm listed by the client, which is also found on the server's
+list, is selected. Note that this implies that order in which algorithms
+are listed on the server's list doesn't matter: if several algorithms
+are present on both the server's and the client's lists, it's the
+client's order that determines which algorithm is selected.
+
+   <p>Algorithms of different types, e.g. data compression and message
+authentication, are negotiated independently. Furthermore, algorithms
+used for transmission from the client to the server are independent of
+the algorithms used for transmission from the server to the client. 
+There are therefore no less than six different lists that could be
+configured at each end.
+
+   <p>The command line options for lsh and lshd don't let you specify
+arbitrary lists. For instance, you can't specify different preferences
+for sending and receiving.
+
+   <p>There is a set of default algorithm preferences. When you use a command
+line option to say that you want to use <var>algorithm</var> for one of the
+algorithms, the default list is replaced with a list containing the
+single element <var>algorithm</var>. For example, if you use <samp><span class="option">-c
+arcfour</span></samp> to say that you want to use <code>arcfour</code> as the encryption
+algorithm, the connection will either end up using <code>arcfour</code>, or
+algorithm negotiation will fail because the peer doesn't support
+<code>arcfour</code>.
+
+   <p><table summary=""><tr align="left"><td valign="top" width="10%">Option
+  </td><td valign="top" width="20%">Algorithm type </td><td valign="top" width="20%">Default </td><td valign="top" width="50%">
+<br></td></tr><tr align="left"><td valign="top" width="10%"><samp><span class="option">-z</span></samp> </td><td valign="top" width="20%">Data compression
+  </td><td valign="top" width="20%"><code>none</code>, <code>zlib</code>
+
+<p></td><td valign="top" width="50%">The default preference list supports zlib compression, but
+prefers not to use it.
+
+<p><br></td></tr><tr align="left"><td valign="top" width="10%"><samp><span class="option">-c</span></samp> </td><td valign="top" width="20%">Encryption
+  </td><td valign="top" width="20%"><code>aes256-cbs</code>, <code>3dec-cbc</code>, <code>blowfish-cbc</code>, <code>arcfour</code>
+
+<p></td><td valign="top" width="50%">The default encryption algorithm is aes256. The default list
+includes only quite old and well studied algorithms. There is a special
+algorithm name <code>all</code> to enable all supported encryption algorithms
+(except <code>none</code>).
+
+<p><br></td></tr><tr align="left"><td valign="top" width="10%"><samp><span class="option">-m</span></samp> </td><td valign="top" width="20%">Message Authentication
+  </td><td valign="top" width="20%"><code>hmac-sha1</code>, <code>hmac-md5</code>
+
+<p></td><td valign="top" width="50%">Both supported message authentication algorithms are of the
+<acronym>HMAC</acronym> family.
+   <br></td></tr></table>
+
+   <p>As a special case, <samp><span class="option">-z</span></samp> with no argument changes the compression
+algorithm list to <code>zlib</code>, <code>none</code>, which means that you want to
+use <code>zlib</code> if the other end supports it. This is different from
+<samp><span class="option">-zzlib</span></samp> which causes the negotiation to fail if the other end
+doesn't support <code>zlib</code>. A somewhat unobvious consequence of
+<samp><span class="option">-z</span></samp> having an <em>optional</em> argument is that if you provide an
+argument, it must follow directly after the option letter, no spaces
+allowed.
+
+<div class="node">
+<a name="Hostauth-options"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Userauth-options">Userauth options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Algorithm-options">Algorithm options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Invoking-lsh">Invoking lsh</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">4.2 Host authentication options</h3>
+
+<p>As described earlier (see <a href="#Threats">Threats</a>), proper authentication of the
+remote host is crucial to protect the connection against
+man-in-the-middle attacks. By default, <samp><span class="command">lsh</span></samp> verifies the server's
+claimed host key against the <dfn>Access Control Lists</dfn> in
+<samp><span class="file">~/.lsh/host-acls</span></samp>. If the remote host cannot be authenticated,
+the connection is dropped.
+
+   <p>The options that change this behaviour are
+
+     <dl>
+<dt><samp><span class="option">--host-db</span></samp><dd>Specifies the location of the <acronym>ACL</acronym> file.
+
+     <br><dt><samp><span class="option">--sloppy-host-authentication</span></samp><dd>Tell <samp><span class="command">lsh</span></samp> not to drop the connection if the server's key can not
+be authenticated. Instead, it displays the fingerprint of the key, and
+asks if it is trusted. The received key is also appended to the file
+<samp><span class="file">~/.lsh/captured_keys</span></samp>. If run in quiet mode, &lsquo;<samp><span class="samp">lsh -q
+--sloppy-host-authentication</span></samp>&rsquo;, <samp><span class="command">lsh</span></samp> connects to any host, no
+questions asked.
+
+     <br><dt><samp><span class="option">--strict-host-authentication</span></samp><dd>Disable sloppy operation (this is the default behaviour).
+
+     <br><dt><samp><span class="option">--capture-to</span></samp><dd>Use some other file than <samp><span class="file">~/.lsh/captured_keys</span></samp>. For example,
+
+     <pre class="example">          lsh --sloppy-host-authentication --capture-to ~/.lsh/host-acls
+</pre>
+     <p class="noindent">makes <samp><span class="command">lsh</span></samp> behave more like the <samp><span class="command">ssh</span></samp> program.
+
+     <br><dt><samp><span class="option">--srp-keyexchange</span></samp><dd>Try using <acronym>SRP</acronym> for keyexchange and mutual authentication.
+
+   </dl>
+
+<div class="node">
+<a name="Userauth-options"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Action-options">Action options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Hostauth-options">Hostauth options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Invoking-lsh">Invoking lsh</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">4.3 User authentication options</h3>
+
+     <dl>
+<dt><samp><span class="option">-l</span></samp><dd>Provide a name to use when logging in. By default, the value of the
+<samp><span class="env">LOGNAME</span></samp> environment variable is used.
+
+     <br><dt><samp><span class="option">-i</span></samp><dd>Try the keys from this file to log in. By default, <samp><span class="command">lsh</span></samp> uses
+<samp><span class="file">~/.lsh/identity</span></samp>, if it exists. It ought to be possible to use
+several <samp><span class="option">-i</span></samp> options to use more than one file, but that is
+currently not implemented.
+
+     <br><dt><samp><span class="option">--no-publickey</span></samp><dd>Don't attempt to log in using public key authentication.
+
+</dl>
+
+<div class="node">
+<a name="Action-options"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Verbosity-options">Verbosity options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Userauth-options">Userauth options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Invoking-lsh">Invoking lsh</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">4.4 Action options</h3>
+
+<p>There are many things <samp><span class="command">lsh</span></samp> can do once you are logged in. There
+are two types of options that control this: <dfn>actions</dfn> and
+<dfn>action modifiers</dfn>. For short options, actions use uppercase letters
+and modifiers use lowercase.
+
+   <p>For each modifier <samp><span class="option">--foo</span></samp> there's also a negated form
+<samp><span class="option">--no-foo</span></samp>. Options can also be negated by preceding it with the
+special option <samp><span class="option">-n</span></samp>. This is mainly useful for negating short
+options. For instance, use <samp><span class="option">-nt</span></samp> to tell <samp><span class="command">lsh</span></samp> not to
+request a remote pseudo terminal. Each modifier and its negation can be
+used several times on the command line. For each action, the latest
+previous modifier of each pair apply.
+
+   <p>First, the actions:
+
+     <dl>
+<dt><samp><span class="option">-L</span></samp><dd>Requests forwarding of a local port. This option takes a mandatory
+argument of the form
+<var>listen-port</var>:<var>target-host</var>:<var>target-port</var>. This option tells
+<samp><span class="command">lsh</span></samp> to listen on <var>listen-port</var> on the local machine. When
+someone conects to that port, <samp><span class="command">lsh</span></samp> asks the remote server to open
+a connection to <var>target-port</var> on <var>target-host</var>, and if it
+succeeds, the two connections are joined together through an the
+<samp><span class="command">lsh</span></samp> connection. Both port numbers should be given in decimal.
+
+     <br><dt><samp><span class="option">-R</span></samp><dd>Requests forwarding of a remote port. It takes one mandatory argument,
+just like <samp><span class="option">-L</span></samp>. But in this case <samp><span class="command">lsh</span></samp> asks the
+<em>remote</em> server to listen on <var>listen-port</var>. When someone
+connects to the remote hosts, the server will inform the local
+<samp><span class="command">lsh</span></samp>. The local <samp><span class="command">lsh</span></samp> then connects to <var>target-port</var> on
+<var>target-host</var>.
+
+     <br><dt><samp><span class="option">-D</span></samp><dd>Requests SOCKS-style forwarding. It takes one optional argument, the
+port number to use for the SOCKS proxy (default is 1080). Other
+applications can then use socks version 4 or version 5, to open
+outgoing connections which are forwarded via the SSH connection. Note
+that for short options the port number must be in the same argument if given
+(i.e. &lsquo;<samp><span class="samp">-D1080</span></samp>&rsquo; is correct, &lsquo;<samp><span class="samp">-D 1080</span></samp>&rsquo; is not).
+
+     <br><dt><samp><span class="option">-E</span></samp><dd>This option takes one mandatory argument, which is a command line to be
+executed on the remote machine.
+
+     <br><dt><samp><span class="option">-S</span></samp><dd>Start an interactive shell on the remote machine.
+
+     <br><dt><samp><span class="option">-G</span></samp><dd>Open a gateway on the local machine. A gateway is a local socket,
+located under /tmp, that can be used for controlling and using the ssh
+connection. It is protected using the ordinary file permissions.
+
+     <br><dt><samp><span class="option">-N</span></samp><dd>This is a no-operation action. It inhibits the default action, which is
+to start an interactive shell on the remote machine. It is useful if you
+want to set up a few forwarded tunnels or a gateway, and nothing more.
+
+     <br><dt><samp><span class="option">-B</span></samp><dd>Put the client into the background after key exchange and
+user authentication. Implies <samp><span class="option">-N</span></samp>
+
+     <br><dt><samp><span class="option">--subsystem</span></samp><dd>Specifies a subsystem to connect to, implies <samp><span class="option">--no-pty</span></samp>. Example usage:
+&lsquo;<samp><span class="samp">--subsystem=sftp</span></samp>&rsquo;
+
+   </dl>
+
+   <p>If there are trailing arguments after the name of the remote system,
+this is equivalent to a <samp><span class="option">-E</span></samp> option, with a command string
+constructed by catenating all the remaining arguments, separated by
+spaces. This implies that the arguments are usually expanded first by
+the local shell, and then the resulting command string is interpreted
+again by the remote system.
+
+   <p>If there are no trailing arguments after the name of the remote system,
+and the <samp><span class="option">-N</span></samp> option is not given, the default action is to start
+a shell on the remote machine. I.e. this is equivalent to the
+<samp><span class="option">-S</span></samp> option.
+
+   <p>There are a few supported modifiers:
+
+     <dl>
+<dt><samp><span class="option">-t</span></samp><dd>Request a pseudo terminal. <samp><span class="command">lsh</span></samp> asks the remote system to allocate
+a pseudo terminal. If it succeeds, the local terminal is set to raw
+mode. The default behaviour is to request a pty if and only if the
+local <samp><span class="command">lsh</span></samp> process has a controlling terminal. This modifier
+applies to actions that create remote processes, i.e. <samp><span class="option">-E</span></samp> and
+<samp><span class="option">-S</span></samp>, as well as the default actions.
+
+     <p>Currently, this option is ignored if there is no local terminal.
+
+     <br><dt><samp><span class="option">-x</span></samp><dd>Request <acronym>X</acronym> forwarding. Applies to the <samp><span class="option">-E</span></samp> and
+<samp><span class="option">-S</span></samp> and the default actions.
+
+     <br><dt><samp><span class="option">--stdin</span></samp><dd>Redirect the stdin of a remote process from a given, local, file. 
+Default is to use <samp><span class="command">lsh</span></samp>'s stdin for the first process, and
+<samp><span class="file">/dev/null</span></samp> for the rest. This option applies to the <samp><span class="option">-E</span></samp>
+and <samp><span class="option">-S</span></samp> options as well as to the default actions. The option
+applies to only one process; as soon as it is used it is reset to the
+default.
+
+     <br><dt><samp><span class="option">--stdout</span></samp><dd>Redirect the stdout of a remote process to a given, local, file. Default
+is to use <samp><span class="command">lsh</span></samp>'s stdout. Like <samp><span class="option">--stdin</span></samp>, it is reset
+after it is used.
+
+     <br><dt><samp><span class="option">--stderr</span></samp><dd>Redirect the stdout of a remote process to a given, local, file. 
+Analogous to the <samp><span class="option">--stdout</span></samp> option.
+
+     <br><dt><samp><span class="option">--detach</span></samp><dd>Detach from terminal at session end.
+
+     <br><dt><samp><span class="option">--write-pid</span></samp><dd>Applies to <samp><span class="option">-E</span></samp>. Write PID of backgrounded process to stdout.
+
+     <br><dt><samp><span class="option">-e</span></samp><dd>Set the escape character (use &ldquo;none&rdquo;) to disable. Default is &ldquo;~&rdquo;
+if a tty is allocated and &ldquo;none&rdquo; otherwise.
+
+     <br><dt><samp><span class="option">-g</span></samp><dd>Remote peers, aka global forwarding. This option applies to the
+forwarding actions, i.e. <samp><span class="option">-L</span></samp>, <samp><span class="option">-R</span></samp> and <samp><span class="option">-D</span></samp>. By
+default, only connections to the loopback interface, ip 127.0.0.1, are
+forwarded. This implies that only processes on the same machine can use
+the forwarded tunnel directly. If the -g modifier is in effect, the
+forwarding party will listen on <em>all</em> network interfaces.
+
+   </dl>
+
+<div class="node">
+<a name="Verbosity-options"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Action-options">Action options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Invoking-lsh">Invoking lsh</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h3 class="section">4.5 Verbosity options</h3>
+
+<p>These options determines what messages <samp><span class="command">lsh</span></samp> writes on
+its stderr.
+
+     <dl>
+<dt><samp><span class="option">-q</span></samp><dd>Quiet mode. Disables all messages and all questions, except password
+prompts and fatal internal errors.
+
+     <br><dt><samp><span class="option">-v</span></samp><dd>Verbose mode. Makes <samp><span class="command">lsh</span></samp> a little more verbose. The intention is
+to provide information that is useful for ordinary trouble shooting,
+and makes sense also to those not familiar with <samp><span class="command">lsh</span></samp> internals.
+
+     <br><dt><samp><span class="option">--trace</span></samp><dd>Trace mode. Prints some internal information to aid tracking
+<samp><span class="command">lsh</span></samp>'s flow of control.
+
+     <br><dt><samp><span class="option">--debug.</span></samp><dd>Debug mode. Dumps <em>a lot</em> of information, including dumps of all
+sent and received packets. It tries to avoid dumping highly sensitive data,
+such as private keys and the contents of <code>SSH_MSG_USERAUTH_REQUEST</code>
+messages, but you should still use it with care.
+
+     <br><dt><samp><span class="option">--log-file</span></samp><dd>This option redirects all messages to a file. Takes one mandatory
+argument: The name of that file.
+
+   </dl>
+
+   <p>Note that all these options are orthogonal. If you use <samp><span class="option">--trace</span></samp>,
+you usually want to add <samp><span class="option">-v</span></samp> as well; <samp><span class="option">--trace</span></samp> does not
+do that automatically.
+
+<div class="node">
+<a name="Invoking-lshg"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-lshd">Invoking lshd</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-lsh">Invoking lsh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">5 Invoking <samp><span class="command">lshg</span></samp></h2>
+
+<p><a name="lshg_002dusage"></a>You use <samp><span class="command">lshg</span></samp> to login to a remote machine to which you have
+previously used <samp><span class="command">lsh</span></samp> to set up a gateway (see <a href="#Action-options">Action options</a>). Its usage is very similar to that of <samp><span class="command">lsh</span></samp>
+(see <a href="#Invoking-lsh">Invoking lsh</a>), except that some options are not available.
+
+   <p>Basic usage is
+
+   <p>&lsquo;<samp><span class="samp">lshg [-l </span><var>username</var><span class="samp">] </span><var>host</var></samp>&rsquo;
+
+   <p>which attempts to connect to the gateway that should previously have
+been established by running &lsquo;<samp><span class="samp">lsh [-l </span><var>username</var><span class="samp">] -G </span><var>host</var></samp>&rsquo;)
+
+   <p>The <var>username</var> and <var>host</var> are used to locate the gateway. The
+default value for <var>username</var> is determined in the same way as for
+<samp><span class="command">lsh</span></samp> (see <a href="#Invoking-lsh">Invoking lsh</a>).
+
+   <p>As <samp><span class="command">lshg</span></samp> uses almost the same options as <samp><span class="command">lsh</span></samp>
+(see <a href="#Invoking-lsh">Invoking lsh</a>), only options that are not available or have
+a different meaning in <samp><span class="command">lshg</span></samp> are listed here.
+
+   <p>The algorithm options (see <a href="#Algorithm-options">Algorithm options</a>) as well as most of
+the userauth (see <a href="#Userauth-options">Userauth options</a>) and hostauth (see <a href="#Hostauth-options">Hostauth options</a>) are not available in <samp><span class="command">lshg</span></samp> as they are only used by
+session setup, which is already handled by <samp><span class="command">lsh</span></samp>.
+
+   <p>Due to technical reasons, <acronym>X11</acronym>-forwarding cannot be performed by
+<samp><span class="command">lshg</span></samp>, thus the <samp><span class="option">--x11-forward</span></samp> option (see <a href="#Action-options">Action options</a>) is not
+available.
+
+   <p>To summarize, these are the options that are new, not available or
+that have different meanings:
+
+     <dl>
+<dt><samp><span class="option">-G</span></samp><dd>For <samp><span class="command">lsh</span></samp> <samp><span class="option">-G</span></samp> requests a gateway to be set up. For
+<samp><span class="command">lshg</span></samp> it means that if no usable gateway is found
+<samp><span class="command">lsh</span></samp> should be launched with the same arguments instead.
+
+     <br><dt><samp><span class="option">--send-debug</span></samp><dd>Not available in <samp><span class="command">lsh</span></samp>. Sends a &lsquo;<samp><span class="samp">debug</span></samp>&rsquo; message to the remote machine.
+
+     <br><dt><samp><span class="option">--send-ignore</span></samp><dd>Not available in <samp><span class="command">lsh</span></samp>.  Sends a &lsquo;<samp><span class="samp">ignore</span></samp>&rsquo; message to the remote machine.
+
+     <br><dt><samp><span class="option">-x</span></samp><dd>(<samp><span class="option">--x11-forward</span></samp>) Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">-c</span></samp><dd>(<samp><span class="option">--crypto</span></samp>) Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">-z</span></samp><dd>(<samp><span class="option">--compression</span></samp>) Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">-m</span></samp><dd>(<samp><span class="option">--mac</span></samp>) Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--hostkey-algorithm</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--capture-to</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--strict-host-authentication</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--sloppy-host-authentication</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--host-db</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--publickey</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--no-publickey</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--dh-keyexchange</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--no-dh-keyexchange</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--srp-keyexchange</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">--no-srp-keyexchange</span></samp><dd>Not available in <samp><span class="command">lshg</span></samp>.
+
+     <br><dt><samp><span class="option">-i</span></samp><dd><samp><span class="option">--identity</span></samp> Not available in <samp><span class="command">lshg</span></samp>.
+
+   </dl>
+
+<div class="node">
+<a name="Invoking-lshd"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Files-and-environment-variables">Files and environment variables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-lshg">Invoking lshg</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">6 Invoking <samp><span class="command">lshd</span></samp></h2>
+
+<p><a name="lshd_002dusage"></a><samp><span class="command">lshd</span></samp> is a server that accepts connections from clients
+speaking the Secure Shell Protocol. It is usually started automatically
+when the systems boots, and runs with root privileges. However, it is
+also possible to start <samp><span class="command">lshd</span></samp> manually, and with user
+privileges.
+
+   <p>There are currently no configuration files. Instead, command line options
+are used to tell <samp><span class="command">lshd</span></samp> what to do. Many options have <samp><span class="option">--foo</span></samp>
+and <samp><span class="option">--no-foo</span></samp> variants. Options specifying the default behaviour
+are not listed here.
+
+   <p>Some of the options are the shared with <samp><span class="command">lsh</span></samp>. In particular, see
+<a href="#Algorithm-options">Algorithm options</a> and <a href="#Verbosity-options">Verbosity options</a>.
+
+   <p>Options specific to the <samp><span class="command">lshd</span></samp> server are:
+
+     <dl>
+<dt><samp><span class="option">-p</span></samp><dd>Port to listen to. The mandatory argument is a decimal port number or a
+service name. Default is "ssh", usually port 22.
+
+     <p>It should also be possible to use several -p options as a convenient way
+to make lshd listen on several ports on each specified (or default)
+interface, but that is not yet implemented.
+
+     <p>Note that if you use both <samp><span class="option">-p</span></samp> and <samp><span class="option">--interface</span></samp>, the
+order matters.
+
+     <br><dt><samp><span class="option">--interface</span></samp><dd>Network interface to listen on. By default, <samp><span class="command">lshd</span></samp> listens on all
+interfaces. An interface can be specified as a DNS name, a literal IPv4
+address, or a literal IPv6 address enclosed in square brackets. It can
+optionally be followed by a colon and a port number or service name. If
+no port number or service is specified, the default or the value from a
+<em>preceding</em> <samp><span class="option">-p</span></samp> is used.
+
+     <p>Some examples: <code>--interface=localhost</code>,
+<code>--interface=1.2.3.4:443</code>, <code>--interface=[aaaa::bbbb]:4711</code>. To
+make <samp><span class="command">lshd</span></samp> listen on several ports and interfaces at the same
+time, just use several <samp><span class="option">--interface</span></samp> options on the command line.
+
+     <br><dt><samp><span class="option">-h</span></samp><dd>Location of the server's private key file. By default,
+<samp><span class="file">/etc/lsh_host_key</span></samp>.
+
+     <br><dt><samp><span class="option">--daemonic</span></samp><dd>Enables daemonic mode. <samp><span class="command">lshd</span></samp> forks into the background,
+redirects its stdio file descriptors to <samp><span class="file">/dev/null</span></samp>, changes its
+working directory to <samp><span class="file">/</span></samp>, and redirects any diagnostic or debugging
+messages via syslog.
+
+     <p><samp><span class="command">lshd</span></samp> should be able to deal with the environment it inherits
+if it is started by <samp><span class="command">init</span></samp> or <samp><span class="command">inetd</span></samp>, but this is not
+really tested.
+
+     <br><dt><samp><span class="option">--pid-file</span></samp><dd>Creates a locked pid file, to make it easier to write start and stop
+scripts for <samp><span class="command">lshd</span></samp>. The mandatory argument provides the filename. 
+This option is enabled by default when operating in daemonic mode, and
+the default filename is <samp><span class="file">/var/run/lshd.pid</span></samp>.
+
+     <br><dt><samp><span class="option">--no-syslog</span></samp><dd>Disable the use of the syslog facility. Makes sense only together with
+<samp><span class="option">--daemonic</span></samp>
+
+     <br><dt><samp><span class="option">--enable-core</span></samp><dd>By default, <samp><span class="command">lshd</span></samp> disables core dumps, to avoid leaking sensitive
+information. This option changes that behaviour, and allows <samp><span class="command">lshd</span></samp>
+to dump core on fatal errors.
+
+     <br><dt><samp><span class="option">--no-password</span></samp><dd>Disable the "password" user authentication mechanism.
+
+     <br><dt><samp><span class="option">--no-publickey</span></samp><dd>Disable the "publickey" user authentication mechanism.
+
+     <br><dt><samp><span class="option">--root-login</span></samp><dd>Enable root login. By default, root can not log in using <samp><span class="command">lshd</span></samp>.
+
+     <br><dt><samp><span class="option">--login-auth-mode</span></samp><dd>This option is highly experimental. Bypass <samp><span class="option">lshd</span></samp>'s user
+authentication, and allow users to spawn their login-shell without any
+authentication. Usually combined with <samp><span class="option">--login-shell</span></samp>, to set the
+login shell to a program that performce password authentication.
+
+     <br><dt><samp><span class="option">--kerberos-passwords</span></samp><dd>Verify passwords against the kerberos database. This is implemented
+using the <samp><span class="command">lsh-krb-checkpw</span></samp> helper program. Note that this does
+<em>not</em> use the Kerberos infrastructure in the Right Way. Experimental.
+
+     <br><dt><samp><span class="option">--password-helper</span></samp><dd>Tells <samp><span class="command">lshd</span></samp> to use a helper program for verifying passwords. 
+This is a generalization of <samp><span class="option">--kerberos-passwords</span></samp>, and it could
+be used for verifying passwords against any password database. See the
+source files <samp><span class="file">lsh-krb-checkpw.c</span></samp> and <samp><span class="file">unix_user.c</span></samp> for
+details.
+
+     <br><dt><samp><span class="option">--login-shell</span></samp><dd>Use the specified program as the login shell for all users, overriding
+the login shell in the passwd database.
+
+     <br><dt><samp><span class="option">--srp-keyexchange</span></samp><dd>Enable <acronym>SRP</acronym> keyexchange and user authentication.
+
+     <br><dt><samp><span class="option">--no-pty-support</span></samp><dd>Disable support for pseudo terminals.
+
+     <br><dt><samp><span class="option">--no-tcp-forward</span></samp><dd>Disable support for tcp forwarding, in both directions.
+
+     <br><dt><samp><span class="option">--subsystems</span></samp><dd>Specifies a list of subsystems and corresponding
+programs. 
+Example usage: &lsquo;<samp><span class="samp">--subsystems=sftp=/usr/sbin/sftp-server,foosystem=/usr/bin/foo</span></samp>&rsquo;
+
+   </dl>
+
+<div class="node">
+<a name="Files-and-environment-variables"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Terminology">Terminology</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-lshd">Invoking lshd</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">7 Files and environment variables</h2>
+
+<p>This chapters describes all files and all environment variables that
+are used by <samp><span class="command">lsh</span></samp>, <samp><span class="command">lshd</span></samp>, and related programs.
+
+   <p>There are a few environment variables that modifies the behaviour of
+the <samp><span class="command">lsh</span></samp> programs. And there are also a handful of variables
+that are setup by <samp><span class="command">lshd</span></samp> when starting user processes.
+
+     <dl>
+<dt><samp><span class="env">DISPLAY</span></samp><dd>When <acronym>X</acronym>-forwarding is enabled, <samp><span class="env">DISPLAY</span></samp> specifies the
+local display. Used by <samp><span class="command">lsh</span></samp>.
+
+     <br><dt><samp><span class="env">HOME</span></samp><dd>User's home directory. Determines where client programs looks for the
+<samp><span class="file">~/.lsh</span></samp> directory. When <samp><span class="command">lshd</span></samp> starts a user program, it
+sets <samp><span class="env">HOME</span></samp> from the value in the <samp><span class="file">/etc/passwd</span></samp> file, except
+if <samp><span class="command">lshd</span></samp> is running as an ordinary user process. In the
+latter case, the new process inherits <samp><span class="command">lsh</span></samp>'s own value of
+<samp><span class="env">HOME</span></samp>.
+
+     <br><dt><samp><span class="env">LOGNAME</span></samp><dd>The user's log in name. Used as the default name for logging into
+remote systems. Set by <samp><span class="command">lshd</span></samp> when starting new processes.
+
+     <br><dt><samp><span class="env">LSH_YARROW_SEED_FILE</span></samp><dd>If set, it points out the location of the seed-file for the randomness
+generator. Recognized both by <samp><span class="command">lshd</span></samp> and the client programs.
+
+     <br><dt><samp><span class="env">LSHFLAGS</span></samp><dd>If set, lsh will parse any options as had they been given on the
+command line.
+
+     <br><dt><samp><span class="env">LSHGFLAGS</span></samp><dd>If set, lshg will parse any options as had they been given on the
+command line.
+
+     <br><dt><samp><span class="env">POSIXLY_CORRECT</span></samp><dd>Affects the command line parsing of programs which by default accept
+options mixed with arguments.
+
+     <br><dt><samp><span class="env">SEXP_CONV</span></samp><dd>The location of the <samp><span class="command">sexp-conv</span></samp> program. If not set, the default
+<samp><span class="file">$prefix/bin/sexp-conv</span></samp> is used.
+
+     <br><dt><samp><span class="env">SSH_CLIENT</span></samp><dd>This variable may be set by lshd for established sessions. If it is set
+it consists of three parts separated by whitespace, the first part
+contains the address of the connecting client. The second part
+contains the tcp port used on the connecting client and the third part
+contains the tcp port used on the server.
+
+     <br><dt><samp><span class="env">SSH_TTY</span></samp><dd>This variable may be set by lshd for established sessions. If it is set
+it is the name of the tty allocated.
+
+     <br><dt><samp><span class="env">SHELL</span></samp><dd>User's login shell. When <samp><span class="command">lshd</span></samp> starts a user process, it sets
+<samp><span class="env">SHELL</span></samp> to the value in <samp><span class="file">/etc/passwd</span></samp>, unless overridden by
+the <samp><span class="option">--login-shell</span></samp> command line option.
+
+     <br><dt><samp><span class="env">TERM</span></samp><dd>The type of the local terminal. If the client requests a pty for a
+remote process, the value of <samp><span class="env">TERM</span></samp> is transferred from client to
+server.
+
+     <br><dt><samp><span class="env">TMPDIR</span></samp><dd>Determines where the unix socket used by <samp><span class="command">lshg</span></samp> is located in
+the filesystem.
+
+     <br><dt><samp><span class="env">TZ</span></samp><dd>Time zone. Processes started by <samp><span class="command">lshd</span></samp> inherit the value of
+this variable from the server process.
+
+     <!-- used by xlib @item XAUTHORITY -->
+   </dl>
+
+   <p>Files used by the lsh client, stored in the <samp><span class="file">~/lsh</span></samp> directory:
+
+     <dl>
+<dt><samp><span class="file">captured_keys</span></samp><dd>Keys for remote hosts, saved when running &lsquo;<samp><span class="samp">lsh
+--sloppy-host-authentication</span></samp>&rsquo;. Or more precicely, each key is stored
+together with an as SPKI (Simple Public Key Intrastructure) ACL:s
+(Access Control Lists).
+
+     <br><dt><samp><span class="file">identity</span></samp><dd>Your private key file. Usually created by &lsquo;<samp><span class="samp">lsh-keygen |
+lsh-writekey</span></samp>&rsquo;. Read by <samp><span class="command">lsh</span></samp>. Should be kept secret.
+
+     <br><dt><samp><span class="file">identity.pub</span></samp><dd>The corresponding public key. You can copy this file to other systems
+in order to authorize the private key to login (see <a href="#Converting-keys">Converting keys</a>).
+
+     <br><dt><samp><span class="file">host-acls</span></samp><dd>Host keys (or more precisely, ACL:s) that lsh considers authentic. 
+Entries have the same format as in <samp><span class="file">captured_keys</span></samp>.
+
+     <br><dt><samp><span class="file">yarrow-seed-file</span></samp><dd>The seed file for the randomness generator. Should be kept secret.
+
+   </dl>
+
+   <p>Files used by <samp><span class="command">lshd</span></samp>, some of which are read from user home
+directories:
+
+     <dl>
+<dt><samp><span class="file">/etc/lsh_host_key</span></samp><dd>The server's private host key.
+
+     <br><dt><samp><span class="file">/etc/lsh_host_key.pub</span></samp><dd>The corresponding public key.
+
+     <br><dt><samp><span class="file">/var/spool/lsh/yarrow-seed-file</span></samp><dd>The seed-file for <samp><span class="command">lshd</span></samp>'s randomness generator.
+
+     <br><dt><samp><span class="file">~/.lsh/authorized_keys</span></samp><dd>This is a directory that keeps a &ldquo;database&rdquo; of keys authorized for
+login. With the current implementation, a key is authorized for login
+if and only if this directory contains a file with a name which is the
+SHA1 hash of the key. The usual way to create files is by running the
+script <samp><span class="command">lsh-authorize</span></samp>.
+
+     <br><dt><samp><span class="file">~/.lsh/srp-verifier</span></samp><dd>If you use the experimental support for <acronym>SRP</acronym> (see <a href="#srp">srp</a>),
+the server reads a user's <acronym>SRP</acronym> verifier from this file. 
+</dl>
+
+<div class="node">
+<a name="Terminology"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Concept-Index">Concept Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Files-and-environment-variables">Files and environment variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">8 Terminology</h2>
+
+<div class="node">
+<a name="Concept-Index"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Terminology">Terminology</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="unnumbered">Concept Index</h2>
+
+<ul class="index-cp" compact>
+   </ul></body></html>
+
+<!--
+
+Local Variables:
+coding: iso-8859-1
+End:
+
+-->

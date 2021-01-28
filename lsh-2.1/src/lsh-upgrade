@@ -1,0 +1,61 @@
+#! /bin/sh
+
+# A script for upgrading files under .lsh for lsh-2.0
+
+# FIXME: Fix private keys as well, at least unencrypted keys like the
+# server host key.
+
+werror () {
+  echo "$1" >&2
+}
+
+die () {
+  werror "$1"
+  exit 1
+}
+
+if [ $# -ne 0 ] ; then
+  werror "Updates older lsh files to work with lsh-2.0"
+  werror ""
+  werror "Usage: lsh-upgrade"
+  exit 1
+fi
+
+: ${SEXP_CONV:=sexp-conv}
+
+cd "$HOME/.lsh" || die "No .lsh directory, so nothing to do."
+
+if [ -s host-acls ] ; then
+  werror "~/.lsh/host-acls already exists, so I won't touch that."
+else
+  if [ -s known_hosts ] ; then
+    werror "Converting known_hosts to host-acls"
+    # These are the changes we must make:
+    #
+    # * The subject of an acl must be enclosed in a subject-expression
+    #
+    # * Numbers are signed, so the most significant bit of all our
+    #   numbers must be 0. So we add a leading zero octet to numbers
+    #   that need it.
+    
+    "$SEXP_CONV" -s hex <known_hosts \
+      | sed -e 's,(entry ,(entry (subject ,' \
+            -e 's,(tag ,)(tag ,' \
+	    -e 's,(\(.\) #\([89a-fA-F]\),(\1 #00\2,' \
+      | "$SEXP_CONV" >host-acls
+  fi
+fi
+
+if [ -d authorized_keys_sha1 ]; then
+  # Upgrade authorized keys
+  werror "Upgrading any authorized keys"
+
+  for p in authorized_keys_sha1/*; do
+    # Upgrade the current key and store it temporary
+    "$SEXP_CONV" -s hex < "$p" | \
+	sed -e 's,(\(.\) #\([89a-fA-F]\),(\1 #00\2,' > tmp_upgraded_auth_key && \
+    lsh-authorize tmp_upgraded_auth_key 
+  done
+
+  rm tmp_upgraded_auth_key
+fi

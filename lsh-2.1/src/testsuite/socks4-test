@@ -1,0 +1,25 @@
+#! /bin/sh
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+need_tsocks
+
+SERVERPORT=`expr $PORT + 1`
+SOCKSPORT=10080
+
+TSOCKS_CONF_FILE="$srcdir/socks4-config"
+export TSOCKS_CONF_FILE
+
+# FIXME: We need to configure tsocks to use a socks server on localhot
+# to connect to other servers on localhost.
+at_connect $SERVERPORT 1 'grep bar && echo foo' \
+    && spawn_lshd \
+    && spawn_lsh -D$SOCKSPORT \
+    && echo bar | tsocks tcpconnect localhost $SERVERPORT | grep foo \
+    && test_success
+
+test_done

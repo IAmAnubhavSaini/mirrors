@@ -1,0 +1,86 @@
+--- gneural_network release 0.9.1
+
+    03 May 2016, J.M. Sellier, jeanmichel.sellier@gmail.com
+
+    --- The parser has been drastically improved.
+
+    --- The code has been restructured to avoid the use of global variables,
+        making this package easier to understand and maintain.
+
+--- gneural_network release 0.9.0
+
+    13 Apr. 2016, J.M. Sellier, jeanmichel.sellier@gmail.com
+
+    --- A bug has been fixed in the computation of the neural
+        network error.
+
+    --- The multi-scale Monte Carlo algorithm to train a
+        neural network has been parallelized by means of
+        OpenMP.
+
+    --- The genetic algorithm to train a neural network has
+        been parallelized by means of OpenMP.
+
+    --- The script modulus_of_two_dimensional_vectors.input
+        has been fixed.
+
+
+--- gneural_network release 0.8.0
+
+    02 Apr. 2016, J.M. Sellier, jeanmichel.sellier@gmail.com
+
+    --- The previous (simplified) genetic algorithm has been
+        drastically improved.
+    --- A multi-scale Monte Carlo optimizer has been implemeted
+        to train the neural network.
+    --- New scripts have been implemented and are provided in
+        the folder "tests", one which fits a quandratic curve,
+        another which trains a network to compute the modulus
+        of a two-dimensional vector and, finally, one which
+        trains a network to invert the order of numbers in a
+        given couple (a,b).
+    --- Several bugs have been fixed.
+
+--- gneural_network release 0.6.0
+
+    24 Mar. 2016, J.M. Sellier, jeanmichel.sellier@gmail.com
+
+    --- The code has been divided into proper header and
+        implementation files.
+    --- The code and the scripting language have been
+        generalized to handle a general number of neurons in
+        both the input and output layers.
+    --- A neural network can now be saved in a file specified by
+        the user (to be loaded afterwards).
+    --- Some part of the code have been further optimized
+        to run faster.
+    --- The user can now decide if the initial weights of a
+        network have to be randomized before the training.
+    --- Several important bugs have been fixed.
+
+--- gneural_network release 0.5.0
+
+    18 Mar. 2016, J.M. Sellier, jeanmichel.sellier@gmail.com
+
+    --- The installation process has been standardized as
+        it should be for a GNU package.
+    --- A scripting language has been implemented which allows
+        the user to define his/her own neural network without
+        having to go through the source code.
+        Plenty of options are now possible, for instance, the
+        user can define the number of neurons, their connections,
+        their discriminant, activation functions, etc.
+        The user can choose among four different methods for
+        training the neural network which can be saved for
+        later use.
+    --- Some part of the code have been optimized to run faster.
+    --- A test folder has been created containing a commented
+        example of script which defines a neural network for
+        a simple curve fitting task.
+
+--- gneural_network release 0.0.1
+
+    03 Mar. 2016, J.M. Sellier, jeanmichel.sellier@gmail.com
+
+    --- First release of gneural_network
+

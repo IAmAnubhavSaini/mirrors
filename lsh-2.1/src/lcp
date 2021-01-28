@@ -1,0 +1,209 @@
+#! /bin/bash
+
+# rcp-like copying program. Uses bash, for the noclobber feature.
+# Unless -f is used, bash is required also on the remote machine, but
+# no other special programs.
+
+# lsh, an implementation of the ssh protocol
+# 
+# Copyright (C) 2001 Niels Möller
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+set -e
+
+verbose=no
+dry_run=no
+force=no
+
+RSH=${LCP_RSH:-lsh}
+
+function werror () {
+  if [ "x$verbose" = xyes ] ; then
+    echo 1>&2 "$@"
+  fi
+}
+
+function usage () {
+  echo "Usage: lcp [OPTIONS] SOURCE DESTINATION"
+  echo
+  echo "Both SOURCE and DESTINATION can be files on remote machines."
+  echo "Valid file specifications are:"
+  echo
+  echo "  file"
+  echo "  machine:file"
+  echo "  user@machine:file"
+  echo
+  echo "Valid options are:"
+  echo
+  echo "  --help         display this message"
+  echo "  -f, --force    overwrite existing files"
+  echo "  -v, --verbose  display commands before they are executed"
+  echo "  -n, --dry-run  don't execute any commands. Implies -v"
+}
+
+# FIXME: This isn't failsafe at all. We could do somthing simple, like
+# inserting a backslash before each character, or do something more
+# sophisticated whichat doesn't quote filenames that don't need it.
+
+function quote () {
+  echo '"'"$1"'"'
+}
+
+# Splits an argument of the form [[user@]host:]file
+function split_spec () {
+  host=''
+  user=''
+  file="$1"
+  case "$file" in
+    *:*)
+      host=${1%:*}
+      file=${1#*:}
+	  case "$host" in
+	    *@*)
+	      user=${host%@*}
+	      host=${host#*@}
+	    ;;
+	  esac
+    ;;
+  esac
+}
+
+# Arguments USER HOST FILE
+function read_src () {
+  local user="${1:+-l}$1"
+  local host="$2"
+  local file="$3"
+  local qfile="`quote "$file"`"
+
+  if [ -z "$host" ]; then
+    werror 'From: cat "'"$file"'"'
+    if [ "x$dry_run" = xno ] ; then
+      cat "$file"
+    fi
+  else
+    werror "From: " $RSH $user "$host" cat "$qfile"
+    if [ "x$dry_run" = xno ] ; then
+      $RSH $user "$host" cat "$qfile"
+    fi
+  fi
+}
+
+# Arguments USER HOST DST SRC_FILE
+function write_dst () {
+  local user="${1:+-l}$1"
+  local host="$2"
+  local dst="$3"
+  local src_file="$4"
+  local qdst="`quote "$file"`"
+  local qsrc="`quote "$src_file"`"
+  
+  if [ -z "$host" ]; then
+    werror 'To: if [ -d "'"$dst"'" ] ; then cat > "'"$dst/$src_file"'" ; else cat > "'"$dst"'"; fi'
+    if [ "x$dry_run" = xno ] ; then
+      if [ -d "$dst" ] ; then cat > "$dst/$src_file" ; else cat > "$dst"; fi 
+    fi
+  else
+    command="$rset_clobber"' if [ -d "'"$dst"'" ] ; then cat > "'"$dst/$src_file"'" ; else cat > "'"$dst"'" ; fi'
+
+    werror "To: " $RSH $user '"'"$host"'"' "bash -c '$command'"
+
+    if [ x$dry_run = xno ] ; then
+      $RSH $user "$host" bash -c "'$command'"
+    fi
+  fi
+}
+
+function foo ()
+{
+  split_spec "$1"
+  echo user: `quote "$user"`
+  echo host: `quote "$host"`
+  echo file: `quote "$file"`
+}
+
+while [ $# -ge 1 ]; do
+  case "$1" in
+    --usage|--help)
+      usage
+      exit 1;
+    ;;
+    -v|--verbose)
+      verbose=yes
+    ;;
+    -n|--dry-run)
+      dry_run=yes
+      verbose=yes
+    ;;
+    -f|--force)
+      force=yes
+    ;;
+    --)
+      shift
+      if [ $# != 2 ] ; then
+        usage
+	exit 1
+      fi
+      break
+    ;;
+    -*)
+      echo "lcp: unrecognized option \`$1'"
+      echo "Try \`lcp --help' or \`lcp --usage' for more information."
+      exit 1;
+    ;;
+    *)
+      break
+    ;;
+  esac
+  shift
+done
+
+if [ $# != 2 ] ; then
+  usage
+  exit 1
+fi
+
+split_spec "$1"
+src_user="$user"
+src_host="$host"
+src_file="$file"
+
+split_spec "$2"
+dst_user="$user"
+dst_host="$host"
+dst_file="$file"
+
+# echo dry_run: $dry_run
+# echo verbose: $verbose
+
+if [ "x$force" = xyes ] ; then
+  set +C
+  rset_clobber=''
+  SHELL_PROGRAM=sh
+else
+  set -C
+  rset_clobber='set -C ;'
+  SHELL_PROGRAM=bash
+fi
+
+file=`basename $src_file`
+
+if [ "x$dry_run" = xyes ] ; then
+  read_src "$src_user" "$src_host" "$src_file" 
+  write_dst "$dst_user" "$dst_host" "$dst_file" "$file"
+else
+  read_src "$src_user" "$src_host" "$src_file" \
+  | write_dst "$dst_user" "$dst_host" "$dst_file" "$file"
+fi

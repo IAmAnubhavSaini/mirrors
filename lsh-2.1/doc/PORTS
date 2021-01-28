@@ -1,0 +1,45 @@
+This file lists systems/architectures on which versions of lsh has been
+tested.
+
+lsh version:	1999-01-28 with patches
+uname -a:	Linux zensunni 2.0.36 #1 Mon Nov 16 19:50:22 CET 1998 i686 unknown
+libc:		2.0.7.19981211
+Status:		Compiles quite cleanly.
+		Both client and server work.
+		SSH1 fallback works.
+
+
+lsh version:	1999-01-28 with many patches
+uname -a:	Linux alpha-quadrant 2.2.1-ac5 #1 Sun Feb 7 12:54:28 CET 1999 alpha unknown
+libc:		libc6.1 2.0.7.19981211-4.0.1
+Status:		Client works.
+		Server gets channel.c:1101: channel_close: Assertion `!
+		(channel->flags & 1)' failed. after close of the first
+		connection.
+
+lsh version:	1999-01-28 with patches
+uname -a:	Linux zensunni 2.0.36 #1 Mon Nov 16 19:50:22 CET 1998 i686 unknown
+libc:		2.0.7.19981211
+Status:		Compiles quite cleanly.
+		Both client and server work.
+		SSH1 fallback works.
+
+
+lsh version:	CVS 1998-12-30 with patches
+uname -a:	Linux alpha-quadrant 2.0.30 #1 Wed Nov 12 12:40:59 EST 1997 alpha unknown
+libc:		libc6.1 2.0.7u-5
+Status:		Client works fine when compiled without zlib support; with
+		zlib, it segfaults inside zlib (in inflate_blocks_reset
+		after about the fifth call to zlib_alloc).
+
+
+lsh version:	CVS 1998-12-30 with patches
+uname -a:	Linux tervola 2.1.115 #1 Tue Aug 11 08:05:32 UTC 1998 ppc unknown
+libc:		libc6 2.0.100-2
+Status:		Simple test connection to Linux/i386 lshd works.
+
+
+lsh version:	CVS 1998-12-30 with patches
+uname -a:	SunOS ultra5 5.5 Generic_103093-14 sun4u sparc SUNW,Ultra-1
+Status:		Compiles reasonably clean.
+		Simple test connection to Linux/i386 lshd works.

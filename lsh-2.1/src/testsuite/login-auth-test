@@ -1,0 +1,16 @@
+#! /bin/sh
+
+echo lsh, test login, login-auth-mode
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+LSHD_FLAGS="$LSHD_FLAGS --login-auth-mode --login-shell=/bin/cat --no-password --no-publickey"
+
+cat ../lshd > test.out1
+spawn_lshd && exec_lsh <test.out1 >test.out2
+
+compare_output "lsh-login-test"

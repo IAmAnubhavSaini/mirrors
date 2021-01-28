@@ -1,0 +1,19 @@
+#! /bin/sh
+
+# Checks that connection fails if we don't have an known_hosts file
+echo lsh, test 7
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+spawn_lshd && \
+  if HOME="$TEST_HOME" ../lsh -nt --host-db=/dev/null $LSH_FLAGS -p $PORT localhost true ; then
+    test_fail
+  else
+    test_success
+  fi
+
+test_done

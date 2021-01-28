@@ -1,0 +1,24 @@
+#! /bin/sh
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+SERVERPORT=`expr $PORT + 1`
+PROXYPORT=`expr $PORT + 2`
+
+# The delay is needed because -B doesn't wait for other actions, such
+# as -R, to complete.
+
+# For some reason, tcpconnect < /dev/null doesn't work on SunOS-5.4. Hence
+# the appearantly unneeded use of cat.
+at_connect $SERVERPORT 1 'echo foo' \
+    && spawn_lshd \
+    && spawn_lsh -R $PROXYPORT:localhost:$SERVERPORT \
+    && sleep 30 \
+    && cat /dev/null | ./tcpconnect localhost $PROXYPORT | grep foo \
+    && test_success
+
+test_done

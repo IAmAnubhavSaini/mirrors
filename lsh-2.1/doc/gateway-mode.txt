@@ -1,0 +1,48 @@
+GATEWAY MODE
+
+One thing that I'd like to add to the list of interesting projects is
+an lsh gateway mode. The idea is that when you start lsh, you can tell
+it to open one or more local gateways. A gateway is a unix domain
+socket somewhere in the filesystem (preferable local, and with
+paranoid file protection). You can then connect to the gateway, one or
+several times. Below, the lsh process listening on this socket is
+referred to as the "gateway lsh process", and processes connecting to
+it are called "gateway clients".
+
+On each connection to the gateway, you can send packets which are
+inserted into the encrypted stream to the remote server. A little
+filtering and bookkeeping by the local gateway lsh may be required,
+but not very much. Relevant packets received from the remote server
+are forwarded to the gateway client, and in this way some operations
+can be "delegated" to the gateway client.
+
+The most important operation that can be done through the gateway is
+opening new channels; if a gateway client request opening a channel,
+the local lsh delegates all packets associated with the new channel to
+the right client.
+
+All communications through the gateway are unencrypted. Only the lsh
+process needs to know anything about key exchange and various
+encryption methods.
+
+The gains are:
+
+1. Faster channel open times (no key exchange, or even tcp-connect
+   roundtrips required). This can of course also be provided by a
+   separate wrapper, like ceder's fsh.
+
+2. Flexibility; you can request new forwarded ports, or use direct-tcp to
+   tunnel new connections, without having to know that at the time the
+   local lsh is started.
+
+3. The gateway interface can be used by external programs implementing
+   things like those described in the doc/configuration.txt file.
+
+What seems a little more difficult, but doable, is delegation of
+channels opened by the server (e.g. forwarded tcp ports, or X
+forwarding). To do this, the gateway process must remember which
+client requested which forwardings, and redirect the received channel
+open messages to the right gateway client.
+
+Another possibly useful feature is to create a similar gateway socket
+also on the remote end of the lsh connection.

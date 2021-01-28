@@ -1,0 +1,68 @@
+#! /bin/sh
+
+# A script for upgrading lsh private keys
+
+werror () {
+  echo "$1" >&2
+}
+
+die () {
+  werror "$1"
+  exit 1
+}
+
+if [ $# -eq 0 ] ; then
+  werror "You must supply a key to update, the upgraded key will"
+  werror "have the suffix .new."
+  werror ""
+  werror "Usage: key.."
+  exit 1
+fi
+
+umask 077
+
+: ${SEXP_CONV:=sexp-conv}
+: ${LSH_DECRYPT_KEY:=lsh-decrypt-key}
+: ${LSH_WRITEKEY:=lsh-writekey}
+
+type "$SEXP_CONV" >/dev/null 2>&1 || die "Can't find the sexp-conv program"
+type "$LSH_DECRYPT_KEY" >/dev/null 2>&1 || die "Can't find the lsh-decrypt-key program"
+type "$LSH_WRITEKEY" >/dev/null 2>&1 || die "Can't find the lsh-writekey program"
+
+for p in $@; do
+    werror "Converting key $p"
+
+
+    # These are the changes we must make:
+    #
+    # * Numbers are signed, so the most significant bit of all our
+    #   numbers must be 0. So we add a leading zero octet to numbers
+    #   that need it.
+
+    # It also seems we must reconvert back to transport format to make lsh-writekey
+
+
+    if "$SEXP_CONV" -s advanced < "$p" \
+    | grep 'password-encrypted' >/dev/null; then
+      werror "Key is encrypted and must be decrypted."
+
+      # Encrypted key
+      if "$LSH_DECRYPT_KEY" --in="$p"; then \
+        werror "Key will be reencrypted using aes256-cbc"; \
+      else \
+	werror "Decryption failed for $p, aborting."; \
+        die "(errors from lsh-writekey may be ignored)."; \
+      fi | \
+      "$SEXP_CONV" -s hex  \
+        | sed -e 's,(\(.\) #\([89a-fA-F]\),(\1 #00\2,' \
+        | "$SEXP_CONV" -s transport \
+	| "$LSH_WRITEKEY" -c aes256-cbc -o "$p.new"     
+    else
+     # Not encrypted
+     "$SEXP_CONV" -s hex <"$p" \
+       | sed -e 's,(\(.\) #\([89a-fA-F]\),(\1 #00\2,' \
+       | "$SEXP_CONV" -s transport \
+       | "$LSH_WRITEKEY" -o "$p.new"
+
+    fi
+done

@@ -1,0 +1,598 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define if building universal (internal helper macro) */
+#undef AC_APPLE_UNIVERSAL_BUILD
+
+/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
+   systems. This function is required for `alloca.c' support on those systems.
+   */
+#undef CRAY_STACKSEG_END
+
+/* Define to 1 if using `alloca.c'. */
+#undef C_ALLOCA
+
+/* Define to enable sanity checking on memory allocation and casting */
+#undef DEBUG_ALLOC
+
+/* Define to enable tracing */
+#undef DEBUG_TRACE
+
+/* Define to 1 if the `getpgrp' function requires zero arguments. */
+#undef GETPGRP_VOID
+
+/* Work around buggy MIT library */
+#undef GSS_C_NT_HOSTBASED_SERVICE
+
+/* Define if AI_NUMERICHOST exists */
+#undef HAVE_AI_NUMERICHOST
+
+/* Define to 1 if you have the `alarm' function. */
+#undef HAVE_ALARM
+
+/* Define to 1 if you have `alloca', as a function or macro. */
+#undef HAVE_ALLOCA
+
+/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
+   */
+#undef HAVE_ALLOCA_H
+
+/* Define to 1 if you have the <argp.h> header file. */
+#undef HAVE_ARGP_H
+
+/* Define to 1 if you have the `cfmakeraw' function. */
+#undef HAVE_CFMAKERAW
+
+/* Define to 1 if you have the <crypt.h> header file. */
+#undef HAVE_CRYPT_H
+
+/* Define to 1 if you have the declaration of `sys_siglist', and to 0 if you
+   don't. */
+#undef HAVE_DECL_SYS_SIGLIST
+
+/* Define to 1 if you have the declaration of `_sys_siglist', and to 0 if you
+   don't. */
+#undef HAVE_DECL__SYS_SIGLIST
+
+/* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
+#undef HAVE_DOPRNT
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the `gai_strerror' function. */
+#undef HAVE_GAI_STRERROR
+
+/* Define if the compiler understands __attribute__ */
+#undef HAVE_GCC_ATTRIBUTE
+
+/* Define to 1 if you have the `getaddrinfo' function. */
+#undef HAVE_GETADDRINFO
+
+/* Define to 1 if you have the `getdtablesize' function. */
+#undef HAVE_GETDTABLESIZE
+
+/* Define to 1 if you have the `getnameinfo' function. */
+#undef HAVE_GETNAMEINFO
+
+/* Define to 1 if you have the `getrusage' function. */
+#undef HAVE_GETRUSAGE
+
+/* Define to 1 if you have the `getspnam' function. */
+#undef HAVE_GETSPNAM
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the <gmp.h> header file. */
+#undef HAVE_GMP_H
+
+/* Define to 1 if you have the <gssapi/gssapi_generic.h> header file. */
+#undef HAVE_GSSAPI_GSSAPI_GENERIC_H
+
+/* Define to 1 if you have the <gssapi/gssapi.h> header file. */
+#undef HAVE_GSSAPI_GSSAPI_H
+
+/* Define to 1 if you have the <gssapi.h> header file. */
+#undef HAVE_GSSAPI_H
+
+/* Define to 1 if you have the <gss.h> header file. */
+#undef HAVE_GSS_H
+
+/* Define to 1 if you have the `inet_aton' function. */
+#undef HAVE_INET_ATON
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <krb5.h> header file. */
+#undef HAVE_KRB5_H
+
+/* Define to 1 if you have the `crypt' library (-lcrypt). */
+#undef HAVE_LIBCRYPT
+
+/* Define to 1 if you have the `gmp' library (-lgmp). */
+#undef HAVE_LIBGMP
+
+/* Define to 1 if you have the `gss' library (-lgss). */
+#undef HAVE_LIBGSS
+
+/* Define to 1 if you have the `oop' library (-loop). */
+#undef HAVE_LIBOOP
+
+/* Define to 1 if you have the `pam' library (-lpam). */
+#undef HAVE_LIBPAM
+
+/* Define to 1 if you have the `socket' library (-lsocket). */
+#undef HAVE_LIBSOCKET
+
+/* Define to 1 if you have the `util' library (-lutil). */
+#undef HAVE_LIBUTIL
+
+/* Define to 1 if you have the <libutil.h> header file. */
+#undef HAVE_LIBUTIL_H
+
+/* Define to 1 if you have the `wrap' library (-lwrap). */
+#undef HAVE_LIBWRAP
+
+/* Define to 1 if you have the `Xau' library (-lXau). */
+#undef HAVE_LIBXAU
+
+/* Define to 1 if you have the `xnet' library (-lxnet). */
+#undef HAVE_LIBXNET
+
+/* Define to 1 if you have the `z' library (-lz). */
+#undef HAVE_LIBZ
+
+/* Define to 1 if you have the `login' function. */
+#undef HAVE_LOGIN
+
+/* Define to 1 if you have the `logout' function. */
+#undef HAVE_LOGOUT
+
+/* Define to 1 if you have the `logwtmp' function. */
+#undef HAVE_LOGWTMP
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `openpty' function. */
+#undef HAVE_OPENPTY
+
+/* Define to 1 if you have the `poll' function. */
+#undef HAVE_POLL
+
+/* Define to 1 if you have the <poll.h> header file. */
+#undef HAVE_POLL_H
+
+/* Define to 1 if you have the <pty.h> header file. */
+#undef HAVE_PTY_H
+
+/* Define to 1 if you have the `pututline' function. */
+#undef HAVE_PUTUTLINE
+
+/* Define to 1 if you have the `pututxline' function. */
+#undef HAVE_PUTUTXLINE
+
+/* Define to 1 if you have the <security/pam_appl.h> header file. */
+#undef HAVE_SECURITY_PAM_APPL_H
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define to 1 if you have the `seteuid' function. */
+#undef HAVE_SETEUID
+
+/* Define to 1 if you have the `setresuid' function. */
+#undef HAVE_SETRESUID
+
+/* Define to 1 if you have the `setrlimit' function. */
+#undef HAVE_SETRLIMIT
+
+/* Define to 1 if you have the <shadow.h> header file. */
+#undef HAVE_SHADOW_H
+
+/* Define to 1 if you have the `socket' function. */
+#undef HAVE_SOCKET
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <stropts.h> header file. */
+#undef HAVE_STROPTS_H
+
+/* Define to 1 if you have the `strsignal' function. */
+#undef HAVE_STRSIGNAL
+
+/* Define to 1 if you have the `strtol' function. */
+#undef HAVE_STRTOL
+
+/* Define to 1 if `ut_addr' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_ADDR
+
+/* Define to 1 if `ut_addr_v6' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_ADDR_V6
+
+/* Define to 1 if `ut_exit' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_EXIT
+
+/* Define to 1 if `ut_exit.e_termination' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_EXIT_E_TERMINATION
+
+/* Define to 1 if `ut_exit.ut_termination' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_EXIT_UT_TERMINATION
+
+/* Define to 1 if `ut_exit.__e_termination' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_EXIT___E_TERMINATION
+
+/* Define to 1 if `ut_host' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_HOST
+
+/* Define to 1 if `ut_id' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_ID
+
+/* Define to 1 if `ut_name' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_NAME
+
+/* Define to 1 if `ut_pid' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_PID
+
+/* Define to 1 if `ut_session' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_SESSION
+
+/* Define to 1 if `ut_syslen' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_SYSLEN
+
+/* Define to 1 if `ut_time' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_TIME
+
+/* Define to 1 if `ut_tv' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_TV
+
+/* Define to 1 if `ut_tv.tv_sec' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_TV_TV_SEC
+
+/* Define to 1 if `ut_user' is a member of `struct utmpx'. */
+#undef HAVE_STRUCT_UTMPX_UT_USER
+
+/* Define to 1 if `ut_addr' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_ADDR
+
+/* Define to 1 if `ut_addr_v6' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_ADDR_V6
+
+/* Define to 1 if `ut_exit' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_EXIT
+
+/* Define to 1 if `ut_exit.e_termination' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_EXIT_E_TERMINATION
+
+/* Define to 1 if `ut_exit.ut_termination' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_EXIT_UT_TERMINATION
+
+/* Define to 1 if `ut_exit.__e_termination' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_EXIT___E_TERMINATION
+
+/* Define to 1 if `ut_host' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_HOST
+
+/* Define to 1 if `ut_id' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_ID
+
+/* Define to 1 if `ut_name' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_NAME
+
+/* Define to 1 if `ut_pid' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_PID
+
+/* Define to 1 if `ut_session' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_SESSION
+
+/* Define to 1 if `ut_syslen' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_SYSLEN
+
+/* Define to 1 if `ut_time' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_TIME
+
+/* Define to 1 if `ut_tv' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_TV
+
+/* Define to 1 if `ut_tv.tv_sec' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_TV_TV_SEC
+
+/* Define to 1 if `ut_user' is a member of `struct utmp'. */
+#undef HAVE_STRUCT_UTMP_UT_USER
+
+/* Define to 1 if you have the `syslog' function. */
+#undef HAVE_SYSLOG
+
+/* Define to 1 if you have the <syslog.h> header file. */
+#undef HAVE_SYSLOG_H
+
+/* Define to 1 if you have the <sys/poll.h> header file. */
+#undef HAVE_SYS_POLL_H
+
+/* Define to 1 if you have the <sys/resource.h> header file. */
+#undef HAVE_SYS_RESOURCE_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define if a we have working UNIX98 pty handling */
+#undef HAVE_UNIX98_PTYS
+
+/* Define to 1 if you have the `updwtmp' function. */
+#undef HAVE_UPDWTMP
+
+/* Define to 1 if you have the `updwtmpx' function. */
+#undef HAVE_UPDWTMPX
+
+/* Define to 1 if you have the <utmpx.h> header file. */
+#undef HAVE_UTMPX_H
+
+/* Define to 1 if you have the <utmp.h> header file. */
+#undef HAVE_UTMP_H
+
+/* Define to 1 if you have the `vprintf' function. */
+#undef HAVE_VPRINTF
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* Define to 1 if you have the <X11/Xauth.h> header file. */
+#undef HAVE_X11_XAUTH_H
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#undef HAVE_ZLIB_H
+
+/* Define to enable the initgroups workaround */
+#undef INITGROUPS_WORKAROUND
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Traditional BSD pty handling */
+#undef PTY_BSD_SCHEME
+
+/* Possible first characters in a /dev/ptyXX name */
+#undef PTY_BSD_SCHEME_FIRST_CHARS
+
+/* Possible second characters in a /dev/ptyXX name */
+#undef PTY_BSD_SCHEME_SECOND_CHARS
+
+/* Define to indicate that shutdown seems to work properly */
+#undef SHUTDOWN_WORKS_WITH_UNIX_SOCKETS
+
+/* If using the C implementation of alloca, define if you know the
+   direction of stack growth for your system; otherwise it will be
+   automatically deduced at runtime.
+	STACK_DIRECTION > 0 => grows toward higher addresses
+	STACK_DIRECTION < 0 => grows toward lower addresses
+	STACK_DIRECTION = 0 => direction of growth unknown */
+#undef STACK_DIRECTION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Enable extensions on AIX 3, Interix.  */
+#ifndef _ALL_SOURCE
+# undef _ALL_SOURCE
+#endif
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# undef _GNU_SOURCE
+#endif
+/* Enable threading extensions on Solaris.  */
+#ifndef _POSIX_PTHREAD_SEMANTICS
+# undef _POSIX_PTHREAD_SEMANTICS
+#endif
+/* Enable extensions on HP NonStop.  */
+#ifndef _TANDEM_SOURCE
+# undef _TANDEM_SOURCE
+#endif
+/* Enable general extensions on Solaris.  */
+#ifndef __EXTENSIONS__
+# undef __EXTENSIONS__
+#endif
+
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to enable authentication agent forwarding */
+#undef WITH_AGENT_FORWARD
+
+/* Use gcov */
+#undef WITH_GCOV
+
+/* Define if gss should be used */
+#undef WITH_GSS
+
+/* Whether to use gss K5 authorization (Heimdal/MIT) */
+#undef WITH_GSS_K5
+
+/* For Ipv6 support */
+#undef WITH_IPV6
+
+/* For kerberos */
+#undef WITH_KERBEROS
+
+/* For PAM */
+#undef WITH_PAM
+
+/* Define to enable pty support */
+#undef WITH_PTY_SUPPORT
+
+/* Define if SRP should be supported */
+#undef WITH_SRP
+
+/* Whatever to use tcpwrappers */
+#undef WITH_TCPWRAPPERS
+
+/* Define to enable tcp forwarding */
+#undef WITH_TCP_FORWARD
+
+/* For utmp support */
+#undef WITH_UTMP
+
+/* Define to enable x11 forwarding */
+#undef WITH_X11_FORWARD
+
+/* Define if zlib should be used */
+#undef WITH_ZLIB
+
+/* Define WORDS_BIGENDIAN to 1 if your processor stores words with the most
+   significant byte first (like Motorola and SPARC, unlike Intel). */
+#if defined AC_APPLE_UNIVERSAL_BUILD
+# if defined __BIG_ENDIAN__
+#  define WORDS_BIGENDIAN 1
+# endif
+#else
+# ifndef WORDS_BIGENDIAN
+#  undef WORDS_BIGENDIAN
+# endif
+#endif
+
+/* Program used by lshd to handle .Xauthority-files */
+#undef XAUTH_PROGRAM
+
+/* Define to 1 if on MINIX. */
+#undef _MINIX
+
+/* Define to 2 if the system does not provide POSIX.1 features except with
+   this defined. */
+#undef _POSIX_1_SOURCE
+
+/* Define to 1 if you need to in order for `stat' and other things to work. */
+#undef _POSIX_SOURCE
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef gid_t
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Length type used by getsockopt */
+#undef socklen_t
+
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef uid_t
+
+/* AIX requires this to be the first thing in the file.  */
+#ifndef __GNUC__
+# if HAVE_ALLOCA_H
+#  include <alloca.h>
+# else
+#  ifdef _AIX
+ #pragma alloca
+#  else
+#   ifndef alloca /* predefined by HP cc +Olibcalls */
+char *alloca ();
+#   endif
+#  endif
+/* Needed for alloca on windows */
+#  if HAVE_MALLOC_H
+#   include <malloc.h>
+#  endif
+# endif
+#else /* defined __GNUC__ */
+# if HAVE_ALLOCA_H
+#  include <alloca.h>
+# endif
+#endif
+
+
+#if HAVE_STRERROR
+#define STRERROR strerror
+#else
+#define STRERROR(x) (sys_errlist[x])
+#endif
+
+
+#if HAVE_STRSIGNAL
+# define STRSIGNAL strsignal
+#else /* !HAVE_STRSIGNAL */
+# if HAVE_DECL_SYS_SIGLIST
+#  define STRSIGNAL(x) (sys_siglist[x])
+# else
+#  if HAVE_DECL__SYS_SIGLIST
+#   define STRSIGNAL(x) (_sys_siglist[x])
+#  else
+#   define STRSIGNAL(x) "Unknown signal"
+#   if __GNUC__
+#    warning Using dummy STRSIGNAL
+#   endif
+#  endif
+# endif
+#endif /* !HAVE_STRSIGNAL */
+
+
+#if !HAVE_SETEUID
+# if HAVE_SETRESUID
+#  define seteuid(uid) setresuid(-1, (uid), -1)
+# endif
+#endif
+
+#if __GNUC__ && HAVE_GCC_ATTRIBUTE
+# define NORETURN __attribute__ ((__noreturn__))
+# define PRINTF_STYLE(f, a) __attribute__ ((__format__ (__printf__, f, a)))
+# define UNUSED __attribute__ ((__unused__))
+#else
+# define NORETURN
+# define PRINTF_STYLE(f, a)
+# define UNUSED
+#endif
+

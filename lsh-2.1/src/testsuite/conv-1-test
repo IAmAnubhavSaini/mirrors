@@ -1,0 +1,57 @@
+#! /bin/sh
+
+# Tests the conversion programs
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+# Keep silent unless -v is used.
+
+if [ x$1 != x-v ]; then
+    exec 2>/dev/null
+fi
+
+# All output is diagnostic
+exec 1>&2
+
+echo "conv-1-test: Testing ssh-conv and sexp-conv"
+
+($srcdir/../ssh-conv --decode-with ../lsh-decode-key | "$SEXP_CONV" -w 61 |tee test.out1) <<EOF
+---- BEGIN SSH2 PUBLIC KEY ----
+Subject: markus
+Comment: "1024-bit dsa, markus@openssh.com"
+AAAAB3NzaC1kc3MAAACBAITHa/VN9aak2K3QLad9I2PlM8iaLU8264w0oQTbp3f2NeL1uc
+xJXakWILVn/abezL/ZbyWa06Hjd6Qa7a0pF7E/xatC/vVKVGr/Kc7bk+mmvL4a02XnyE3K
+SZiliZ6O66ELy3fwWxbTFB/U12jkAehgxPsnCWM/7YFVy7eA4XyhAAAAFQDQ7bt+2gtw+H
+IvfwPP1+DSEY/5gwAAAIAGYuO7C1rHSu7nVAaQsOMY1ckRxjBQjg59/fKA4WQLe+Lyt0Og
+2uGasVDfK/UUxSRY30xKo+p4vPFmPu6KtDmaDRJj+72TUzLvjIzBDUV9qdVs+YRd3qB4Et
+lpE6O+aasRWVi2d17+CeD1KcCrOffsQ9BSyMqL/UCtrwjCn99eKAAAAIAHmCvgV/QN26Pl
+Ld4D6J6x+LBz/odVkWCilzp3UCrvgN/oWKxL9qijd1KdDkvIX5SgxGqpmexG9rQqDqSQN0
+nM3eqHKFuYMIbF2lh2p3Azpz9UPYKSM4YXwF9hvBuXjPBexMot/jx3Z9tNhPExgK6Iw6vG
+r1qSvQSlc6T43RcCKg==
+---- END SSH2 PUBLIC KEY ----
+EOF
+
+cat >test.out2 <<EOF
+(public-key (dsa (p |AITHa/VN9aak2K3QLad9I2PlM8iaLU8264w0oQTb
+                     p3f2NeL1ucxJXakWILVn/abezL/ZbyWa06Hjd6Qa
+                     7a0pF7E/xatC/vVKVGr/Kc7bk+mmvL4a02XnyE3K
+                     SZiliZ6O66ELy3fwWxbTFB/U12jkAehgxPsnCWM/
+                     7YFVy7eA4Xyh|)
+                 (q |ANDtu37aC3D4ci9/A8/X4NIRj/mD|)
+                 (g |BmLjuwtax0ru51QGkLDjGNXJEcYwUI4Off3ygOFk
+                     C3vi8rdDoNrhmrFQ3yv1FMUkWN9MSqPqeLzxZj7u
+                     irQ5mg0SY/u9k1My74yMwQ1FfanVbPmEXd6geBLZ
+                     aROjvmmrEVlYtnde/gng9SnAqzn37EPQUsjKi/1A
+                     ra8Iwp/fXig=|)
+                 (y |B5gr4Ff0Dduj5S3eA+iesfiwc/6HVZFgopc6d1Aq
+                     74Df6FisS/aoo3dSnQ5LyF+UoMRqqZnsRva0Kg6k
+                     kDdJzN3qhyhbmDCGxdpYdqdwM6c/VD2CkjOGF8Bf
+                     Ybwbl4zwXsTKLf48d2fbTYTxMYCuiMOrxq9akr0E
+                     pXOk+N0XAio=|)))
+EOF
+
+compare_output "conv-1-test"

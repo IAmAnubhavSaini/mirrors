@@ -1,0 +1,131 @@
+I'm happy to announce a new version of LSH, the GNU implementation of
+the secure shell protocols. LSH includes a client, a server, and a few
+scripts and utility programs.
+
+The LSH-2.0 release, and any following LSH-2.0.x updates, are intended
+to be stable. New features will be added to LSH-2.1.x.
+
+FEATURES
+
+The most notable changes and new features in LSH-2.0 are:
+
+o  Incompatible change to key format, to comply with the latest spki
+   structure draft. You can use the script lsh-upgrade to copy and
+   convert the information in the old .lsh/known-hosts to the new file
+   .lsh/host-acls, and the script lsh-upgrade-key to convert private
+   keys to the new format. (This change was made between lsh-1.5 and
+   lsh-1.5.1).
+
+o  X11 forwarding support in lshd, enabled by default (lsh 
+   doesn't ask for X11 forwarding by default).
+
+o  Several programs have new default behaviour:
+
+   * lsh-keygen generates RSA rather than DSA keys by default.
+
+   * lsh-writekey encrypts the private key by default, using
+     aes256-cbc. Unless the --server flag is used.
+
+o  Client support for the "keyboard-interactive" user authentication
+   method.
+
+o  SOCKS-style forwarding, using lsh -D. Supports both SOCKS-4 and
+   SOCKS-5.
+
+o  Support for keyexchange with
+   diffie-hellman-group14-sha1/diffie-hellman-group2-sha1 (the
+   standardized name is at the moment not decided).
+
+o  The lsh client no longer sets its stdio file descriptors into
+   non-blocking mode, which should avoid a bunch of problems. As a
+   consequence, the --cvs-workaround command line option has been
+   deleted.
+
+o  Includes x86 assembler code for arcfour and sha1.
+
+o  Deleted the --ssh1-fallback option for lshd. I hope ssh1 is dead by
+   now; if it isn't, you have to run ssh1d and lshd on different
+   ports.
+	
+o  Deleted code for bug-compatibility with ancient versions of
+   Datafellow's SSH2. There are zero bug-compatibility hacks in this
+   version.
+
+
+Some of the older (LSH-1.0, LSH-1.2, LSH-1.4) features are
+
+o  Random numbers are generated using the Yarrow pseudorandomness
+   generator, which improves security in particular on systems without
+   /dev/random. A new program lsh-make-seed is provided for
+   initializing the generator.
+
+o  AES is now the default cipher. Faster assembler versions are
+   included for x86 and sparc.
+
+o  lshd handles SIGHUP by closing its listening socket, and then
+   waiting for existing connections to be closed before exiting. This
+   makes it easier to restart lshd in a friendly way.
+
+o  A "gateway" interface, which lets you create a single SSH connection
+   to a remote host, and reuse that connection for later commands.
+   Ideal for applications like remote CVS.
+
+o  Limited Kerberos support, comparable to that available for the
+   original sshd.
+
+o  Experimental support for Secure Remote Password (SRP) authentication.
+
+o  Experimental support for IPv6.
+
+o  A manual.
+
+
+COMPATIBILITY AND PORTABILITY
+
+LSH implements the secsh protocol as defined by the latest drafts from
+the IETF secsh working group, and interoperates with other
+implementations, including SSH Inc's SSH2 products and OpenSSH. Note
+that LSH is *not* compatible with SSH1.
+
+LSH is intended to be portable. LSH-2.0 compiles and works on at least
+
+  * GNU/Linux (x86, x86_64, ia64, alpha)
+
+  * FreeBSD (x86)
+  
+  * Solaris (sparc)
+
+  * Darwin/MacOS X (ppc)
+  
+The current version probably does not work out of the box on AIX and
+HPUX.
+
+
+QUALITY
+
+LSH is provided AS IS, ABSOLUTELY NO GUARANTEES, etc. Please report
+any bugs you find.
+
+
+COPYRIGHT
+
+LSH is distributed under the terms and conditions of the GNU General
+Public License.
+
+
+AVAILABILITY AND FURTHER INFORMATION
+
+The LSH home page at
+
+  http://www.lysator.liu.se/~nisse/lsh/
+
+The main LSH archive is located at
+
+  ftp://ftp.lysator.liu.se/pub/security/lsh
+
+Discussions about LSH takes place on the lsh-bugs mailing list. See
+http://lists.lysator.liu.se/mailman/listinfo/lsh-bugs.
+
+
+Happy hacking,
+/Niels Möller, <nisse@lysator.liu.se>

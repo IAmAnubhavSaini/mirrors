@@ -1,0 +1,20 @@
+#! /bin/sh
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+SERVERPORT=`expr $PORT + 1`
+PROXYPORT=`expr $PORT + 2`
+
+# Tests that an "address already in use" error is handled properly.
+
+at_connect $SERVERPORT 1 'echo foo' \
+    && spawn_lshd \
+    && run_lsh "echo bar" -L $SERVERPORT:localhost:$SERVERPORT \
+       | grep bar \
+    && test_success
+    
+test_done

@@ -1,0 +1,56 @@
+.\" COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" Copyright (C) 1999 J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are 
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a 
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this manual
+.\" into another language, under the above conditions for modified versions,
+.\" except that this permission notice may be stated in a translation approved
+.\" by the Free Software Foundation, Inc. <URL:http://www.fsf.org>
+.\"
+.\" END COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" If you make modified versions of this manual, please notify the current 
+.\" maintainers of the package you received this manual from and make your
+.\" modified versions available to them.
+.\"
+.TH DSA 5 "JANUARY 1999" LSH "Lsh Manuals"
+.SH NAME
+DSA \- Digital Signature Algorithm
+.SH DESCRIPTION
+DSA is the Digital Signature Algorithm specified in
+.BR [DSS],
+a standard for public-key based digital signatures from NIST, the
+U.S. National Institute for Standards and Technology. 
+DSA employs
+.BR SHA (5).
+
+For a description of DSS, its history and security, see
+.BR [AC2] .
+.SH REFERENCES
+.PP
+.B [DSS]
+National Institute of standards and Technology, 
+NIST FIPS PUB 186,
+.IR "Digital Signature Standard" ,
+U.S. Department of Commerce,
+May 1994.
+.PP
+.B [AC2]
+Bruce Schneier,
+.IR "Applied Cryptography: Protocols, Algorithms and Source Code in C" ,
+second edition,
+John Wiley and Sons,
+1996.
+.SH AUTHOR
+This man-page was written by J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>.
+.SH "SEE ALSO"
+.BR lsh_keygen (1)

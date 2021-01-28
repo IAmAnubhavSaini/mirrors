@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# Version 0.1
+#
+# chkconfig: 345 40 60
+# description: provides secure connections through untrusted networks
+# lsh is based on the specification for ssh2 and should (eventually)
+# be compatible.
+#
+# processname: lshd
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+export PATH
+
+if [ ! -x /usr/sbin/lshd -o \
+        ! -f /etc/lsh_host_key -o \
+        ! -f /etc/lsh_host_key.pub ]
+then
+        cat 1>&2 <<EOF!
+                ERROR: lsh is not installed properly
+                check the existence of these files:
+                /usr/sbin/lshd
+		/etc/lsh_host_key
+		/etc/lsh_host_key.pub
+		 
+EOF!
+        exit 1
+fi
+
+case "$1" in
+        start)
+                echo -n "Starting lshd secure connection service: "
+                daemon lshd --daemonic
+                touch /var/lock/subsys/lshd
+                echo
+                ;;
+
+        stop)
+                echo -n "Stopping lshd secure connection service:"
+                killproc lshd
+                rm -f /var/lock/subsys/lshd
+                echo
+                ;;
+
+        status)
+                status lshd
+                ;;
+
+        restart|reload)
+                $0 stop
+                $0 start
+                ;;
+
+        *)
+                echo "Usage: $0 {start|stop|restart|reload|status}"
+                exit 1
+esac
+
+exit 0

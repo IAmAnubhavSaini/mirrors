@@ -1,0 +1,110 @@
+diff -u /usr/local/src/tsocks-1.8/parser.c tsocks/parser.c
+--- /usr/local/src/tsocks-1.8/parser.c	Wed Mar 13 13:34:22 2002
++++ tsocks/parser.c	Mon Mar  1 22:03:38 2004
+@@ -31,6 +31,7 @@
+ static int handle_local(struct parsedfile *, int, char *);
+ static int handle_defuser(struct parsedfile *, int, char *);
+ static int handle_defpass(struct parsedfile *, int, char *);
++static int handle_forcelocal(struct parsedfile *, int);
+ static int make_netent(char *value, struct netent **ent);
+
+ int read_config (char *filename, struct parsedfile *config) {
+@@ -74,8 +75,9 @@
+ 		}
+ 		fclose(conf);
+
+-		/* Always add the 127.0.0.1/255.0.0.0 subnet to local */
+-		handle_local(config, 0, "127.0.0.0/255.0.0.0");
++		if (!(config->flags & TSOCKS_FORCELOCAL))
++			/* Always add the 127.0.0.1/255.0.0.0 subnet to local */
++			handle_local(config, 0, "127.0.0.0/255.0.0.0");
+
+ 		/* Check default server */
+ 		check_server(&(config->defaultserver));
+@@ -132,6 +134,8 @@
+ 			handle_path(config, lineno, nowords, words);
+ 		} else if (!strcmp(words[0], "}")) {
+ 			handle_endpath(config, lineno, nowords,
+ 		words);
++		} else if ((nowords == 1) && !strcmp(words[0], "forcelocal")) {
++			handle_forcelocal(config, lineno);
+ 		} else {
+ 			/* Has to be a pair */
+ 			if ((nowords != 3) || (strcmp(words[1], "=")))
+ 		{
+@@ -480,6 +484,11 @@
+ 	ent -> next = config->localnets;
+ 	(config->localnets) = ent;
+
++	return(0);
++}
++
++static int handle_forcelocal(struct parsedfile *config, int lineno) {
++	config->flags |= TSOCKS_FORCELOCAL;
+ 	return(0);
+ }
+
+diff -u /usr/local/src/tsocks-1.8/parser.h tsocks/parser.h
+--- /usr/local/src/tsocks-1.8/parser.h	Sun Feb 10 08:26:27 2002
++++ tsocks/parser.h	Mon Mar  1 22:03:02 2004
+@@ -28,8 +28,11 @@
+ 	struct netent *next; /* Pointer to next network entry */
+ };
+
++enum tsock_flags { TSOCKS_FORCELOCAL = 1 };
++
+ /* Structure representing a complete parsed file */
+ struct parsedfile {
++   enum tsock_flags flags;
+    struct netent *localnets;
+    struct serverent defaultserver;
+    struct serverent *paths;
+diff -u /usr/local/src/tsocks-1.8/tsocks.c tsocks/tsocks.c
+--- /usr/local/src/tsocks-1.8/tsocks.c	Tue Jul 16 00:50:52 2002
++++ tsocks/tsocks.c	Mon Mar  1 22:02:31 2004
+@@ -313,7 +313,7 @@
+       bzero(&(server_address.sin_zero), 8);
+
+       /* Complain if this server isn't on a localnet */
+-      if (is_local(config, &server_address.sin_addr)) {
++      if (!(config->flags & TSOCKS_FORCELOCAL) && is_local(config, &server_address.sin_addr)) {
+          show_msg(MSGERR, "SOCKS server %s (%s) is not on a local subnet!\n",
+                   path->address, inet_ntoa(server_address.sin_addr));
+       } else
+diff -u /usr/local/src/tsocks-1.8/tsocks tsocks/tsocks
+--- /usr/local/src/tsocks-1.8/tsocks	Sat Mar 16 11:27:18 2002
++++ tsocks/tsocks	Wed Mar 17 21:06:51 2004
+@@ -42,14 +42,16 @@
+    exit
+ fi
+ 
++libdir="/usr/local/lib"
++
+ case "$1" in
+ 	on)
+ 		if [ -z "$LD_PRELOAD" ]
+ 			then
+-				export LD_PRELOAD="/usr/lib/libtsocks.so"
++				export LD_PRELOAD="$libdir/libtsocks.so"
+ 			else
+-				echo $LD_PRELOAD | grep -q "/usr/lib/libtsocks\.so" || \
+-				export LD_PRELOAD="/usr/lib/libtsocks.so $LD_PRELOAD"
++				echo $LD_PRELOAD | grep -q "$libdir/libtsocks\.so" || \
++				export LD_PRELOAD="$libdir/libtsocks.so $LD_PRELOAD"
+ 		fi
+ 	;;
+ 	off)
+@@ -68,10 +70,10 @@
+ 	*)
+ 		if [ -z "$LD_PRELOAD" ]
+ 		then
+-			export LD_PRELOAD="/usr/lib/libtsocks.so"
++			export LD_PRELOAD="$libdir/libtsocks.so"
+ 		else
+-			echo $LD_PRELOAD | grep -q "/usr/lib/libtsocks\.so" || \
+-			export LD_PRELOAD="/usr/lib/libtsocks.so $LD_PRELOAD"
++			echo $LD_PRELOAD | grep -q "$libdir/libtsocks\.so" || \
++			export LD_PRELOAD="$libdir/libtsocks.so $LD_PRELOAD"
+ 		fi
+ 
+ 		if [ $# = 0 ]

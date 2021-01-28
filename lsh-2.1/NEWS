@@ -1,0 +1,1014 @@
+News for the 2.1 release
+
+	No longer includes the Nettle library; GNU Nettle has to be
+	installed separately. At least version 2.2 is needed.
+	Available at ftp.gnu.org.
+
+	Includes several improvements from debian maintainer Magnus
+	Holmgren:
+
+	 * Make lsh exit properly on connection failure.
+
+	 * Improved lsh error message when seed file doesn't exist.
+
+	 * Make lshd set the IPV6_V6ONLY option when binding IPv6
+	   sockets.
+
+	Uses a more recent version of automake, avoiding a
+	vulnerability in the automake-generated distcheck target.
+
+	Use service name "lshd" in lsh-pam-checkpw (patch from Ludovic
+	Courtès).
+
+	Fixed an utmp-related build problem on GNU/Linux x86_64.
+
+	Testsuite includes new versions of tcpconnect and mini-inetd,
+	which work better with IPv6.
+
+News for the 2.0.4 release
+
+	Fixed x11 forwarding bug in the lsh client.
+
+News for the 2.0.3 release
+
+	At startup, lshd now tries to close any spurious open file
+	descriptors. New test case for lshd fd leakage.
+
+	lshd --daemonic --no-syslog now sets up a proper daemonic
+	environment, except that log messages are still sent to
+	stderr. Improved testing of this feature.
+
+News for the 2.0.2 release
+
+	Fixed a couple of problems in lshd, where the server process
+	leaks file descriptors to user shells that it starts. These
+	bugs implied a local denial of service hole, at best.
+
+	Support for aes256-ctr.
+
+	Newer nettle library. Bugfixes and performance improvements
+	for the assembler code, in particular support for sparc64, and
+	Makefile fixes.
+
+News for the 2.0.1 release
+
+	Fixed denial of service bug in lshd.
+
+	Fixed a bug in lsh-make-seed, which could make the program go
+	into an infinite loop on read errors.
+
+	lsh now asks for passwords also in quiet (-q) mode, as
+	described in the manual.
+
+	Control character filtering used to sometimes consider newline
+	as a dangerous control character. Now newlines should be
+	displayed normally.
+
+	Removed support for the non-standard alias
+	"diffie-hellman-group2-sha1". The standardized name is for
+	this key exchange method is "diffie-hellman-group14-sha1".
+
+News for the 2.0 release
+
+	Several programs have new default behaviour:
+
+	* lshd enables X11 forwarding by default (lsh still does not).
+
+	* lsh-keygen generates RSA rather than DSA keys by default.
+
+	* lsh-writekey encrypts the private key by default, using
+	  aes256-cbc. Unless the --server flag is used.
+
+	Improved the lcp script. It is now installed by default.
+	
+	Implemented the client side of "keyboard-interactive" user
+	authentication.
+	
+	Support keyexchange with
+	diffie-hellman-group14-sha1/diffie-hellman-group2-sha1 (the
+	standardized name is at the moment not decided).
+
+	Fixes to the utf8 encoder, and in particular interactions
+	between utf8 and control character filtering.
+
+News for the 1.5.5 release
+
+	Added SOCKS-style proxying to lsh and lshg. See the new -D
+	command line option. Supports both SOCKS-4 and SOCKS-5.
+
+	The lsh client no longer sets its stdio file descriptors into
+	non-blocking mode, which should avoid a bunch of problems. As
+	a consequence, the --cvs-workaround command line option has
+	been deleted.
+
+	In the user lookup code, lshd now ignores the shadow database
+	if getspnam returns NULL.
+
+	In the server pty setup code, use the group "system" as a
+	fallback if the group "tty" doesn't exist. This is the case on
+	AIX. (There are however more problems on AIX, which makes it
+	uncertain that lshd will work out of the box).
+
+	Deleted the --ssh1-fallback option for lshd. I hope ssh1 is
+	dead by now; if it isn't, you have to run ssh1d and lshd on
+	different ports.
+	
+	Deleted code for bug-compatibility with ancient versions of
+	Datafellow's SSH2. There are zero bug-compatibility hacks in
+	this version.
+
+News for the 1.5.4 release
+
+	Added logging of tcpip-forward requests.
+
+	Includes nettle-1.9, which have had some portability fixes and
+	optimizations. In particular, arcfour on x86 should be much
+	faster.
+	
+	Implemented flow control on the raw ssh connection. Enforce
+	limits on the amount of buffered data waiting to be written to
+	the socket.
+
+	Moved all destructive string operations to a separate file
+	lsh_string.c, which has exclusive rights of accessing string
+	internals. Should make the code more robust, as buffer size
+	and index calculations elsewhere in the code should hit an
+	assert in lsh_string.c before doing damage.
+
+	Some general simplification and cleanup of the code.
+
+News for the 1.5.3 release
+
+	Fixed heap buffer overrun with potential remote root
+	compromise. Initial bug report by Bennett Todd.
+
+	Fixed a similar bug in the check for channel number allocation
+	failure in the handling of channel_open, and in the
+	experimental client SRP code.
+
+	lshd now has an experimental mode similar to telnet, where it
+	accepts the 'none' authentication method and automatically
+	disables services such as X and TCP forwarding. This can be
+	useful in environment where it's required that /bin/login or
+	some other program handle authentication and session setup
+	(e.g. handle security contexts and so on).
+
+News for the 1.5.2 release
+
+	Encrypted private keys works again.
+	
+	New client escape sequence RET ~ ?, which lists all available
+	escape sequences. Also fixed the werror functions so that they
+	use \r\n to terminate lines when writing to a tty in raw mode.
+
+	Implemented handling of multiple --interface options to lshd.
+	As a side effect, The -p option must now be given before
+	--interface to have any effect.
+
+	Connecting to machines with multiple IP-adresses is smarter,
+	it connects to a few addresses at a time, in parallel.
+	
+	Fixed a file descriptor leak in the server tcpip forwarding
+	code.
+
+	Lots of portability fixes.
+	
+News for the 1.5.1 release
+
+	Incompatible change to key format, to comply with the current
+	spki structure draft. You can use the script lsh-upgrade to
+	copy and convert the information in the old .lsh/known-hosts
+	to the new file .lsh/host-acls. The new code uses libspki.
+	
+	Fixed IPv6 bug reported by Simon Kowallik.
+
+	lshd now does the equivalence of ulimit -n unlimited, this is
+	inherited by processes started upon client requests. If you
+	don't want this, you should use /etc/{profile,login,whatever}
+	to set limits for your users. Do note that PAM-based solutions
+	will NOT work as PAM is used from a separate process that
+	terminates as soon as the authentication is finished (this of
+	course goes for environment variables too).
+
+	lsh and and lshg now parses options from LSHFLAGS and
+	LSHGFLAGS, these are parsed before and can be overridden by
+	the command line.
+
+News for the 1.5 release
+
+	Implemented the server side of X11 forwarding. Try lshd
+	--x11-forward. There's one known bug: The server may start
+	sending data on the session channel (typically your first
+	shell prompt) before it has sent the reply to the client's
+	"shell" or "exec" request. lsh will complain about, and ignore
+	that data.
+
+	As part of the X11 hacking, the socket code have been
+	reorganized.
+
+	Deleted one of the ipv6 configure tests. Now lsh will happily
+	build ipv6 support even if ipv6 is not available at run-time
+	on the build machine.
+
+	Fixed bug preventing -c none from working.
+
+	Another bug fix, call setsid even in the non-pty case.
+
+	Various bug fixes.
+	
+News for the 1.4.2 release
+
+	Fixed minor bug in bubble-babble key display.
+
+	Fixed support for encrypted private keys.
+
+	Tweaks to the handling of disabled accounts, and shadow
+	passwords.
+
+	  * Shadow records are looked up only if there's a single "x"
+	    in the passwd entry.
+
+	  * A passwd entry with a single "*" is interpreted as an
+	    account that is open but with ordinary password
+	    authentication disabled.
+
+	  * A passwd entry that starts with "*" but is longer than one
+            character is interpreted as a disabled account.
+
+	  * It is recommended that all disabled accounts have their
+            login shells set to something harmless, e.g. /bin/false.
+
+	Disabled the "I/O error" message that was printed to the
+	server log every time a session logged out.
+
+	Improved the server's EOF-handling on pty:s.
+
+	Other minor bug fixes.
+	
+News for the 1.4.1 release
+
+	Added --enable-initgroups-workaround option to the configure
+	script.
+
+News for the 1.4 release
+ 
+	In 1.3.6, there was an incompatible change to the rsa key
+	format. This change has been reverted for 1.4. You may want to
+	pass your keys through `sexp-conv
+	--replace=%rsa-pkcs1%rsa-pkcs1-sha1% -f transport'
+
+	lshd now sets SSH_CLIENT and SSH_TTY (if appropiate).
+	
+	TCP-wrapper support contributed by Pontus Sköld, pass
+	--with-tcpwrappers to configure to enable.
+
+	Display more information about unknown keys, including
+	openssh-style fingerprint and "bubblebabble"-fingerprint. 
+
+	Using the lsh/lshg gateway could sometimes generated packets
+	that slightly exceeded a channes maximum packet size; this bug
+	has been fixed.
+
+News for the 1.3.7 release
+
+	Improved key reexchange handling. Should now request key
+	reexchange about once per hour (reexchange requests after 1GB
+	data not yet implemented).
+
+	Use the aes256-cbc cipher by default. Includes sparc assembler
+	code, and the C implementation has been optimized as well.
+
+	Rewrote the RSA code to use Nettle's functions for signatures
+	and key generation.
+
+	Build requirements changed, lsh now needs liboop-0.8 or later,
+	and GMP-3.1 or later.
+	
+	lshd handles SIGHUP by closing its listening socket, and
+	then waiting for existing connections to be closed before
+	exiting. 
+
+	Implemented handshake timeout, both server and client
+	disconnects if handshake and userauthentication is not
+	completed in about ten minutes.
+
+	Reorganized server pty handling. Now it works also on Solaris.
+
+	Added utmp logging.
+
+	Rewrote the code for executing user processes. Now it avoids
+	the sequence fork(), setuid(), exec(), which may leave server
+	memory readable by users between setuid and exec. Instead, the
+	server exec:s a helper program lsh-execuv that changes the uid
+	before exec:ing the shell.
+	
+	Helper program to let the server use PAM passwords.
+	Contributed by Pontus Sköld.
+
+	New option --server to lsh-keygen and lsh-writekey. It makes
+	the programs use the system seed-file, and also changes
+	lsh-writekey's default output files to /etc/lsh_host_key and
+	/etc/lsh_host_key.pub.
+
+	Made lsh-writekey a little smarter, now it doesn't create any
+	output files until it has something to write to them.
+	
+	In interactive mode, the client modifyes the terminal's VMIN
+	and VTIME values to get more than one character per packet.
+
+	Fixed the default port handling on systems that don't include
+	ssh in /etc/services.
+
+	New client option --subsystem for starting a subsystem such as
+	sftp on the server. Appeared already in 1.3.6, but wasn't
+	mentioned in NEWS.
+
+	Pontus Sköld's file transfer client lsftp is included in the
+	distribution.
+	
+News for the 1.3.6 release
+
+	New randomness generator based on Yarrow-256. Initial seeding
+	is done by a separate program, lsh-make-seed. See the manual
+	or the README file.
+
+	Manual update, new section describing the files and
+	environment variables that are used.
+
+	Various bug-fixes.
+
+News for the 1.3.5 release:
+
+	Fixed window change handling in lshd.
+
+	Replaced the io-backend code. Now uses liboop.
+
+	Uses nettle's implementations of cbc and des3 chaining.
+	
+News for the 1.3.4 release:
+
+	Updated the manual.
+	
+	Added X11 forwarding to lsh. Try lsh -x some.where. -x is a
+	modifier flag for the -E, -S and default actions. 
+
+	New escape sequences <escape> d, <eascape>q and <escape> v,
+	for toggling the debug, quiet and verbose flags.
+
+	Fixed twofish bug in nettle, spotted by Jean-Pierre.
+	
+News for the 1.3.3 release:
+
+	Server suport for subsystems, and a new experimental command
+	line option --subsystems for lshd. An sftp-server included in
+	the dist, but it's mostly untested.
+
+	Better messages when the initial handshake fails.
+
+	Support for AES (formely known only as rijndael).
+
+	Simplified the internal command definition machinery.
+
+	Fixed bug in lshg; it crashed if given a host name argument
+	with strange characters.
+
+	Updates to SRP support, to get it closer to the latest draft.
+
+	New client option -B, which is like -N but also puts the
+	process in the background.
+	
+News for the 1.3.2 release:
+
+	Suspend works better, and is bound to the escape sequence
+	RET ~ ^Z.
+	
+News for the 1.3.1 release:
+
+	Repackaged the low-level crypto functions as the "nettle"
+	library. Bugfixes for serpent.
+
+News for the 1.3.0 release:
+
+	Bugfixes (same as in 1.2.2).
+
+	constness fixes.
+
+	Deleted the complex streamed sexp-parser.
+
+	Verbose messages at KEXINIT and NEWKEYS.
+
+	Tolerate empty atoms (like in "3des-cbs,,aes256-cbc,").
+
+	If compiled with --debug-alloc, all strings are counted and
+	leaks detected. Fixed some minor leaks.
+
+	Changed conventions for packet handlers, all packets are freed
+	by connection_handle_packet, so individual packet handlers
+	shouldn't do that.
+
+	Handle the TSTP signal. Backgrounding still doesn't work quite
+	right, though.
+
+	Rewrote parts of the gaba.scm preprocessor.
+		
+News for the 1.2.0 release:
+
+	Added the lcp copying script to the distribution (although it
+	isn't installed automatically). No other changes.
+	
+News for the 1.1.9 release:
+
+	Some code cleanup. Removed a dozen files, four classes and
+	about 1k lines of code. Useful tools are make class-map and
+	./configure --enable-gcov.
+
+	To get gcov to work properly when running several processes in
+	parallell, you may also want to apply misc/libgcc2.c-patch to
+	gcc. The patch adds locking for the output *.da files.
+	
+News for the 1.1.8 release:
+
+	Updated the scsh support for scsh-0.5.2. Note that scsh is now
+	free software; the "non-commercial use" restrictions were
+	removed in the 0.5.2 release.
+
+	Updated the channel close logic to be compatible with other
+	ssh implementations.
+
+	Handle POLLERR; the previous version went into a busy loop if
+	poll set the POLLERR flag on any fd.
+
+	--cvs-workaround=e is now on by default. New option
+        --no-cvs-workaround to disable it.
+
+News for the 1.1.7 release:
+
+	More bug fixes, most of them related to the EOF handling.
+
+	Added testcase for lshg -L, fixed the exposed bugs.
+
+	Don't output the "Userauth successful" message unless in
+	verbose mode.
+	
+News for the 1.1.6 release:
+
+	Fixed a bug in the testsuite framework, and discovered and
+	fixed a few new and old bugs (mostly related to the EOF and
+	channel close logic).
+
+	Improved handling of POLLHUP on Linux.
+	
+	Fixed bug in lshd password authentication, which sometimes
+	crashed lshd.
+
+	Support for RSA keys, according to
+	draft-ietf-secsh-transport-09.txt. Wrote a test case for RSA
+	hostkeys, and fixed a bug in the ssh-rsa public key decoder.
+
+	Added support for OpenSSH style RSA keys to ssh-conv.
+
+	Changed unix_random.c to be more quiet.
+
+	Changed tcpip forwarding code to call shutdown() when it
+	receives an SSH_MSG_CHANNEL_EOF.
+
+	Updated the manual.
+	
+News for the 1.1.5 release:
+
+	Fixed bug in random generator seeding (spotted by jps).
+
+	More argp fixes.
+
+	Work on rsync, but still not used.
+	
+News for the 1.1.4 release:
+
+	Fixes for encrypted private keys (thanks to jps).
+
+	Updated argp, and ripped out its dependencies on getopt.
+	
+News for the 1.1.3 release:
+
+	Support for encrypted private keys (not tested).
+
+	The lshg gateway client works.
+	
+News for the 1.1.2 release:
+
+	New experimental option to lsh: --cvs-workaround. Using this
+	option causes lsh to fork off a few extra processes to handle
+	its stdio file descriptors, and avoid setting them in
+	nonblocking mode. One can also use for instance
+	--cvs-workaround=o to fork only for stdout; the optional
+	argument can be any combination of the characters 'i' (stdin),
+	'o' (stdout) and 'e' (stderr). If this turns out to be useful,
+	the option will probably be renamed and perhaps made the
+	default.
+
+	Implemented window change messages in the client.
+						
+	Added signal handlers to io_backend.
+
+	Reorganized the code a little to make the lshg binary smaller.
+	
+	Some work on an "interactive" class, encapsulating the
+	oparations one may want to do on the user's tty, including
+	subscription for window change events.
+	
+News for the 1.1.1 release:
+
+	First try for the gateway mode. New option -G for lsh, and a
+	new program lshg for talking to the gateway.
+
+	lshd forks of a new process and changes its uid for reading
+	user files. The only file read in this way, so far, is
+	~/.lsh/srp-verifier.
+
+	Improved randomness framework.
+	
+News for the 1.1.0 release:
+
+	First, note that the 1.1.x series should be considered
+	experimental.
+
+	New program lsh-export-key (contributed by jps, and then
+	hacked some more by me).
+
+	Some of the methods for public-key operations have been
+	improved and generalized.
+	
+News for the 1.0.6 release
+
+	Fixed bug in ssh-dss bug-compatibility.
+	
+	Experimental kerberos support. New lshd option
+	--kerberos-passwords. Compiles with heimdal, MIT kerberos not yet
+	tested. 
+
+	Improved handling of serialized userauth requests (not yet
+	used by kerberos password functions).
+
+	Hacked serpent code to support variable size keys.
+
+	Added rijndael test cases. No working serpent testcases yet.
+	
+News for the 1.0.5 release
+
+	Experimental support for RSA, using spki-style keys and
+	signatures. 
+
+	Some reorganization of signature algorithms, to support
+	spki-style signatures (including rsa) properly.
+
+	Fix for key renegotiation bug reported by jps.
+
+	New algorithms bulk encryption algorithms: serpent and
+	rijndael. Rijndael implementation and lsh glue code
+	contributed by Rafael R. Sevilla. Serpent implementation by
+	Ross Anderson, Eli Biham, and Lars Knudsen.
+
+	New option -call to use any supported bulk encryption
+	algorithm; the default preference list is quite conservative.
+
+	New option --hostkey-algorithm, to tune the hostkey algorithm
+	preference list.
+
+	Renamed lsh_keygen and lsh_writekey to lsh-keygen and
+	lsh-writekey, respectively (actually happened in 1.0.4, but I
+	forgot to mention that).
+	
+News for the 1.0.4 release
+
+	Fixed yet another bug in the userauth logic.
+
+	Some RSA support (so far, only lsh-keygen and lsh-writekey
+	support RSA). 408 hours left...
+
+	Support for the transport spki format in sexp_parser.c.
+
+News for the 1.0.3 release
+
+	Fixed bug in client userauth logic.
+
+	Configure fix: put -L and -R flags in LDFLAGS, not LIBS.
+
+	Portability fixes and some signed/unsigned cleanup.
+	
+News for the 1.0.2 release
+
+	Fixed bug in lsh_writekey, and improved the error message when
+	the outputfile already exists.
+
+	Fixed bug in the poll emulation in jpoll.c (noticed by
+	Jean-Pierre Stierlin).
+
+	Portability bugs reported by Jean-Pierre Stierlin, for
+	compiling on MacOS.
+	
+News for the 1.0.1 release
+
+	Various bug fixes. Spelling and grammar fixes in the manual,
+	contributed by Johan Myreen.
+	Hacked lsh user authentication to stop asking for a password
+	if the empty password is entered twice.
+
+News for the 0.9.15 release
+
+	Portability fixes. Fixed 32-bit bug in the memory allocation
+	that appeared on alpha-linux. Fixes for HPUX compiler. Fixed
+	make distclean, which failed when cleaning in src/symmetric.
+
+News for the 0.9.14 release
+
+	Added --stdin, --stdout and --stderr options to lsh.
+	
+	Implemented pretty-printing of s-expressions when using the
+	advanced syntax.
+
+	Renamed sexp_conv to sexp-conv.
+	
+	Fixed bug preventing forwarded connections from being closed
+	properly. Reported by Daniel Prevett and Joseph Galbraith.
+
+	New Getting Started chapter in the manual, and other
+	documentation updates.
+	
+News for the 0.9.13 release
+
+	New program lsh-decode-key and script ssh-conv, for converting
+	OpenSSH/ssh2 keys to sexp format.
+
+	Updated SRP support to the draft doc/srp-spec.txt.
+	Made it possible to skip the userauth sub-protocol when using
+	SRP. The proxy program was probably broken in the process.
+	
+	Fixed lsh-authorize, to use the right options to sexp_conv.
+
+	Let $HOME override the home directory in the passwd database,
+	when running as non-root.
+	
+News for the 0.9.10 release
+
+	Fixed bug that caused buffered output to be lost at channel
+	close.
+
+	Experimental SRP support.
+
+	New program srp-gen.
+	
+	Improved the hex dumps in debug output.
+
+News for the 0.9.9 release
+
+	autoconf fixes. Add -R-flags when appropriate. Recognize
+	gmp-3.x. Added --with-lib-path option.
+
+	Portability fixes.
+
+News for the 0.9.7 release
+
+	Experimental IPv6 support.
+
+	Experimental support for encrypted private keys (for now, only
+	in lsh_writekey).
+
+	wtmp logging.
+
+	Improved behaviour of --port and -z options.
+
+News for the 0.9.2 release
+
+	Improved support for shadow passwords.
+
+	Some preparations for gateway mode.
+	
+News for the 0.9.1 release
+
+	Support for remote commands directly on the lsh command line.
+	New options -S and -E. More features in the proxy.
+
+News for the 0.2.9 release
+
+	Fixed bugs in the length checking of incoming packets.
+
+News for the 0.2.8 release
+
+	Reworked i/o and the CHANNEL_OPEN mechanism. Seems to fix the
+	crash when requesting forwarding to a port that doesn't
+	answer.
+
+	Also close ports for local and remote forwarding properly. 
+
+	Updated the proxy code.
+ 
+News for the 0.2.7 release
+
+	Bug fixes for compialtion on Solaris.
+
+News for the 0.2.6 release
+
+	Bugfixes for tcp forwarding functions.
+
+	Some more tests for testsuite. To try them, you must first
+	setup lsh so that you can login with no password. Then type
+	"make check-more" in the testsuite subdirectory. 
+	
+News for the 0.2.5 release
+
+	Bugfixes.
+
+News for the 0.2.3 release
+
+	Added lshd options --password, --no-password, --publickey and
+	--no-publickey, for configuring the set of supported userauth
+	methods.
+
+	Changes to the proxy program (Bazsi).
+
+News for the 0.2.2 release
+
+	Bug fixes. Verbose messages on algorithm selection.
+
+News for the 000.2 release
+
+	Bugfixes. New --pty-support and --no-pty-support options for
+	lshd.
+
+News for the lsh-0.1.20 release
+
+	Bugfixes. New test script for lsh_writekey.
+
+News for the lsh-0.1.19 release
+
+	Lots of bugfixes. Reading of ~/.lsh/known_hosts and
+	~/.lsh/identity seems to work.
+
+	New contrib sub-directory.
+	
+News for the lsh-0.1.18 release
+
+	lsh now reads ACL:s from the ~/.lsh/known_hosts file.
+
+	First attempt at a m4-based testsuite. It depends on m4 being
+	able to handle the eight-bit quote characters » and «. If your
+	m4 doesn't do that, get the latest beta of GNU m4 or recompile
+	GNU m4-1.4 with CFLAGS=-funsigned-char.
+
+News for the lsh-0.1.17 release
+
+	More support for host authentication and SPKI.
+
+	First version that includes Bazsi's work on an ssh-proxy (i.e.
+	a program that implements the traditional Man-in-the-middle
+	attack on the ssh2 protocol). Could be useful for people
+	running firewalls, and also for those of us who want to point
+	out that it's a bad idea to use unauthenticated hostkeys.
+
+News for the lsh-0.1.16 release
+
+	Some preparations for real host authentication.
+	
+News for the lsh-0.1.15 release
+
+	Support for publickey user authentication.
+
+	A new script lsh-authorize.
+
+News for the lsh-0.1.14 release
+
+	First try on daemonization support.
+
+	Better tracing; try --trace to get some more information than
+	with -v, but without all the boring information generated by
+	--debug.
+
+	Generally nicer options and help mesasges, thanks to argp.
+
+	Better handling of i/o exceptions. lshd should no longer crash
+	when connections behave unexpectedly.
+
+News for the lsh-0.1.12 release
+
+	Tried to fix bugs related to channel close. In the process,
+	improved the resource mechanism, and let each channel
+	have it's own list of resources.
+
+	Fixed configure.in to handle systems with neither scsh or
+	guile installed.
+	
+
+News for the lsh-0.1.11 release
+
+	Support for other scheme implementations in the build process,
+	in particular guile.
+	
+
+News for the lsh-0.1.10 release
+
+	Fixed bug in sexp parser and lsh_writekey.
+
+	Merged more of bazsis patches.
+	
+
+News for the lsh-0.1.9 release
+
+	Lot's of bug fixes. This version actually seems to work.
+
+	Bazsi's public key patches is in, although I haven't been able
+	to test them.
+
+	The SEXP parser is rewritten to use the new exception
+	framework. The program that makes the most of of this right
+	now is lsh_writekey. Its core reads like
+
+     (params
+       (private object io_write_file_info)
+       (public object io_write_file_info))
+     
+     (lambda (backend)
+       (let ((key (read (stdin backend))))
+         (prog1 (transport (open backend public) (private2public key))
+                ; FIXME: Add encryption here
+                (canonical (open backend private) key))))))
+	
+	The sexptest program has been renamed to sexp_conv. It reads
+	an sexp (for now, only canonical and transport syntax are
+	supported) on stdin, and prints it using advanced, transport
+	or canonical syntax. More features could be added.
+
+	The --debug option now dumps both sent and received packets,
+	and it includes a human readable name of the packet type.
+	Packets of type SSH_MSG_USERAUTH_REQUEST are suppressed,
+	however, because they typically contains user passwords.
+
+	There is one known bug: Running without pty allocation (lsh
+	-nt) doesn't work, at least not for me.
+
+	
+News for the lsh-0.1.8 release
+
+	Reworked all the error handling to use exceptions. No new
+	features, but lots of new bugs.
+
+There are no official releases numbered 0.1.4 -- 0.1.7. However,
+these version numbers are used for Bazsi's unofficial releases during
+the summer. The unofficial releases feature public key user
+authentication and better compatibility with Datafellow's ssh2
+products. 
+
+News for the lsh-0.1.3 release
+
+	Local forwarding (-L) works. -R is slightly broken.
+
+News for the lsh-0.1.2 release
+
+	First user visible tcpforwarding (-L option). Not tested
+	yet...
+
+	Fixed flow control.
+
+	DSA signatures should conform better both to the draft andd to
+	the ssh-2.x implementations.
+
+	Better handling of POLLHUP.
+	
+News for the lsh-0.1 release
+
+	Added compiler.scm to the dist.
+
+	Changed the session key generation to comply with the latest
+	draft (pointed out by Joseph Galbraith).
+
+	Added IDEA support (Bazsi).
+
+	Fixes to pty handling and flow control (mostly Bazsi). 
+
+	Fixed the client side handling of userauth failures.
+
+	By default, if we are running with a pty, use the same fd for
+	stdout and stderr. This workaround should make lsh more
+	friendly to bash and other programs that expect stderr to be a
+	tty.
+
+NEWS for the 1999-04-25 snapshot:
+
+	Fixed a few bugs in pty and eof handling. Should now work
+	about as well as the 03-17 snapshot. Also removed most old
+	#if:ed out code.
+
+NEWS for the 1999-04-20 snapshot:
+
+	Internal reorganization. Implemented the "control language".
+	And some bug fixes. See ChangeLog for all the details.
+
+NEWS for the 1999-03-17 snapshot
+
+	CAST and TWFOFISH seem to work now.
+
+	Includes a lambda->SK compiler.
+
+	Bugfixes.
+
+NEWS for the 1999-03-08 snapshot
+
+	No user visible changes. Added a instance variable to keep
+	track of the amount of buffered data in the write_buffer
+	objects (needed to fix the broken flow control).
+
+	Added a generic doubly linked list, currently used by the
+	write_buffer and resource_list classes, but which will be
+	needed for more things (see the CONTROL item on the TODO
+        list). 
+
+NEWS for the 1999-03-07 snapshot
+
+	Improved CFMAKERAW. Ugly fix for the UNIX98-style pty:s
+	support.
+
+	Twofish support (not quite working).
+
+	Started on tcp forwarding (Bazsi).
+
+	Some support for broken ssh2 signatures (Baszi). Needs some
+	more work.
+
+	Various bugfixes.
+
+NEWS for the 1999-02-28 snapshot
+
+	Portability fixes for Solaris.
+
+NEWS for the 1999-01-28 snapshot
+
+	Some PTY support
+
+	Integrated support for sshd1 fallback (not tested)
+
+	Bug fixes.
+
+NEWS for the 1999-01-14 snapshot
+
+	Fixed off-by-one bug in dss_keygen.
+
+	Some portability fixes (sys/poll.h, crypt.h, unistd.h).
+
+NEWS for the 1999-01-08 snapshot:
+
+	New program lsh_writekey.
+
+NEWS for the 1999-01-05 snapshot:
+
+	Command line options to select which algorithms to use.
+
+	Various bug fixes. The 3des and blowfish support seems do work
+	now. 
+
+NEWS for the 1999-01-01 snapshot:
+
+	ZLIB support. (Bazsi)
+	Long key support (needed for 3DES) (Bazsi).
+	Fixed configure test for shutdown().
+	Various bug fixes (Ray).
+
+NEWS for the 1998-12-26 snapshot:
+
+	New lsh_keygen program.
+
+NEWS for the 1998-12-21 snapshot:
+
+Moved most objects in crypto.c and abstract_crypto.c into separate
+files.
+
+Added a workaround for Datafellows ssh2 client, which (contrary to the
+specification) asks for protocol version 1.99.
+
+Use /dev/urandom, if available.
+
+Collect most object files into liblsh.a.
+
+Started on a key generation program.
+
+TASKLIST and NOTES files now included in the snapshot.
+
+
+NEWS since the 1998-12-17 snapshot:
+
+Support for md5 (by Balázs Scheidler).
+
+Various bugfixes.
+
+
+NEWS since the 1998-12-11 snapshot:
+
+A resource mechanism (resource.[ch]) used by the server to cleanup
+properly when a connection dies unexpectedly. Can be used to kill
+child processes, close files and ports, etc.
+
+Generic code for chaining ciphers (crypto_cbc()) and piping them
+together (crypto_cascade()).
+
+Some untested support for blowfish and 3DES. A -c command line option
+is needed.
+
+A few bugfixes. Thanks to J.H.M. Dassen (Ray) and Balázs Scheidler.

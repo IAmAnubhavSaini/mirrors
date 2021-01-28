@@ -1,0 +1,13 @@
+#! /bin/sh
+
+echo lsh, test 1
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+spawn_lshd && run_lsh "exit 0" && test_success
+
+test_done

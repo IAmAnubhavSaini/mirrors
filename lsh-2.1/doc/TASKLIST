@@ -1,0 +1,32 @@
+This file describes some mostly independent subprojects for lsh.
+Before starting on any of them, please contact me (Niels Möller
+<nisse@lysator.liu.se); someone may already be working on it already,
+and we need to coordinate.
+
+
+Port forwarding services
+  X,
+  ssh-agent,
+  UDP (not in the spec, but that's no reason why it couldn't be
+       implemented).
+
+User interface. This includes command line options, configuration
+files, an escape-character mechanism and any features attached to that,
+including a command mode to create or terminate forwarded ports and
+channels interactively.
+
+Key storage, generation and management.
+
+SPKI support. Using SPKI certificates to grant access for groups and
+individuals seems like a good thing to me (even if I suspect
+that its usefulness is greater for more specialized services than
+login). I also find it appealing to send SPKI hashed key id:s rather
+than the public keys themselves in the publickey authentication
+protocol.
+
+SSH agent (does anybody have a specification of the protocol(s) used
+by ssh-agent?)
+
+Projects not to do:
+
+PAM support. (Looked at it. Didn't like it. See NOTES for details).

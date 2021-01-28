@@ -1,0 +1,95 @@
+#! /bin/sh
+#
+# Debian style init script to start and stop the lshd daemon.
+#
+# NOTE: This script is for the default installation of lsh as built
+# from the "upstream" source. A proper debian package would use
+# somewhat different conventions.
+#
+# Written by Niels Möller
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/local/sbin/lshd
+NAME=lshd
+DESC="secure shell service"
+
+PIDFILE=/var/run/$NAME.pid
+
+# Use this port
+# The default for lshd is whatever is listed in /etc/services.
+# When using both lsh and some ssh1 implementation, it might make
+# sense to use a different port.
+PORT=22
+
+set -e
+
+if [ ! -x $DAEMON \
+     -o ! -f /etc/lsh_host_key  \
+     -o ! -f /etc/lsh_host_key.pub \
+     -o ! -f /var/spool/lsh/yarrow-seed-file ]
+then
+	echo "lshd not installed properly" >&2
+        exit 1
+fi
+
+case "$1" in
+  start)
+	echo -n "Starting $DESC: "
+	start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON \
+		-- --pid-file $PIDFILE --daemonic --port $PORT
+	echo "$NAME."
+	;;
+  stop)
+	echo -n "Stopping $DESC: "
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+		--exec $DAEMON
+	echo "$NAME."
+	;;
+  #reload)
+	#
+	#	If the daemon can reload its config files on the fly
+	#	for example by sending it SIGHUP, do it here.
+	#
+	#	If the daemon responds to changes in its config file
+	#	directly anyway, make this a do-nothing entry.
+	#
+	# echo "Reloading $DESC configuration files."
+	# start-stop-daemon --stop --signal 1 --quiet --pidfile \
+	#	/var/run/$NAME.pid --exec $DAEMON
+  #;;
+  restart)
+	echo -n "Restarting $DESC: "
+	# Makes the old lshd stop listening for new connections
+	start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE \
+		--exec $DAEMON
+	sleep 1
+	start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON \
+		-- --pid-file $PIDFILE --daemonic --port $PORT
+	echo "$NAME."
+	;;
+  force-reload)
+	#
+	#	If the "reload" option is implemented, move the "force-reload"
+	#	option to the "reload" entry above. If not, "force-reload" is
+	#	just the same as "restart".
+	#
+	echo -n "Restarting $DESC: "
+	start-stop-daemon --stop --quiet --pidfile $PIDFILE \
+		--exec $DAEMON
+	sleep 1
+	start-stop-daemon --start --quiet --pidfile $PIDFILE \
+		--exec $DAEMON \
+		-- --pid-file $PIDFILE --daemonic --port $PORT
+	echo "$NAME."
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	# echo "Usage: $N {start|stop|restart|reload|force-reload}" >&2
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0

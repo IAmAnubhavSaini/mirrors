@@ -1,0 +1,61 @@
+#! /bin/sh
+
+usage () {
+    echo Usage: $0 key-file
+}
+
+while [ $# != 0 ]; do
+    case $1 in
+    	-help | --help | --hel | --he)
+	    usage
+	    exit 0
+    	    ;;
+	--*)
+	    echo Unknown option $1
+	    usage
+	    exit 1
+	    ;;
+	*)
+	    break
+	    ;;
+    esac
+
+    options="$options $1"
+    shift
+done
+
+if [ $# = 0 ] ; then
+    usage
+    exit 0
+fi
+
+create_dir () {
+    if mkdir $1 2>/dev/null; then
+	echo Created $1
+	chmod $2 $1 || exit 1
+    fi
+}
+
+# Create directories
+create_dir $HOME/.lsh 0700
+create_dir $HOME/.lsh/authorized_keys_sha1 0700
+
+: ${SEXP_CONV:=sexp-conv}
+
+if type "$SEXP_CONV" >/dev/null 2>&1 ; then : ; else
+    echo "Can't find the sexp-conv program"
+    exit 1
+fi
+
+while [ $# != 0 ]; do
+    hash=`"$SEXP_CONV" < $1 --once --hash=sha1`
+    if [ -z $hash ] ; then
+	echo $0: File $1 not found.
+	exit 1
+    else
+        "$SEXP_CONV" < $1 -s canonical --once \
+	    > "$HOME/.lsh/authorized_keys_sha1/$hash" \
+	    || exit 1
+    fi
+    shift
+done

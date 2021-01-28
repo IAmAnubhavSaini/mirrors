@@ -1,0 +1,287 @@
+.\" COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" Copyright (C) 1999 J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are 
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a 
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this manual
+.\" into another language, under the above conditions for modified versions,
+.\" except that this permission notice may be stated in a translation approved
+.\" by the Free Software Foundation, Inc. <URL:http://www.fsf.org>
+.\"
+.\" END COPYRIGHT AND PERMISSION NOTICE
+.\"
+.\" If you make modified versions of this manual, please notify the current 
+.\" maintainers of the package you received this manual from and make your
+.\" modified versions available to them.
+.\"
+.TH LSH 1 "NOVEMBER 2004" LSH "Lsh Manuals"
+.SH NAME
+lsh \- secsh (SSH2) client
+.SH SYNOPSIS
+.B lsh
+[\fIOPTION\fR...] HOST [\fiCOMMAND\fR]
+
+.SH DESCRIPTION
+.B CAUTION! The information in this manpage may be invalid or outdated. For authorative
+.B information on lsh, please see it's Texinfo manual (see the
+.I SEE\ ALSO
+.B section).
+
+Connects to the the remote machine HOST, and perform one or more actions, i.e.
+command execution, various forwarding services. The default action is to start
+a remote interactive shell or execute a given command on the remote machine.
+
+.SH OPTIONS
+.TP
+\fB\-\-capture\-to\fR=\fIFile\fR
+When a new hostkey is received, append an ACL
+expressing trust in the key. In sloppy mode, the
+default is ~/.lsh/captured_keys.
+.TP
+\fB\-\-dh\-keyexchange\fR
+Enable DH support (default, unless SRP is being
+used).
+.TP
+\fB\-\-host\-db\fR=\fIFilename\fR
+By default, ~/.lsh/host-acls
+.TP
+\fB\-i\fR, \fB\-\-identity\fR=\fIIdentity\fR key
+Use this key to authenticate.
+.TP
+\fB\-\-no\-dh\-keyexchange\fR
+Disable DH support.
+.TP
+\fB\-\-no\-publickey\fR
+Don't try publickey user authentication.
+.TP
+\fB\-\-no\-srp\-keyexchange\fR
+Disable experimental SRP support (default).
+.TP
+\fB\-\-publickey\fR
+Try publickey user authentication (default).
+.TP
+\fB\-\-sloppy\-host\-authentication\fR
+Allow untrusted hostkeys.
+.TP
+\fB\-\-srp\-keyexchange\fR
+Enable experimental SRP support.
+.TP
+\fB\-\-strict\-host\-authentication\fR
+Never, never, ever trust an unknown hostkey.
+(default)
+.TP
+\fB\-\-debug\fR
+Print huge amounts of debug information
+.TP
+\fB\-\-log\-file\fR=\fIFile\fR name
+Append messages to this file.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Suppress all warnings and diagnostic messages
+.TP
+\fB\-\-trace\fR
+Detailed trace
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Verbose diagnostic messages
+.TP
+Algorithm selection:
+.HP
+\fB\-c\fR, \fB\-\-crypto\fR=\fIAlgorithm\fR
+.HP
+\fB\-\-hostkey\-algorithm\fR=\fIAlgorithm\fR
+.TP
+\fB\-\-list\-algorithms\fR
+List supported algorithms.
+.HP
+\fB\-m\fR, \fB\-\-mac\fR=\fIAlgorithm\fR
+.TP
+\fB\-z\fR, \fB\-\-compression\fR[=\fIAlgorithm\fR]
+Default is zlib.
+.TP
+\fB\-\-askpass\fR=\fIProgram\fR
+Program to use for reading passwords. Should be an
+absolute filename.
+.TP
+\fB\-l\fR, \fB\-\-user\fR=\fIUser\fR name
+Login as this user.
+.TP
+\fB\-p\fR, \fB\-\-port\fR=\fIPort\fR
+Connect to this port.
+.TP
+Actions:
+.TP
+\fB\-B\fR, \fB\-\-background\fR
+Put process into the background. Implies \fB\-N\fR.
+.HP
+\fB\-D\fR, \fB\-\-forward\-socks\fR[=\fIport\fR] Enable socks dynamic forwarding
+.TP
+\fB\-E\fR, \fB\-\-execute\fR=\fIcommand\fR
+Execute a command on the remote machine
+.HP
+\fB\-L\fR, \fB\-\-forward\-local\-port\fR=\fIlocal\-port\fR:target-host:target-port
+.TP
+\fB\-N\fR, \fB\-\-nop\fR
+No operation (suppresses the default action, which
+is to spawn a remote shell)
+.TP
+\fB\-\-subsystem\fR=\fIsubsystem\-name\fR
+Connect to given subsystem. Implies
+\fB\-\-no\-pty\fR.
+.TP
+\fB\-S\fR, \fB\-\-shell\fR=\fIcommand\fR
+Spawn a remote shell
+.TP
+Universal not:
+.TP
+\fB\-n\fR, \fB\-\-no\fR
+Inverts the effect of the next modifier
+.TP
+Modifiers that apply to port forwarding:
+.TP
+\fB\-g\fR, \fB\-\-remote\-peers\fR
+Allow remote access to forwarded ports
+.TP
+\fB\-\-no\-remote\-peers\fR
+Disallow remote access to forwarded ports
+(default).
+.TP
+Modifiers that apply to remote execution:
+.TP
+\fB\-\-detach\fR
+Detach from terminal at session end.
+.TP
+\fB\-\-no\-detach\fR
+Do not detach session at end, wait for all open
+channels (default).
+.TP
+\fB\-\-no\-pty\fR
+Don't request a remote pty.
+.TP
+\fB\-\-no\-stderr\fR
+Redirect stderr to /dev/null
+.TP
+\fB\-\-no\-stdin\fR
+Redirect stdin from /dev/null
+.TP
+\fB\-\-no\-stdout\fR
+Redirect stdout to /dev/null
+.TP
+\fB\-\-stderr\fR=\fIFilename\fR
+Redirect stderr
+.TP
+\fB\-\-stdin\fR=\fIFilename\fR
+Redirect stdin
+.TP
+\fB\-\-stdout\fR=\fIFilename\fR
+Redirect stdout
+.TP
+\fB\-t\fR, \fB\-\-pty\fR
+Request a remote pty (default).
+.TP
+Miscellaneous options:
+.TP
+\fB\-e\fR, \fB\-\-escape\-char\fR=\fICharacter\fR
+Escape char. `none' means disable. Default is
+to use `~' if we have a tty, otherwise none.
+.TP
+\fB\-\-write\-pid\fR
+Make \fB\-B\fR write the pid of the backgrounded process
+to stdout.
+.TP
+\fB\-G\fR, \fB\-\-gateway\fR
+Setup a local gateway
+.HP
+\fB\-R\fR, \fB\-\-forward\-remote\-port\fR=\fIremote\-port\fR:target-host:target-port
+.TP
+\fB\-\-no\-x11\-forward\fR
+Disable X11 forwarding (default).
+.TP
+\fB\-x\fR, \fB\-\-x11\-forward\fR
+Enable X11 forwarding.
+.TP
+-?, \fB\-\-help\fR
+Give this help list
+.TP
+\fB\-\-usage\fR
+Give a short usage message
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print program version
+
+
+.SH FILES
+
+$HOME/.lsh/captured_keys
+
+is the default file used for storing keys captured when connecting to
+hosts with keys not previously accepted (see the --capture-to option).
+
+$HOME/.lsh/host_acls
+
+is the default file containing accepted keys (see the --host-db option).
+
+$HOME/.lsh/identity
+
+is the key file lsh attempts to use by default (see the --identity option).
+
+.SH DIAGNOSTICS
+See the 
+.B --verbose
+,
+.B --trace
+and 
+.B --debug
+options.
+
+.SH "REPORTING BUGS"
+Report bugs to <bug-lsh@gnu.org>.
+
+
+.SH ENVIRONMENT
+.B LSH_YARROW_SEED_FILE 
+may be used to specify the random seed file.
+
+.B LSHFLAGS
+may be used for passing additional parameters. The parsing order is undefined.
+
+.SH COPYING
+The lsh suite of programs is distributed under the GNU General Public
+License; see the COPYING and AUTHORS files in the source distribution for
+details.
+.SH AUTHOR
+The lsh program suite is written mainly by Niels M\[:o]ller <nisse@lysator.liu.se>.
+
+This man-page was originally written by J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>. 
+It was modified and updated for lsh 2.0 by Pontus Freyhult <pont_lsh@soua.net>
+.SH "SEE ALSO"
+.BR lsftp (1),
+.BR lshg (1),
+.BR lsh-authorize (1),
+.BR lsh-keygen (1),
+.BR lsh-make-seed (1),
+.BR lsh-upgrade (1),
+.BR lsh-upgrade-key (1),
+.BR lsh-writekey (1),
+.BR lshd (8),
+.BR ssh-conv (1)
+
+The full documentation for
+.B lsh
+is maintained as a Texinfo manual.  If the
+.B info
+and
+.B lsh
+programs are properly installed at your site, the command
+.IP
+.B info lsh
+.PP
+should give you access to the complete manual.

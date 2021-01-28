@@ -1,0 +1,228 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+_______________________________________________________________________
+                     Rapid 7, Inc. Security Advisory
+
+        Visit http://www.rapid7.com/ to download NeXpose(tm), our
+         advanced vulnerability scanner. Linux and Windows 2000
+                       versions are available now!
+_______________________________________________________________________
+
+Rapid 7 Advisory R7-0009
+Vulnerabilities in SSH2 Implementations from Multiple Vendors
+
+   Published:  December 16, 2002
+   Revision:   1.0
+   http://www.rapid7.com/advisories/R7-0009.txt
+
+   CERT:       CA-2002-36
+               http://www.cert.org/advisories/CA-2002-36.html
+
+   CVE:        Multiple CVE CANs assigned:
+               o CAN-2002-1357 (incorrect length)
+               o CAN-2002-1358 (lists with empty elements/empty strings)
+               o CAN-2002-1359 (large packets and large fields)
+               o CAN-2002-1360 (string fields with zeros)
+
+1. Affected system(s):
+
+   KNOWN VULNERABLE:
+    o F-Secure Corp. SSH servers and clients for UNIX
+       v3.1.0 (build 11) and earlier
+    o F-Secure Corp. SSH for Windows
+       v5.2 and earlier
+    o SSH Communications Security, Inc. SSH for Windows
+       v3.2.2 and earlier
+    o SSH Communications Security, Inc. SSH for UNIX
+       v3.2.2 and earlier
+    o FiSSH SSH client for Windows
+       v1.0A and earlier
+    o InterSoft Int'l, Inc. SecureNetTerm client for Windows
+       v5.4.1 and earlier
+    o NetComposite ShellGuard SSH client for Windows
+       v3.4.6 and earlier
+    o Pragma Systems, Inc. SecureShell SSH server for Windows
+       v2 and earlier
+    o PuTTY SSH client for Windows
+       v0.53 and earlier (v0.53b not affected)
+    o WinSCP SCP client for Windows
+       v2.0.0 and earlier
+
+   APPARENTLY NOT VULNERABLE:
+    o BitVise WinSSHD server for Windows v3.05
+    o LSH v1.5
+    o OpenSSH v3.5 and earlier
+    o TTSSH SSH Extension for TeraTerm Pro
+    o VanDyke SecureCRT client v3.4.3 for Windows
+    o VanDyke VShell server v1.2 for Windows
+
+   UNKNOWN / NOT TESTED:
+    o MacSSH
+    o SSHv1 implementations (see {1})
+    o SSHv2 enabled network appliances
+
+2. Summary
+
+   SSH servers and clients from several vendors contain vulnerabilities
+   that may allow denial-of-service attacks and/or arbitrary code
+   execution.  The vulnerabilities arise from various deficiencies in
+   the greeting and key-exchange-initialization phases of the SSHv2
+   transport layer.
+
+3. Vendor status and information
+
+   F-Secure Corporation
+   http://www.f-secure.com
+
+      Vendor has been notified.  Release information is unknown at
+      this time.  F-Secure has characterized this issue as not
+      exploitable.
+
+   FiSSH
+   http://pgpdist.mit.edu/FiSSH/index.html
+
+      Vendor has been notified.  Release information is unknown at
+      this time.
+
+   NetComposite (ShellGuard)
+   http://www.shellguard.com
+
+      Vendor has been notified.  Release information is unknown at
+      this time.
+
+   Pragma Systems, Inc.
+   http://www.pragmasys.com
+
+      Vendor has been notified.  The fixed version is SecureShell
+      v3.0, which was released on November 25 2002.
+
+   PuTTY
+   http://www.chiark.greenend.org.uk/~sgtatham/putty/
+
+      Vendor has been notified.  The fixed version is PuTTY v0.53b,
+      which was released on November 12, 2002.
+
+   SSH Communications Security, Inc.
+   http://www.ssh.com
+
+      Vendor has been notified.  Release information is unknown at
+      this time.  SSH, Inc. has characterized this issue as not
+      exploitable.
+
+   SecureNetTerm (InterSoft International, Inc.)
+   http://www.securenetterm.com
+
+      Vendor notified.  The fixed version is SecureNetTerm v5.4.2,
+      released on November 14 2002.
+
+   WinSCP2
+   http://winscp.vse.cz/eng/
+
+      Vendor has been notified.  Release information is unknown at
+      this time.
+
+4. Solution
+
+   No solutions available yet.
+
+5. Detailed analysis
+
+   To study the correctness and security of SSH server and client
+   implementations {2}, the security research team at Rapid 7, Inc.
+   has designed the SSHredder SSH protocol test suite containing
+   hundreds of sample SSH packets. These invalid and/or atypical
+   SSH packets focus on the greeting and KEXINIT (key exchange
+   initialization) phases of SSH connections.
+
+   We then applied the SSHredder suite to some popular SSH servers
+   and clients, observing their behavior when presented with a
+   range of different input.  Several implementation errors were
+   discovered, most of which involve memory access violations.
+   While the impact is different for each product tested, some of
+   these errors were easily exploitable, allowing the attacker to
+   overwrite the stack pointer with arbitrary data.
+
+   In most cases, only the most current versions of the applications
+   were tested.  Vendors listed as "Apparently NOT VULNERABLE" are
+   encouraged to run the tests against older versions of their
+   applications.
+
+   The SSHredder test suite is now available for download from
+   Rapid 7's web site ( http://www.rapid7.com ).  A pre-release
+   version of SSHredder was provided to SSH vendors for testing
+   prior to public disclosure.  SSHredder has been released under
+   the BSD license.
+
+   The test cases combine several test groups of similarly
+   structured data:
+
+      o Invalid and/or incorrect SSH packet lengths (including
+        zero, very small positive, very large positive, and
+        negative).
+
+      o Invalid and/or incorrect string lengths.  These were applied
+        to the greeting line(s), plus all the SSH strings in the
+        KEXINIT packets).
+
+      o Invalid and/or incorrect SSH padding and padding lengths.
+
+      o Invalid and/or incorrect strings, including embedded ASCII
+        NULs, embedded percent format specifiers, very short, and
+        very long strings.  This test group was applied to the
+        greeting line(s), plus all the SSH strings in the KEXINIT
+        packets).
+
+      o Invalid algorithm lists.  In addition to the existing string
+        tests, invalid encryption, compression, and MAC algorithm names
+        were used, including invalid algorithm domain qualifiers;
+        invalid algorithm lists were created by manipulating the
+        separating commas.
+
+   The individual tests in each group were combined systematically to
+   produce a test suite of 666 packets.  A full permutation of every
+   test in each test group would have yielded a test suite that is too
+   large to distribute, so a representative sample of packets was
+   chosen from each group.
+
+   Please note that greeting and KEXINIT are only the first and second
+   phases of SSH connections.  A full test suite for every SSH
+   protocol message could potentially reveal other latent
+   vulnerabilities.
+
+6. Notes
+
+   [1] While SSHv1 has no KEXINIT phase, many of these test cases
+       could affect both SSHv1 and SSHv2 in a generic way).  SSHv1
+       implementations were not tested.
+
+   [2] The SSH protocol is described in several IETF drafts, which can be
+       found at http://www.ietf.org/ids.by.wg/secsh.html .
+
+7. Contact Information
+
+   Rapid 7 Security Advisories
+   Email:   advisory@rapid7.com
+   Web:     http://www.rapid7.com/
+   Phone:   +1 (212) 558-8700
+
+8. Disclaimer and Copyright
+
+   Rapid 7, Inc. is not responsible for the misuse of the information
+   provided in our security advisories. These advisories are a service
+   to the professional security community.  There are NO WARRANTIES
+   with regard to this information. Any application or distribution of
+   this information constitutes acceptance AS IS, at the user's own
+   risk.  This information is subject to change without notice.
+
+   This advisory Copyright (C) 2002 Rapid 7, Inc.  Permission is
+   hereby granted to redistribute this advisory, providing that no
+   changes are made and that the copyright notices and disclaimers
+   remain intact.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.0.7 (OpenBSD)
+
+iD8DBQE9/a5kcL76DCfug6wRAoIdAJ0Xg1HUeXQk5aNzBaKVcS4XP9rlpACguQk6
+G2ihG+Zr3V/VE/1C21p4yf4=
+=iqCp
+-----END PGP SIGNATURE-----

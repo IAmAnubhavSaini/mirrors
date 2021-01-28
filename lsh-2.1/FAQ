@@ -1,0 +1,89 @@
+× Out of curiosity, what's the relationship between LSH and OpenSSH?
+
+They are almost completely unrelated. LSH development started in late
+August 1998, soon after the first specifications for the version 2 of
+the SSH protocols were made public. OpenSSH is derived from the old
+free versions of the ssh program written by Tatu Ylonen, and support
+for version 2 of the protocols was added later on, in May 2000.
+
+I think the implementations share very little source code; perhaps
+things like the implementations of blowfish or SHA1 has common
+ancestors. OpenSSH uses the OpenSSL library for low-level
+cryptographic operations. LSH uses the Nettle library for symmetric
+cryptographic operations, and GMP for its bignum calculations.
+
+OpenSSH supports both version 1 and version 2 of the protocols, LSH
+only supports version 2 of the protocol.
+
+LSH and OpenSSH have been tested together with positive results. LSH
+and OpenSSH use different file formats for storing DSA and RSA keys; some
+conversion tools are included in the LSH dist.
+
+
+× Why use a gc?
+
+I'll try to explain how I think about gc, as I'm afraid some may find
+it a little unorthodox.
+
+The reasoning behind the decision to use a gc is that the explicitly
+deallocating an object is a very global operation. The requirement to
+do this makes it *MUCH* more painful to modularize the code. On the
+other hand, most of the data in lsh (i.e. all strings) can be managed
+quite easily in a producer/consumer fashion. So we only need to use
+the gc for objects such as packet handlers, instances of
+cryptoalgorithms, and other closures. These are quite few, perhaps one
+or two dozen of objects per connection.
+
+Thus, the cost of doing automatic gc on this will be small, while it
+makes coding the objects much more straight-forward. And as a simple
+mark&sweep algorithm should be adequate, implementation is almost
+trivial (what makes the implementation a little more interesting is
+that I want to describe the object types in such a way that I can
+generate the gc glue needed for proper marking and deallocation
+automatically. As a side effect, this should also make the sanity
+checks (basically run-time type checking) more reliable).
+
+Tools like checker and purify may be great for *detecting* memory
+leaks. But they *don't* solve the problem of deciding exactly when
+each object can be freed, and it is this problem that makes explicit
+memory management destroy modularity boundaries.
+
+Personally I think that the *single* most important advantage of using
+higher level languages like python or scheme rather than plain C is
+that you don't have to mess with memory deallocation. But that's no
+reason why we should have to do that in C; a gc should take care of
+most of it in one place, in a few hundred lines of code.
+
+
+× I don't see the value in lsh-writekey. Why not have lsh-keygen
+  do the writing?
+
+I like the approach to have each program do one thing, and do it well.
+And I'm a little tired of programs like ssh and pgp which include a
+good key generator, but only generates keys in some specialized,
+internal format, which are difficult to extract for other uses.
+
+My intention is that lsh-keygen should be general program for
+generating key pairs for public key cryptography. It outputs keys as
+"s-expressions", and should use the formats defined by SPKI. It
+supports all of canonical, transport and advanced flavors of
+s-expressions. 
+
+On the other hand, lsh-writekey is responsible for two things: to
+split out the public part of the key, and for storing the private part
+securely. lsh-writekey need not support the advanced s-expression
+syntax.
+
+Furthermore, if you ever want to import a dss key from some other
+program (say, pgp-5), I suspect that it will be easier to find or
+write up a converter that outputs an unencrypted SPKI style key, than a
+program that can create the files under ~/.lsh directly. Then, the
+separate lsh-writekey program may come in handy.
+
+This said, I understand that we also need a more user friendly
+interface that does all the work with a single command. But I'd rather
+write that as a simple shell script that pipes the primitives
+together.
+
+   http://www.clark.net/pub/cme/html/spki.html
+   http://theory.lcs.mit.edu/~rivest/sexp.html

@@ -1,0 +1,14 @@
+#! /bin/sh
+
+echo lshg test 1
+
+if [ -z "$srcdir" ] ; then
+  srcdir=`pwd`
+fi
+
+. $srcdir/functions.sh
+
+spawn_lshd && spawn_lsh -G && \
+  echo foo | exec_lshg cat | grep foo > /dev/null && test_success
+
+test_done

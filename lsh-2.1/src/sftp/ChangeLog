@@ -1,0 +1,527 @@
+2013-06-16  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Recognize --with-include-path.
+
+2013-06-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Use AC_CONFIG_HEADER, not AM_CONFIG_HEADER.
+	Replace use of obsolete AM_PROG_CC_STDC and am_cv_prog_cc_stdc.
+
+2006-05-08  Niels Möller  <nisse@lysator.liu.se>
+
+	* Man pages: Applied patch from Stefan Pfetzing, addressing long
+	lines and non-ascii caharacters.
+
+2006-04-27  Niels Möller  <niels@s3.kth.se>
+
+	* rl.c: Disable readline support if the needed functions aren't available.
+
+2004-11-19  Pontus Freyhult  <pont@soua.net>
+
+	* Makefile.am: Added new manpages to man_MANS and EXTRA_DIST.
+
+	* sftp-server.8: New manpage.
+
+	* lsftp.1: New manpage.
+
+2004-11-17  Niels Möller  <nisse@lysator.liu.se>
+
+	* commands.c (com_chown): Always us unsigned char with isdigit.
+	(com_chgrp): Likewise.
+
+	* Makefile.am (LDADD): All programs need linking with $(LIBOBJS),
+	not just lsftp.
+
+	* configure.ac: Check for stadarg.h. Needed by vsnprintf.c.
+
+2004-11-14  Niels Möller  <nisse@lysator.liu.se>
+
+	* commands.c (uidstring, gidstring): When using snprintf,
+	NUL-terminate the result string explicitly.
+
+	* Makefile.am (lsftp_LDADD): Link lsftp with $(LIBOBJS), to pickup
+	snprintf and vsnprintf.
+
+	* configure.ac: Deleted AC_FUNC_ERROR_AT_LINE.
+	Added checks for snprintf and vsnprintf.
+
+2004-11-13  Niels Möller  <nisse@lysator.liu.se>
+
+	* dc.h: Reverted apache workaround. It turned out it was not
+	sufficient to solve the problem, there remained undefined
+	references to the function ap_signal.
+
+2004-11-10  Niels Möller  <nisse@lysator.liu.se>
+
+	* dc.h: Added workaround for broken fnmatch.h installed by apache.
+
+2004-03-20  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Use AC_CONFIG_AUX_DIR([.]).
+
+2004-02-17  Niels Möller  <nisse@lysator.liu.se>
+
+	* filemode.h: Always use prototypes.
+
+2004-02-15  Niels Möller  <nisse@lysator.liu.se>
+
+	* Makefile.am (AM_CPPFLAGS): Added -I.., needed for inclusion of
+	nettle-types.h. This is somewhat ugly, as sftp shouldn't really
+	depend on nettle or lsh.
+
+	* buffer.h: Include nettle/nettle-types.h, for unint32_t and
+	friends.
+
+	* sftp_c.h: Don't include inttypes.h or stdint.h, rely on buffer.h
+	doing the right thing.
+
+2003-05-20  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* configure.ac: Commented out AC_FUNC_MALLOC.
+
+2003-05-20  Niels Möller  <niels@s3.kth.se>
+
+	* sftp.h (enum sftp_attr_flag): Use a #define for the
+	SSH_FILEXFER_ATTR_EXTENDED constant, as it's too large to fit in
+	an enum constant. 
+
+2003-05-16  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* Changed include file ordering, to follow the same conventions as
+	lsh and nettle: .c-files include config.h first, then system
+	files, and finally sftp files. .h-files never include config.h,
+	and they include system files before sftp files. 
+
+	* dump-hex.c: Include config.h, to get alloca defined properly.
+
+	* configure.ac: Use LSH_FUNC_ALLOCA.
+
+2003-03-02  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* buffer.c (sftp_put_uint64): Fixed WRITE_UINT32 search&replace
+	bug. 
+
+2003-02-26  Pontus Sköld  <pont@soua.net>
+
+	* sftp_bind.c (lsftp_handle_packet): Only free(a) if free_a is
+	set.
+	(lsftp_nullcb): Init free_a to false.
+	(lsftp_do_stat): Explicitly clear free_a.
+	(lsftp_do_chown): Set free_a.
+	(lsftp_do_chmod): dito.
+	(lsftp_handle_chall): Respect free_a.
+
+	* sftp_bind.h (struct lsftp_callback): New flag, free_a.
+
+	* buffer.h: If available, include <stdint.h> and <inttypes.h>.
+
+	* sftp_c.h: Dito.
+
+	* configure.ac: Also check for stdint.h.
+
+2003-02-24  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* rl.c (lsftp_rl_remotefile_generator): Use const char.
+
+2003-02-23  Niels Moller  <nisse@carduelis>
+
+	* dc.c (lsftp_dc_r_isdir): Adapted to new sftp_attrib argument to
+	lsftp_do_stat. 
+	* commands.c (get_file_or_folder, com_chown, com_chgrp): Likewise.
+
+	* dc.h: Deleted the posixperms field, and replaced it with two
+	fields, has_permissions and permissions. That way we don't need
+	to compare (unsigned) mode_t:s to the special constant -1.
+
+	* sftp_bind.h (struct lsftp_callback): Deleted stat pointer.
+
+	* sftp_bind.c (lsftp_do_stat): Use a struct sftp_attrib for
+	reporting the result, not a struct stat.
+	(lsftp_handle_stat): Just copy the sftp_attrib struct, don't try
+	converting it to a struct stat.
+
+	* configure.ac: Use LSH_GCC_ATTRIBUTES.
+
+	* Use uint32_t and friends instead of UINT32.
+
+2003-02-17  Niels Möller  <niels@s3.kth.se>
+
+	* configure.ac: Deleted initial newline in readline warning.
+
+2003-02-11  Niels Möller  <niels@s3.kth.se>
+
+	* sftp_c.c (sftp_get_file_main): Added an explicit cast to kludge
+	around a bug in the constification.
+
+2002-11-07  Pontus Sköld  <pont@soua.net>
+
+	* rl.c (lsftp_rl_completion): Bugfix: Don't free memory for every
+	command checked.
+
+2002-07-29  Pontus Sköld  <pont@soua.net>
+
+	* configure.ac: Take advantage of lshg now understanding -G (pass
+	-G by default if compiling with lsh).
+
+2002-07-18  Niels Möller  <niels@s3.kth.se>
+
+	* configure.ac: Don't use -ggdb3 with gcc-2.96.
+
+2002-06-27  Pontus Sköld  <pont@soua.net>
+
+	* commands.c (com_mv): Use lsftp_dc_endglob instead of freeing the
+	strings in the glob.
+	(com_chown): Dito.
+	(put_file_or_folder): Cleaned up types of variables used.
+	(get_file_or_folder): Dito.
+
+	* sftp_bind.c (lsftp_do_cd): Pass a char** to lsftp_do_realpath.
+
+	* sftp_bind.h: lsftp_do_realpath takes a char** destptr, not const
+	char**.
+
+	* sftp_bind.c (lsftp_do_realpath): Dito.
+	
+2002-06-27  Pontus Sköld  <Pontus.Skold@dis.uu.se>
+
+	* commands.c (com_umask): Do an explicit cast of the parameter to
+	isdigit.
+
+	* str_utils.c (lsftp_s_strtok): Don't use strndup.
+	(lsftp_s_strtok): Removed unused variable.
+
+2002-06-27  Pontus Sköld  <pont@soua.net>
+
+	* commands.h: Include gnu_stuff.h to get declaration for
+	canonicalize_file_name compability function.
+
+2002-06-25  Niels Möller  <niels@s3.kth.se>
+
+	* gnu_stuff.c (help_option): Deleted spuriuos comma.
+
+2002-06-25  Pontus Sköld  <pont@soua.net>
+
+        * gnu_stuff.c (help_option): Added note about where to report
+        bugs.
+
+2002-06-06  Pontus Sköld  <pont@soua.net>
+
+	* commands.c (com_lpwd): Don't assume getcwd with extended
+	functionality, use 8192 as a fallback if PATH_MAX is undefined.
+
+	* configure.ac: Check for canonicalize_file_name.
+
+	* commands.c (get_file_or_folder): Use canonicalize_file_name
+	instead of realpath.
+	(put_file_or_folder): Dito.
+
+	* gnu_stuff.c: Added compability function for systems without
+	canonicalize_file_name.
+
+	* gnu_stuff.h: Declaration of compability function.
+
+2002-06-05  Pontus Sköld  <pont@soua.net>
+
+	* str_utils.h: Changed declaration of lsftp_s_strtok, take a
+	char** to fill in with a new allocated string instead of a buffer
+	and it's length.
+
+	* str_utils.c (lsftp_s_strtok): See above.
+
+	* commands.c: Changed to use the new lsftp_s_strtok.
+
+	* rl.c (lsftp_rl_completion): Dito.
+
+	* sftp_bind.c (lsftp_open_connection): Dito.
+
+2002-05-26  Pontus Sköld  <pont@soua.net>
+
+	* rl.c (lsftp_rl_remotefile_generator):
+	Bugfix. lsftp_unqualify_path returns a pointer into the given
+	string. We can't free that.
+
+	* commands.c (com_cd): Glob absolute paths only.
+	(com_rm): Dito.
+	(com_get): Dito.
+	(com_mv): Dito.
+
+2002-05-25  Pontus Sköld  <pont@soua.net>
+
+	* rl.c (lsftp_rl_remotefile_generator): (Hopefully) fixed
+	completion to behave correctly. Always glob on absolute path and
+	make them relative if neccessary when returning them.
+
+	* sftp_bind.c (lsftp_path_is_absolute): New function.
+
+	* sftp_bind.h: Declaration.
+
+2002-05-23  Pontus Sköld  <pont@soua.net>
+
+	* sftp_bind.c (lsftp_do_ls): Bail out if globbing failed.
+
+2002-05-15  Pontus Sköld  <pont@soua.net>
+
+	* commands.c (get_file_or_folder): Removed debug message.
+
+	* dc.c (lsftp_dc_r_startglob): Remove lsftp_unqualify_path calls,
+	I wonder why I thought they should be there from the beginning.
+
+	* commands.c (com_longhelp): New function (almost identical to the
+	old help function, just ignore the visible bit). Cosmetic fix at
+	the same time (an empty line inserted before the help for a
+	command).
+	(com_help): Rewrote to just display all available commands in
+	short form (if called without arguments). If arguments are given,
+	leave it to longhelp.
+
+	* commands.h: New function com_longhelp.
+
+	* commands.c: Added longhelp entry to available commands, changed
+	text for help.
+
+2002-05-06  Niels Möller  <niels@s3.kth.se>
+
+	* configure.ac (CFLAGS): Don't enable -Waggregate-return.
+
+2002-05-05  Niels Möller  <nisse@lysator.liu.se>
+
+	* acconfig.h: Deleted file.
+
+	* configure.ac: Pass no arguments to AM_INIT_AUTOMAKE. Use the
+	three-argument form of AC_DEFINE.
+
+2002-05-05  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* configure.ac: Update for automake-1.6.
+
+2002-04-02  Pontus Sköld  <pont@soua.net>
+
+	* sftp-server.c (sftp_process_readdir): Include up to
+	MAX_DIRENTS_PER_REQUEST files in response to a single
+	SSH_FXP_READDIR. Should (and seems to) speed up directory 
+	traversal dramatically.
+	
+2002-03-27  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* werror.c (_fatal): New function.
+
+	* sftp.h (SFTP_MAX_PACKET): New constant.
+
+	* sftp-test-client.c: Replaced FATAL with calls of fatal.
+	* sftp_bind.c: Likewise.
+
+	* sftp-server.c: Define the werror_program_name constant. Replaced
+	FATAL with calls of fatal.
+
+	* buffer.c: Moved the definitions of struct sftp_input and struct
+	sftp_output, and selected functions, to separate files io_input
+	and io_output. The code left in this file does not depend on the
+	details of those structs.
+
+	* Makefile.am (shared_src): New make variable listing
+	source files used by all clients and servers. Added io_input and
+	io_output. 
+
+	* io.h (sftp_make_output): New file with declarations that doesn't
+	fit in buffer.h, in particular the constructors for sftp_input and
+	sftp_output. 
+
+	* lsftp.c: Include werror.h, and define
+	werror_program_name. 
+
+	* io_output.c: New file, with all the functions that need to knwo
+	about the internals of struct sftp_output.
+	* io_input.c: New file, with all the functions that need to knwo
+	about the internals of struct sftp_input.
+
+	* misc_fun.c (FATAL): Deleted function, use the fatal
+	function in werror.c instead.
+
+2002-03-26  Pontus Sköld  <pont@soua.net>
+
+	* sftp-server.c (MAX_DIRENTS_PER_REQUEST): New constant, the
+	maximum number of directory entries to include in response to one
+	SSH_FXP_READDIR.
+
+	* buffer.c (sftp_read_packet): Cosmetic fixes and a bugfix (if
+	sftp_get_data returns -1, it's not ok).
+
+	* gnu_stuff.c (help_option): Added an help text. It needs work but
+	is (hopefully) better than nothing.
+
+2002-03-25  Pontus Sköld  <pont@soua.net>
+
+	* buffer.c (sftp_read_packet): Loop to read data.
+	(sftp_get_data): Likewise.
+	(sftp_write_packet): Loop to write data.
+
+	* sftp_c.c (sftp_ls_main): Check return values from
+	sftp_get_string.
+
+	* sftp-test-client.c (fork_server): Use fds, not FILE*s.
+
+	* sftp-server.c (sftp_init): Use fds, not FILE*s.
+	(main): Use fds STDIN_FILENO and STDOUT_FILENO instead of FILE*s
+	stdin and stdout.
+
+	* buffer.c: We need unistd.h to have read and write defined. And
+	we want errno to, so we need errno.h
+	(sftp_make_input): Use fd, not FILE*
+	(sftp_make_output): Likewise.	
+
+	* sftp_bind.c (lsftp_close_connection): Use fd_to_transport and
+	fd_from_transport instead of to_transport and from_transport.
+
+	* configure.ac (CPPFLAGS): use AC_DEFINE_UNQUOTED instead of
+	putting options for before and after in CPPFLAGS. Solves problem
+	with spaces in before- and after-opts.
+ 
+	* sftp_bind.c (lsftp_open_connection): Dont't use FILE* but fds
+	directly.
+	(lsftp_handshake): Use read instead of fread, and pass fds to
+	sftp_make_input and sftp_make_output.
+
+	* buffer.c (struct sftp_input): Use fd instead of FILE*.
+	(struct sftp_output): Likewise.
+	(sftp_get_data): Use read instead of fread.
+	(sftp_read_packet): Likewise.
+	(sftp_write_packet): Use write instead of fwrite.
+
+	* buffer.h: Changed prototype of sftp_make_input and
+	sftp_make_output to use fds instead of files.
+
+2002-03-24  Pontus Sköld  <pont@soua.net>
+
+	* configure.ac: Added --no-pty to default options if we're using
+	lsh(g).
+
+	* commands.c (com_quit): Only call com_close if connected.
+
+2002-03-23  Pontus Sköld  <pont@soua.net>
+
+	* configure.ac: Removed -G from default after options.
+
+2002-03-23  Pontus Sköld  <pont@it.uu.se>
+
+	* configure.ac (termcap): Added check for libtermcap. This should
+	help systems with a dynamically linked libreadline that depends on
+	libtermcap.
+
+2002-03-21  Pontus Sköld  <pont@soua.net>
+
+	* configure.ac: Almost completely rewrote the checks for readline
+	and history, now actually uses the results of the library checks.
+
+	* rl.c: Use WITH_READLINE and WITH_HISTORY instead of header
+	existence.
+	
+	* rl.h: Use <readline.h> and <history.h> if available.
+
+2002-03-19  Pontus Sköld  <pont@it.uu.se>
+
+	* Makefile.am: sftp-server should go to sbin (or should it go to
+	libexec? Not bin anyway).
+
+2002-03-18  Niels Möller  <nisse@lysator.liu.se>
+
+	* commands.c (com_umask): Use unsigned char.
+	(com_chown): Likewise.
+	(com_chgrp): Likewise.
+	(handle_command): Unsigned char argument.
+
+2002-03-14  Pontus  <pont@it.uu.se>
+
+	* configure.ac: Changed version number from 1.0 to 1.0-pre to make
+	sure noone thinks "to highly" of the code. Also removed debug code
+	that shouldn't have been checked in.
+
+2002-02-27  Niels Möller  <nisse@cuckoo.hack.org>
+
+	* gnu_stuff.c: Include stdlib.h and string.h.
+
+2002-02-25  Pontus  <pont@it.uu.se>
+
+	* lsftp.c (main): Readded support for GNU-thingies (was lost
+	somehow some time ago).
+
+	* gnu_stuff.c (lsftp_welcome): Included Niels in welcome message.
+	(version_option): dito.
+	(do_gnu_stuff): New function to check for GNU-thingies.
+	
+	* configure.ac: Added ugly fix to detect if we're part of the main
+	lsh distribution. If we are, assume $bindir/lshg works
+	satisfactionary.
+	
+	* sftp_bind.c (lsftp_install_lsftp_cb): Return a pointer to the
+	callback instead.
+	(lsftp_do_rm): Adopted for new use of lsftp_install_lsftp_cb.
+	(lsftp_do_get): dito.
+	(lsftp_do_ls): dito.
+	(lsftp_do_chmod): dito.
+	(lsftp_do_mv): dito.
+	(lsftp_do_realpath): dito.
+	(string_comparer): Changed type for arguments from char** to const
+	void*.
+
+	* sftp_bind.h: Changed return type of lsftp_install_lsftp_cb from
+	int to struct lsftp_callback*.
+
+	* sftp_bind.c (lsftp_lsftp_cb_init): Fixed a bug using the same
+	memory both for sftp_cbs and lsftp_cbs, mumble!
+
+2002-02-24  Pontus  <pont@it.uu.se>
+
+	* sftp_bind.c (lsftp_remove_lsftp_cb): Use lsftp_nullcb to clean
+	out callback.
+	(lsftp_handle_packet): Changed variable i (used twice) to r.
+
+	* sftp_bind.h: New function lsftp_nullcb.
+
+	* sftp_bind.c (lsftp_compact_sftp_cbs): Fixed a bug that would
+	loose callbacks before a hole if there were any more.
+	(lsftp_compact_lsftp_cbs): Fixed the same bug for struct
+	lsftp_callbacks.
+	(lsftp_handle_packet): Clean out old state after callbacks, should
+	hopefully make things more robust.
+
+	(lsftp_nullcb): New function to clean a struct lsftp_callback.
+
+	* dc.c (lsftp_dc_init): Check that malloc succeeded before using
+	the memory (duh!).
+	
+	* sftp_bind.c: Removed obsolete default callback array sizes.
+
+	* dc.c: Removed obsolete default dircache size.
+
+	* lsftp.c (main): Always init the callbacks.
+
+	* sftp_bind.c (lsftp_lsftp_cb_init): Also clear option flags.
+
+	* lsftp.c (main): Added some comments.
+
+	* sftp_bind.c (lsftp_do_put): Added some comments.
+
+2002-02-22  Pontus  <pont@it.uu.se>
+
+	* configure.ac (lsh_cv_c_attribute): Removed obsolete checks for
+	behaviour of stat and lstat.
+
+2002-02-12  Pontus  <pont@it.uu.se>
+
+	* commands.c (com_mv): Didn't properly check for error in return value of
+	lsftp_dc_r_isdir.
+
+2002-02-11  Pontus  <pont@it.uu.se>
+
+	* sftp-server.c (sftp_process_realpath): Added deugging message.
+	(sftp_process): Added debugging message.
+	(sftp_process_symlink): Added debugging message.
+
+	* buffer.c (sftp_read_packet): If called with data left, flush
+	(read and throw away) remaining data.
+
+	* configure.ac: Created new configure.ac as a merge of the
+	configure.in from lsftp and the sftp package.
+
+	* Started new Changelog in sftp. 
+

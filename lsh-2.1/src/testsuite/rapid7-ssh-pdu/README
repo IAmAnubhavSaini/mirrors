@@ -1,0 +1,24 @@
+SSHredder SSH Protocol Test Suite v1.0
+
+The test packets are given in binary form in the
+pdu/ subdirectory.  These packets can be
+delivered via nc (netcat) or other similar
+tools.
+
+For client testing, you must create a server
+program which listens on port 22 and sends a
+PDU to connecting clients (for each new client
+that connects, send the next PDU).  This is
+possible with netcat.
+
+For server testing, you must create a client
+program that connects to port 22 and sends a
+PDU to the server.  This is possible with
+netcat.
+
+If you need assistance, please contact us:
+
+   Rapid 7 Security Advisories
+   Email:   advisory@rapid7.com
+   Web:     http://www.rapid7.com/
+   Phone:   +1 (212) 558-8700

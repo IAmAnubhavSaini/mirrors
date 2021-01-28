@@ -1,0 +1,207 @@
+#! /bin/sh
+
+conv () {
+    echo "$1" | sexp-conv -s transport | tee test.in
+}
+
+die () {
+    echo "Test failed:" "$@"
+    exit 1
+}
+
+test_valid () {    
+    name="$1"
+    shift
+    if [ $# = 2 ] ; then
+	msg="$1"
+	flags=""
+	shift
+    else
+	msg=""
+	flags="--no-data"
+    fi
+    sign="$1"
+
+    # echo $msg : ../tools/spki-check-signature $flags "`conv "$sign"`" 
+    echo "$msg" | ../tools/spki-check-signature $flags "`conv "$sign"`" \
+	|| die "$name"
+}
+
+test_invalid () {
+    name="$1"
+    shift
+    if [ $# = 2 ] ; then
+	msg="$1"
+	flags=""
+	shift
+    else
+	msg=""
+	flags="--no-data"
+    fi
+    sign="$1"
+
+    # echo $msg : ../tools/spki-check-signature $flags "`conv "$sign"`" 
+    if echo "$msg" | ../tools/spki-check-signature $flags "`conv "$sign"`"
+    then die "$name"
+    fi
+}
+
+test_valid "valid rsa" '
+(signature (hash sha1
+                 |8dLS+STphqyG/fezbJS83zK+7BU=|)
+           (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT2rVFtkPFIu
+                                           Daxy8FShFh2LLQhSpONFObSR30MXm
+                                           KFLgi8vn7RQyqn85bLbqbkRahR|)
+                                       (e |J4NiEw==|)))
+           (rsa-pkcs1-sha1 |AsI2rx8wZmfYRGsUDfzcq3ycWWNThNP3NmU07Y7rONR2
+                            xaHDqfwpm5n+j3kzToBxyWQb+5G7mqXZBPfwlpGJ|))'
+
+test_invalid "rsa, different hash" '
+(signature (hash sha1
+                 |8dLSxSTphqyG/fezbJS83zK+7BU=|)
+           (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT2rVFtkPFIu
+                                           Daxy8FShFh2LLQhSpONFObSR30MXm
+                                           KFLgi8vn7RQyqn85bLbqbkRahR|)
+                                       (e |J4NiEw==|)))
+           (rsa-pkcs1-sha1 |AsI2rx8wZmfYRGsUDfzcq3ycWWNThNP3NmU07Y7rONR2
+                            xaHDqfwpm5n+j3kzToBxyWQb+5G7mqXZBPfwlpGJ|))'
+
+test_invalid "rsa, too long hash" '
+(signature (hash sha1
+                 |8dLS+STphqyG/fezbJS83zK+7BUx|)
+           (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT2rVFtkPFIu
+                                           Daxy8FShFh2LLQhSpONFObSR30MXm
+                                           KFLgi8vn7RQyqn85bLbqbkRahR|)
+                                       (e |J4NiEw==|)))
+           (rsa-pkcs1-sha1 |AsI2rx8wZmfYRGsUDfzcq3ycWWNThNP3NmU07Y7rONR2
+                            xaHDqfwpm5n+j3kzToBxyWQb+5G7mqXZBPfwlpGJ|))'
+
+test_invalid "valid rsa, too short hash" '
+(signature (hash sha1
+                 |8dLS+STphqyG/fezbJS83zK+7A==|)
+           (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT2rVFtkPFIu
+                                           Daxy8FShFh2LLQhSpONFObSR30MXm
+                                           KFLgi8vn7RQyqn85bLbqbkRahR|)
+                                       (e |J4NiEw==|)))
+           (rsa-pkcs1-sha1 |AsI2rx8wZmfYRGsUDfzcq3ycWWNThNP3NmU07Y7rONR2
+                            xaHDqfwpm5n+j3kzToBxyWQb+5G7mqXZBPfwlpGJ|))'
+
+test_valid "valid rsa, with message" "foo" '
+(signature (hash sha1
+                 |8dLS+STphqyG/fezbJS83zK+7BU=|)
+           (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT2rVFtkPFIu
+                                           Daxy8FShFh2LLQhSpONFObSR30MXm
+                                           KFLgi8vn7RQyqn85bLbqbkRahR|)
+                                       (e |J4NiEw==|)))
+           (rsa-pkcs1-sha1 |AsI2rx8wZmfYRGsUDfzcq3ycWWNThNP3NmU07Y7rONR2
+                            xaHDqfwpm5n+j3kzToBxyWQb+5G7mqXZBPfwlpGJ|))'
+
+test_invalid "rsa, with invalid message" "bar" '
+(signature (hash sha1
+                 |8dLS+STphqyG/fezbJS83zK+7BU=|)
+           (public-key (rsa-pkcs1-sha1 (n |CijcTD4ZSRQtpqa9nLT2rVFtkPFIu
+                                           Daxy8FShFh2LLQhSpONFObSR30MXm
+                                           KFLgi8vn7RQyqn85bLbqbkRahR|)
+                                       (e |J4NiEw==|)))
+           (rsa-pkcs1-sha1 |AsI2rx8wZmfYRGsUDfzcq3ycWWNThNP3NmU07Y7rONR2
+                            xaHDqfwpm5n+j3kzToBxyWQb+5G7mqXZBPfwlpGJ|))'
+
+test_valid "valid dsa" '
+   (signature
+    (hash sha1 |UNGhcpNFWg5UhtoV2yxV6wPMJPA=|)
+    (public-key
+     (dsa-sha1
+      (p
+       |AMxZt4PXzxBFGaF5r+cGpXQzNXCHjjk1awgnr4LCzXYbC97QVXi/Xes
+       1k28t0YcDlon56Yut0lTz39fziBpHbGBfc1LvOgW1P5MIa1W8eM3UXi4
+       dzWjWtjCn/QM2s33qyELDsCmgAeKg3sVygjKavNgZiSxf44R7RcIEnZB
+       xkcN/|)
+      (g
+       |fbT/lMbMgBWb81X2kRyklLLO/TamsDbLCyp2esdrf/3771RKgsI1RZT
+       WMxIpR51D6maNNpEywxhy4L8isXFXplysrAMCfDjpaUCowhQNSDRT8Yz
+       ygxZHJpZIU8it+QtLc4fIxA/qSqFL4N3fTIe7xApQlmmG9bI2lgBlZbi
+       1/OU=|)
+      (q |AP9n7Cy++blLMxOaB0ML3Z3Cc+qh|)
+      (y
+       |ALpgrX32c8zRlqBSBMtvJzYwrXXpCj3oqeevPna/9zND2LX7wVZd1c9
+       K6ZxmQCqxDqGl/anDVToNAnlzr2btlS32cymsxpEm8bIlAJ6Jk4clT3N
+       rxuTDRft/W+rgvndiK8fEmtNZ2iaYgAKoM2M3zbij6Ts1H0FfjODHZrt
+       ULyNB|)))
+    (dsa-sha1
+     (r |APyNegTrlzLMCCcMRWoMlnKAOHIu|)
+     (s |AIPV/423068nuoNmoQQupyW3x+S1|)))'
+
+test_invalid "dsa, different hash" '
+   (signature
+    (hash sha1 |UNGhcpNFWg5UhtoV3yxV6wPMJPA=|)
+    (public-key
+     (dsa-sha1
+      (p
+       |AMxZt4PXzxBFGaF5r+cGpXQzNXCHjjk1awgnr4LCzXYbC97QVXi/Xes
+       1k28t0YcDlon56Yut0lTz39fziBpHbGBfc1LvOgW1P5MIa1W8eM3UXi4
+       dzWjWtjCn/QM2s33qyELDsCmgAeKg3sVygjKavNgZiSxf44R7RcIEnZB
+       xkcN/|)
+      (g
+       |fbT/lMbMgBWb81X2kRyklLLO/TamsDbLCyp2esdrf/3771RKgsI1RZT
+       WMxIpR51D6maNNpEywxhy4L8isXFXplysrAMCfDjpaUCowhQNSDRT8Yz
+       ygxZHJpZIU8it+QtLc4fIxA/qSqFL4N3fTIe7xApQlmmG9bI2lgBlZbi
+       1/OU=|)
+      (q |AP9n7Cy++blLMxOaB0ML3Z3Cc+qh|)
+      (y
+       |ALpgrX32c8zRlqBSBMtvJzYwrXXpCj3oqeevPna/9zND2LX7wVZd1c9
+       K6ZxmQCqxDqGl/anDVToNAnlzr2btlS32cymsxpEm8bIlAJ6Jk4clT3N
+       rxuTDRft/W+rgvndiK8fEmtNZ2iaYgAKoM2M3zbij6Ts1H0FfjODHZrt
+       ULyNB|)))
+    (dsa-sha1
+     (r |APyNegTrlzLMCCcMRWoMlnKAOHIu|)
+     (s |AIPV/423068nuoNmoQQupyW3x+S1|)))'
+
+test_invalid "dsa, too long hash" '
+   (signature
+    (hash sha1 |UNGhcpNFWg5UhtoV2yxV6wPMJPAB|)
+    (public-key
+     (dsa-sha1
+      (p
+       |AMxZt4PXzxBFGaF5r+cGpXQzNXCHjjk1awgnr4LCzXYbC97QVXi/Xes
+       1k28t0YcDlon56Yut0lTz39fziBpHbGBfc1LvOgW1P5MIa1W8eM3UXi4
+       dzWjWtjCn/QM2s33qyELDsCmgAeKg3sVygjKavNgZiSxf44R7RcIEnZB
+       xkcN/|)
+      (g
+       |fbT/lMbMgBWb81X2kRyklLLO/TamsDbLCyp2esdrf/3771RKgsI1RZT
+       WMxIpR51D6maNNpEywxhy4L8isXFXplysrAMCfDjpaUCowhQNSDRT8Yz
+       ygxZHJpZIU8it+QtLc4fIxA/qSqFL4N3fTIe7xApQlmmG9bI2lgBlZbi
+       1/OU=|)
+      (q |AP9n7Cy++blLMxOaB0ML3Z3Cc+qh|)
+      (y
+       |ALpgrX32c8zRlqBSBMtvJzYwrXXpCj3oqeevPna/9zND2LX7wVZd1c9
+       K6ZxmQCqxDqGl/anDVToNAnlzr2btlS32cymsxpEm8bIlAJ6Jk4clT3N
+       rxuTDRft/W+rgvndiK8fEmtNZ2iaYgAKoM2M3zbij6Ts1H0FfjODHZrt
+       ULyNB|)))
+    (dsa-sha1
+     (r |APyNegTrlzLMCCcMRWoMlnKAOHIu|)
+     (s |AIPV/423068nuoNmoQQupyW3x+S1|)))'
+
+test_invalid "dsa, too short hash" '
+   (signature
+    (hash sha1 |UNGhcpNFWg5UhtoV2yxV6wPMJA==|)
+    (public-key
+     (dsa-sha1
+      (p
+       |AMxZt4PXzxBFGaF5r+cGpXQzNXCHjjk1awgnr4LCzXYbC97QVXi/Xes
+       1k28t0YcDlon56Yut0lTz39fziBpHbGBfc1LvOgW1P5MIa1W8eM3UXi4
+       dzWjWtjCn/QM2s33qyELDsCmgAeKg3sVygjKavNgZiSxf44R7RcIEnZB
+       xkcN/|)
+      (g
+       |fbT/lMbMgBWb81X2kRyklLLO/TamsDbLCyp2esdrf/3771RKgsI1RZT
+       WMxIpR51D6maNNpEywxhy4L8isXFXplysrAMCfDjpaUCowhQNSDRT8Yz
+       ygxZHJpZIU8it+QtLc4fIxA/qSqFL4N3fTIe7xApQlmmG9bI2lgBlZbi
+       1/OU=|)
+      (q |AP9n7Cy++blLMxOaB0ML3Z3Cc+qh|)
+      (y
+       |ALpgrX32c8zRlqBSBMtvJzYwrXXpCj3oqeevPna/9zND2LX7wVZd1c9
+       K6ZxmQCqxDqGl/anDVToNAnlzr2btlS32cymsxpEm8bIlAJ6Jk4clT3N
+       rxuTDRft/W+rgvndiK8fEmtNZ2iaYgAKoM2M3zbij6Ts1H0FfjODHZrt
+       ULyNB|)))
+    (dsa-sha1
+     (r |APyNegTrlzLMCCcMRWoMlnKAOHIu|)
+     (s |AIPV/423068nuoNmoQQupyW3x+S1|)))'

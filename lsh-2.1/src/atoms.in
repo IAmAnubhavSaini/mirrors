@@ -1,0 +1,168 @@
+# Atoms known by this ssh-implementation
+# Lines beginning with # are comments. Empty lines are ignored. The
+# first word on each line is the name of an atom.
+
+# Compression
+none
+zlib
+
+# Bulk encryption
+
+3des-cbc         REQUIRED          three-key 3DES in CBC mode
+3des-ctr         RECOMMENDED       Three-key 3DES in SDCTR mode
+blowfish-cbc     RECOMMENDED       Blowfish in CBC mode, 128-bit key
+blowfish-ctr     OPTIONAL          Blowfish in SDCTR mode, 256-bit key
+twofish256-cbc   OPTIONAL          Twofish in CBC mode, with 256-bit key
+twofish-cbc      OPTIONAL          alias for "twofish256-cbc"
+twofish128-cbc   RECOMMENDED       Twofish with 128-bit key
+twofish192-cbc   OPTIONAL          Twofish with 192-bit key
+twofish128-ctr   OPTIONAL          Twofish in SDCTR mode, with 128-bit key
+twofish192-ctr   OPTIONAL          Twofish with 192-bit key
+twofish256-ctr   OPTIONAL          Twofish with 256-bit key
+aes256-cbc       OPTIONAL          AES (Rijndael) in CBC mode, with 256-bit key
+aes192-cbc       OPTIONAL          AES with 192-bit key
+aes128-cbc       RECOMMENDED       AES with 128-bit key
+aes128-ctr       RECOMMENDED       AES (Rijndael) in SDCTR mode, with 128-bit key
+aes192-ctr       RECOMMENDED       AES with 192-bit key
+aes256-ctr       RECOMMENDED       AES with 256-bit key
+serpent256-cbc   OPTIONAL          Serpent in CBC mode, with 256-bit key
+serpent192-cbc   OPTIONAL          Serpent with 192-bit key
+serpent128-cbc   OPTIONAL          Serpent with 128-bit key
+serpent128-ctr   OPTIONAL          Serpent in SDCTR mode, with 128-bit key
+serpent192-ctr   OPTIONAL          Serpent with 192-bit key
+serpent256-ctr   OPTIONAL          Serpent with 256-bit key
+arcfour          OPTIONAL          the ARCFOUR stream cipher
+cast128-cbc      OPTIONAL          CAST-128 in CBC mode
+cast128-ctr      OPTIONAL          CAST-128 in SDCTR mode,
+# none           OPTIONAL          no encryption; NOT RECOMMENDED
+
+# Old lsh aliases
+serpent-cbc@lysator.liu.se      EXPERIMENTAL      Serpent cipher in CBC mode
+
+# MAC algorithms
+
+hmac-sha1         REQUIRED         HMAC-SHA1 (length = 20)
+hmac-sha1-96      RECOMMENDED      first 96 bits of HMAC-SHA1 (length = 12)
+hmac-md5          OPTIONAL         HMAC-MD5 (length = 16)
+hmac-md5-96       OPTIONAL         first 96 bits of HMAC-MD5 (length = 12)
+# none            OPTIONAL         no MAC; NOT RECOMMENDED
+
+# Key exchange methods
+
+diffie-hellman-group1-sha1       REQUIRED
+diffie-hellman-group14-sha1      (to be REQUIRED?)
+
+# Key and certificate types
+
+ssh-dss              REQUIRED     sign      Simple DSS
+ssh-rsa              RECOMMENDED  sign      Simple RSA
+
+x509v3-sign-rsa      RECOMMENDED  sign    X.509 certificates (RSA key)
+x509v3-sign-dss      RECOMMENDED  sign    X.509 certificates (DSS key)
+spki-sign-rsa        OPTIONAL     sign    SPKI certificates (RSA key)
+spki-sign-dss        OPTIONAL     sign    SPKI certificates (DSS key)
+pgp-sign-rsa         OPTIONAL     sign    OpenPGP certificates (RSA key)
+pgp-sign-dss         OPTIONAL     sign    OpenPGP certificates (DSS key)
+
+# Generic spki, for now used only by the testsuite
+spki
+ 
+# Old variants
+
+# x509v3               RECOMMENDED  sign      X.509 certificates
+# spki                 OPTIONAL     sign      SPKI certificates
+# spki-rsa@lysator.liu.se 
+# pgp                  OPTIONAL     sign      OpenPGP certificates
+
+# Services
+
+ssh-userauth
+ssh-connection
+
+# User authentication
+
+publickey
+password
+hostbased
+keyboard-interactive
+gssapi
+
+# Channel related
+
+session
+pty-req
+x11-req
+x11
+auth-agent-req
+auth-agent
+# auth-ssh1-agent-req
+# auth-ssh1-agent
+env
+shell
+exec
+subsystem
+window-change
+xon-xoff
+signal
+exit-status
+exit-signal
+tcpip-forward
+cancel-tcpip-forward
+forwarded-tcpip
+direct-tcpip
+
+# Standard signals
+ABRT
+ALRM
+FPE
+HUP
+ILL
+INT
+KILL
+PIPE
+QUIT
+SEGV
+TERM
+USR1
+USR2
+
+# For unknown signals
+signal-unknown@lysator.liu.se
+ 
+# Used in spki keys
+private-key
+public-key
+dsa
+p
+q
+g
+y
+x
+
+# spki dsa signatures
+r
+s
+
+# spki rsa keys p, q already defined above
+
+# For use in spki keys
+rsa-pkcs1
+
+# These two should be obsoleted
+rsa-pkcs1-sha1
+rsa-pkcs1-md5
+
+n
+e
+d
+a
+b
+c
+
+# spki password encrypted data
+Xpkcs5v2
+
+# SRP related
+srp-ring1-sha1@lysator.liu.se
+srp-verifier
+ssh-ring1

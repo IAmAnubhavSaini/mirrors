@@ -1,0 +1,120 @@
+LIBSPKI
+
+Libspki is a library and a set of tools for handling Simple Public Key
+Infrastructure certificates and other objects.
+
+
+OVERVIEW
+
+This section gives an overview of the SPKI model of authorization.
+
+
+Owners and ACLSs
+
+The owner of a resource writes Access Control Lists (ACLs) specifying
+who can access the resource. User's are identified by their public
+key. A user will contact the server controlling the resource, and
+provide a certificate chain and some proof of knowledge of a his or
+her private key. The server checks the signatures, and then matches
+the certificate chain, the requested access, and the owners ACL, to
+make an access decision.
+
+
+The root of authorization
+
+The owner can write one ACL for each user that should have access to
+the resource, or a single ACL giving full access to one of her own
+keys. She can then use that key to sign certificates that delegate
+some or all of her rights to other users.
+
+There's no need for a trusted third party, because all valid
+certificate chains will be rooted at a key listed in the owner's ACL.
+
+
+Delegation
+
+Delegation is a central issue in SPKI. Any user that has access rights
+to some resource, via the owner's ACL and a certificate chain, and
+which has the delegation flag set in her certificate, can sign new
+certificates delegating some or all of her rights further. When
+delegating, giving somebody a new certifon a new certificate, one will
+usually provide a complete certificate chain, i.e. the chain that
+gives oneself the right to use and delegate the right, extended with
+the newly signed certificate.
+
+
+LIMITATIONS OF LIBSPKI
+
+Libspki doesn't yet implement all aspects of SPKI. In particular, it
+doesn't yet implement SPKI names, online validity checks, and the
+"range" type in tag expressions.
+
+
+STORAGE
+
+The information that SPKI users and applications need is organized as
+follows. ACL:s are stored anywhere the software controling a resource
+finds it convenient. The rest of the information is stored in a
+directory, for users it would be located in files ad directories under
+~/.spki.
+
+  ~/.spki/keys/foo
+
+     A private key. Should contain the public information in
+     cleartext, and the private information in cleartext or encrypted
+     by a password.
+     
+  ~/.spki/keys/foo.pub
+
+     The corresponding public key. Redundant, but may be useful.
+     
+  ~/.spki/sha1-keys/{xxxx...}  --> ../keys/foo
+
+     A symlink from the public-key hash to the corresponding key file.
+
+  ~/.spki/certificates
+
+     A big file containing all the user's certificate chains. To find
+     a relevant certificate, one has to read the file and filter out
+     interesting certificates, usually by looking at the SPKI tags.
+
+  ~/.spki/log/delegations
+
+     A log file containing information about all the user's own
+     delegations. Not strictly necessary, but it seems desirable to
+     keep a log of created certificates. The log file can be rotated
+     if it gets large.
+
+
+TOOLS
+
+Plain signatures can be created and verified with
+
+  spki-make-signature PRIVATE-KEY-FILE <message
+
+and verified with
+
+  spki-check-signature {SIGNATURE} < data
+
+where `{SIGNATURE}' is the transport encoded spki signature.
+Certificates are created with
+
+  spki-delegate --issuer={ISSUER} --subject={SUBJECT} \
+                --tag={RESOURCE} --chain={CERTIFICATE} \
+	        [--key-file=PRIVATE] [--propagate] \
+		[--no-signature]
+		
+where --subject specifies an spki principal (currently a public key or
+hash), --tag specifies the resource to which access is delegated. If
+--chain is used, a certificate chain is created by adding the
+certificate at the end of the given certificate chain, otherwise, if
+--issuer is given, a certificate chain with a single certificate is
+created. --key-file specifies the private key to use (by default, it
+is looked up in ~/.spki/sha1-keys). --propgate creates a delegation
+that can be delegated further.
+
+FIXME: Change terminology, we could talk of the source of the
+delegation (--issuer or --chain).
+
+
+  

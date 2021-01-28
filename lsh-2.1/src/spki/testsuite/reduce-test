@@ -1,0 +1,45 @@
+#! /bin/sh
+
+# Test case from Oscar Cánovas Reverte
+
+conv () {
+    sexp-conv -s transport
+}
+
+die () {
+    echo "Test failed:" "$@"
+    exit 1
+}
+
+check_sexp () {
+    file="$1"
+    shift
+    sexp-conv -s canonical > test.canonical || die "sexp-conv failed"
+    cmp "$file" test.canonical || die "$@"
+}
+
+conv >test.acl <<EOF
+(acl (entry
+        (subject
+           (public-key foo))
+        (tag
+           (pkpfsys /home/ocanovas
+              (* set
+                 (zip)
+                 (backup))))))
+EOF
+
+conv >test.in <<EOF
+(sequence
+  (public-key foo))
+EOF
+../tools/spki-reduce < test.in > test.out \
+    --acl-file=test.acl || die "Reduction failed."
+
+check_sexp test.out "Reduction differs" <<EOF
+(acl (entry (public-key foo)
+            (tag (pkpfsys /home/ocanovas
+                          (* set
+                             (zip)
+                             (backup))))))
+EOF
